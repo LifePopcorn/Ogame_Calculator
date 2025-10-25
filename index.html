@@ -5,7 +5,7 @@
   <title>OGame Калькулятор</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    :root{ --accent:#3a7bd5; --metal:#c9aa4a; --crystal:#7ad1ff; --deut:#9be78f; --try-color:#1877f2; }
+    :root{ --accent:#3a7bd5; --metal:#c9aa4a; --crystal:#7ad1ff; --deut:#9be78f; --try-color:#1877f2; --bycolor1:#ff6b6b; --bycolor2:#ffd86b; --bycolor3:#6bffd8; }
     *{box-sizing:border-box}
     body{
       margin:0; font-family:Arial,Helvetica,sans-serif; font-size:12px; color:#e6edf3;
@@ -76,6 +76,52 @@
       background-clip: text;
     }
 
+    /* By Netflix decorative badge */
+    .by-netflix {
+      position: fixed;
+      right: 18px;
+      bottom: 14px;
+      z-index: 11000;
+      padding: 6px 10px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(6px);
+      background: rgba(8,10,14,0.28);
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 6px 18px rgba(2,6,10,0.6);
+      pointer-events: none;
+    }
+    .by-netflix .by-text {
+      font-weight: 700;
+      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 22px;
+      letter-spacing: 0.6px;
+      line-height: 1;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      mix-blend-mode: screen;
+      background-size: 200% 200%;
+      background-image: linear-gradient(120deg, var(--bycolor1), var(--bycolor2), var(--bycolor3), var(--bycolor1));
+      animation: byShift 4.5s linear infinite;
+      text-shadow: 0 1px 0 rgba(0,0,0,0.35), 0 6px 22px rgba(0,0,0,0.45);
+    }
+    /* small visual accent (dot) */
+    .by-netflix .by-accent {
+      width:8px; height:8px; border-radius:50%;
+      background: linear-gradient(90deg, var(--bycolor3), var(--bycolor1));
+      box-shadow: 0 2px 8px rgba(0,0,0,0.45), 0 0 6px rgba(255,255,255,0.02) inset;
+      opacity:0.95;
+    }
+
+    @keyframes byShift {
+      0% { background-position: 0% 50%; transform: translateY(0); }
+      50% { background-position: 100% 50%; transform: translateY(-2px); }
+      100% { background-position: 0% 50%; transform: translateY(0); }
+    }
+
     @media (max-width:640px){
       .table-wrapper{ left:12px; top:12px; right:12px; position:relative; transform:none; }
       .header-bar{ flex-wrap:wrap; }
@@ -83,6 +129,8 @@
       .right-controls{ order:1; width:100%; justify-content:flex-end; }
       .global-zoom{ top:auto; bottom:12px; right:12px; }
       .box-row{ flex-direction:column; align-items:flex-start; gap:8px; }
+      .by-netflix { right: 12px; bottom: 8px; padding:5px 8px; }
+      .by-netflix .by-text { font-size:12px; }
     }
   </style>
 </head>
@@ -241,6 +289,12 @@
     <button id="globalZoomIn" title="Приблизить">+</button>
     <button id="globalZoomOut" title="Отдалить">−</button>
     <button id="globalZoomReset" title="Сброс и центр">⤢</button>
+  </div>
+
+  <!-- By Netflix badge -->
+  <div class="by-netflix" aria-hidden="true">
+    <div class="by-accent" aria-hidden="true"></div>
+    <div class="by-text">By Netflix</div>
   </div>
 
   <script>
