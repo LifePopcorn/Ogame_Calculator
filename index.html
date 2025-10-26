@@ -76,6 +76,15 @@
       background-clip: text;
     }
 
+    .tm-gradient {
+      font-weight: 800;
+      background: linear-gradient(90deg, #3ec57a, #41c879, #8ef0b0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: inline-block;
+    }
+
     @media (max-width:640px){
       .table-wrapper{ left:12px; top:12px; right:12px; position:relative; transform:none; }
       .header-bar{ flex-wrap:wrap; }
@@ -110,7 +119,7 @@
     <div class="box-row" id="globalBoxRow">
       <label class="label" id="lblBoxes"><img src="images/metal_box.png" class="icon" alt=""> <span data-i18n="boxesLabel">Коробка с металлом</span></label>
       <input id="boxesCount" class="lvl-input" type="text" inputmode="numeric" placeholder="Кол-во коробок" style="width:110px">
-      <input id="boxValue" class="lvl-input" type="text" inputmode="numeric" placeholder="Металла в 1 коробке" style="width:160px">
+      <input id="boxValue" class="lvl-input" type="text" inputmode="numeric" placeholder="Дневная выработка" style="width:160px">
       <div class="info">
         <span data-i18n="needOpen">Нужно открыть:</span>
         <span id="boxesNeeded" aria-live="polite">0</span>
@@ -287,7 +296,7 @@
       grandAfter:"Остаток после вычета:",
       leftoverLabel:"Остаток ТМ",
       boxesCountPh: "Кол-во коробок",
-      boxValuePh: "Металла в 1 коробке"
+      boxValuePh: "Дневная выработка"
     }, tr: {
       tmLabel:"Karanlık Madde",
       totalTMLabel:"Toplam: ",
@@ -336,14 +345,14 @@
     { id:"battleship", ru:"Линкор", tr:"Komuta Gemisi", metal:45000, crystal:15000, deut:0, img:"linkor.png" },
     { id:"battlecruiser", ru:"Линейный крейсер", tr:"Fırkateyn", metal:30000, crystal:40000, deut:15000, img:"battlecruiser.png" },
     { id:"bomber", ru:"Бомбардировщик", tr:"Bombardıman Gemisi", metal:50000, crystal:25000, deut:15000, img:"bombardirovshik.png" },
-    { id:"destroyer", ru:"Уничт", tr:"Muhrip", metal:60000, crystal:50000, deut:15000, img:"unichtozhitel.png" },
+    { id:"destroyer", ru:"Уничтожитель", tr:"Muhrip", metal:60000, crystal:50000, deut:15000, img:"unichtozhitel.png" },
     { id:"zhnec", ru:"Жнец", tr:"Azrail", metal:85000, crystal:55000, deut:20000, img:"zhnec.png" },
     { id:"pathfinder", ru:"Первопроходец", tr:"Rehber", metal:8000, crystal:15000, deut:8000, img:"pathfinder.png" }
   ];
 
   const BUILDING_NAMES = { ru:["Рудник по добыче металла","Рудник по добыче кристалла","Синтезатор дейтерия","Солнечная электростанция","Термоэлектростанция","Фабрика роботов","Фабрика нанитов","Верфь","Хранилище металла","Хранилище кристалла","Хранилище дейтерия","Исслед-кая лаборатория","Терраформер","Склад альянса","Космический док","Ракетный док"], tr:["Metal Madeni","Kristal Madeni","Deuterium Sentezleyici","Solar Enerji Santrali","Füzyon Santrali","Robot Fabrikası","Nanite Fabrikası","Tersane","Metal Deposu","Kristal Deposu","Deuterium Tankeri","Bilimsel Araştırma Laboratuvarı","Terraformer","İttifak Deposu","Uzay İskelesi","Roket Silosu"] };
 
-  const RESEARCH_NAMES = { ru:["Шпионаж","Компьютерная технология","Оружейная технология","Щитовая технология","Технология брони","Энергетическая технология","Гипер-нная технология","Двигатели горения","Импульсный двигатель","Гипер-нный двигатель","Лазерная технология","Ионная технология","Плазменная технология","Галактическая сеть","Астрофизика","Гравитационные исследования"], tr:["Casusluk Tekniği","Bilgisayar Teknolojisi","Silah Teknolojisi","Koruyucu Kalkan Tekniği","Uzay Gemisi Zırhlandırması","Enerji Tekniği","Hiperuzay Tekniği","Yanmalı Motor","İtki Motoru","Hiperuzay İticisi","Lazer Tekniği","İyon Tekniği","Plazma Tekniği","Galaksiler Arası Araştırma Ağı","Astrofizik","Gravitasyon Araştırması"] };
+  const RESEARCH_NAMES = { ru:["Шпионаж","Компьютерная технология","Оружейная технология","Щитовая технология","Броня космических кораблей","Энергетическая технология","Гипер-нная технология","Реактивный двигатель","Импульсный двигатель","Гипер-нный двигатель","Лазерная технология","Ионная технология","Плазменная технология","Галактическая сеть","Астрофизика","Гравитационные исследования"], tr:["Casusluk Tekniği","Bilgisayar Teknolojisi","Silah Teknolojisi","Koruyucu Kalkan Tekniği","Uzay Gemisi Zırhlandırması","Enerji Tekniği","Hiperuzay Tekniği","Yanmalı Motor","İtki Motoru","Hiperuzay İticisi","Lazer Tekniği","İyon Tekniği","Plazma Tekniği","Galaksiler Arası Araştırma Ağı","Astrofizik","Gravitasyon Araştırması"] };
 
   const KEYS = {
     LANG: 'og_calc_lang_v2',
@@ -356,7 +365,6 @@
     ACTIVE_TAB: 'og_calc_active_tab_v2'
   };
 
-  // state initialization
   const state = {
     lang: (function(){ try { const raw = localStorage.getItem(KEYS.LANG); return raw ? JSON.parse(raw) : 'ru'; } catch(e){ return 'ru'; } })(),
     transform: { scale:1, posX:0, posY:0 },
@@ -364,7 +372,6 @@
     activeTab: (function(){ try { const raw = localStorage.getItem(KEYS.ACTIVE_TAB); return raw ? JSON.parse(raw) : 'buildings'; } catch(e){ return 'buildings'; } })()
   };
 
-  // DOM
   const tbodyB = document.getElementById('tbodyBuildings');
   const tbodyR = document.getElementById('tbodyResearch');
   const tmInput = document.getElementById('tmInput');
@@ -375,7 +382,6 @@
   const boxValueInput = document.getElementById('boxValue');
   const boxesCostTLEl = document.getElementById('boxesCostTL');
 
-  // helper utils
   function formatNumber(n){
     if (n === null || n === undefined || isNaN(n)) return '0';
     const sign = n < 0 ? '-' : '';
@@ -454,7 +460,6 @@
     return span;
   }
 
-  // register formatting for a single input (used instead of global attach for selector-heavy cases)
   function registerInputFormatting(inp){
     if(!inp || inp._thousandsBound) return;
     inp._thousandsBound = true;
@@ -542,13 +547,11 @@
     });
   }
 
-  // attach formatting to multiple selectors (only those that exist)
   function attachLiveThousandsFormatting(selector){
     const nodes = Array.prototype.slice.call(document.querySelectorAll(selector || ''));
     nodes.forEach(registerInputFormatting);
   }
 
-  // build rows: create elements and register formatting for created inputs
   function buildRowsBuildings(){
     tbodyB.innerHTML='';
     const names = BUILDING_NAMES[state.lang] || BUILDING_NAMES.ru;
@@ -593,7 +596,6 @@
 
       tbodyB.appendChild(tr);
 
-      // register formatting for inputs created
       registerInputFormatting(inFrom);
       registerInputFormatting(inTo);
       registerInputFormatting(inPlan);
@@ -726,7 +728,6 @@
     const perLevel = toNumberSafe(perLevelRaw, 0);
     const totalTM = Math.round(perLevel * totalLevels * CONFIG.TM_PER_LEVEL_FACTOR);
 
-    // safe DOM update for tmTotal
     if(tmTotal){
       tmTotal.textContent = '';
       const label = document.createTextNode((LANG[state.lang].totalTMLabel || 'Итого: ') + ' ');
@@ -837,7 +838,86 @@
     if(atab) state.activeTab = atab;
   }
 
-  // render fleet table using shipMap for fast lookup
+  function formatWithDotsRaw(inputStr){
+    if(inputStr === null || inputStr === undefined) return '';
+    const s = String(inputStr);
+    const sign = s[0] === '-' ? '-' : '';
+    const digits = (sign ? s.slice(1) : s).replace(/[^0-9]/g, '');
+    if(digits.length === 0) return sign ? '-' : '';
+    let out = '';
+    for(let i = digits.length; i > 0; i -= 3){
+      const start = Math.max(0, i - 3);
+      out = digits.slice(start, i) + (out ? '.' + out : '');
+    }
+    return sign + out;
+  }
+
+  function attachLiveThousandsFormatting(selector){
+    const inputs = document.querySelectorAll(selector);
+    inputs.forEach(inp => {
+      if(!inp) return;
+      if(inp._thousandsBound) return;
+      inp._thousandsBound = true;
+
+      inp.addEventListener('input', function(){
+        const el = this;
+        const raw = el.value;
+        const selStart = el.selectionStart || 0;
+
+        let left = raw.slice(0, selStart).replace(/[^0-9\-]/g, '');
+        const leftDigitsCount = (left[0] === '-' ? left.slice(1) : left).length;
+
+        const formatted = formatWithDotsRaw(raw);
+        el.value = formatted;
+
+        let digitsSeen = 0;
+        let newPos = 0;
+        for(let i=0;i<formatted.length;i++){
+          if(/\d/.test(formatted[i])) digitsSeen++;
+          newPos++;
+          if(digitsSeen >= leftDigitsCount) break;
+        }
+        try{ el.setSelectionRange(newPos, newPos); }catch(e){}
+      });
+
+      inp.addEventListener('blur', function(){
+        const v = this.value;
+        if (v === '' || v === '-') { this.value = ''; return; }
+        const num = toNumberSafe(v, 0);
+        this.value = num === 0 ? '' : formatNumber(num);
+        this.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+
+      inp.addEventListener('keydown', function(e){
+        const allowed = ['Backspace','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Delete','Tab','Home','End'];
+        if (e.ctrlKey || e.metaKey) return;
+        if(allowed.indexOf(e.key) !== -1) return;
+        if(e.key >= '0' && e.key <= '9') return;
+        if(e.key === '-' || e.key === '.' || e.key === ',') return;
+        e.preventDefault();
+      });
+
+      inp.addEventListener('paste', function(e){
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData)?.getData('text') || '';
+        const cleanedChunk = formatWithDotsRaw(text);
+        const start = this.selectionStart || 0;
+        const end = this.selectionEnd || start;
+        const before = this.value.slice(0, start);
+        const after = this.value.slice(end);
+        const nextRaw = before + cleanedChunk + after;
+        const next = formatWithDotsRaw(nextRaw);
+        this.value = next;
+
+        const caretTargetDigits = (before + cleanedChunk).replace(/[^0-9]/g,'').length;
+        let pos = 0, seen = 0;
+        while (pos < next.length && seen < caretTargetDigits) { if (/\d/.test(next[pos])) seen++; pos++; }
+        try { this.setSelectionRange(pos, pos); } catch {}
+        this.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    });
+  }
+
   let shipMap = {};
   function buildShipMap(){ shipMap = Object.fromEntries(shipList.map(s => [s.id, s])); }
 
@@ -870,7 +950,6 @@
 
       tableBody.appendChild(row);
 
-      // register formatting for qty input
       registerInputFormatting(inQty);
 
       if(!inQty._qtyBound){
@@ -883,7 +962,6 @@
     });
   }
 
-  // compute fleet using shipMap (O(n))
   function computeFleet(){
     const factorC = CONFIG.METAL_EQ_CRYSTAL;
     const factorD = CONFIG.METAL_EQ_DEUT;
@@ -1029,15 +1107,13 @@
 
   function debounce(fn, wait) { let t=null; return function(...a){ clearTimeout(t); t=setTimeout(()=>fn.apply(this,a), wait); }; }
 
-  // transform state
   window.scale = state.transform?.scale || 1;
   window.posX = state.transform?.posX || 0;
   window.posY = state.transform?.posY || 0;
 
-  function applyTransform(){ wrapperEl.style.transform = `translate(${window.posX}px, ${window.posY}px) scale(${window.scale})`; /* save is handled separately */ }
+  function applyTransform(){ wrapperEl.style.transform = `translate(${window.posX}px, ${window.posY}px) scale(${window.scale})`; }
   function saveTransform(){ saveToLS(KEYS.TRANSFORM, { scale: window.scale, posX: window.posX, posY: window.posY }); }
 
-  // zoom math
   function doZoom(delta, centerX = window.innerWidth/2, centerY = window.innerHeight/2){
     const oldScale = window.scale; const factor = Math.pow(1.2, delta); const newScale = Math.max(0.4, Math.min(3.5, window.scale * factor));
     const rect = wrapperEl.getBoundingClientRect(); const cx = centerX - rect.left; const cy = centerY - rect.top;
@@ -1047,7 +1123,6 @@
   }
   function centerWrapperAtCurrentScale(){ const el = wrapperEl; if(!el) return; const unscaledW = el.offsetWidth, unscaledH = el.offsetHeight; const desiredLeft = Math.round((window.innerWidth - unscaledW * window.scale)/2); const desiredTop = Math.round((window.innerHeight - unscaledH * window.scale)/2); window.posX = desiredLeft / window.scale; window.posY = desiredTop / window.scale; applyTransform(); saveTransform(); }
 
-  // improved drag using rAF for transform updates and saving only on pointerup
   (function attachDragFix(){
     const dragHandle = document.getElementById('dragHandle'); const wrapper = document.getElementById('tableWrapper'); if(!dragHandle || !wrapper) return;
     let dragging=false, startX=0, startY=0, startPosX=0, startPosY=0;
@@ -1078,7 +1153,6 @@
       dragging=false;
       try{ dragHandle.releasePointerCapture && dragHandle.releasePointerCapture(ev && ev.pointerId); }catch{}
       dragHandle.style.cursor='grab';
-      // save once after end
       saveTransform();
     }
     document.addEventListener('pointerup', stopDrag);
@@ -1107,7 +1181,6 @@
   }
   document.querySelectorAll('.tab-btn').forEach(btn=> btn.addEventListener('click', ()=> setActiveTab(btn.dataset.tab) ));
 
-  // applyLang: rebuild rows and re-render, but do not call restoreAll inside to avoid overwriting transient inputs
   function applyLang(lang){
     if(!lang || (lang!=='ru' && lang!=='tr')) return;
     state.lang = lang; saveToLS(KEYS.LANG, lang);
@@ -1120,7 +1193,6 @@
     document.querySelectorAll('[data-key]').forEach(el=>{
       const key = el.dataset.key; const label = el.querySelector('.data-key-label'); if(label && dict[key] !== undefined) label.textContent = dict[key];
     });
-    document.getElementById('tmLabel') && (document.getElementById('tmLabel').textContent = dict.tmLabel || document.getElementById('tmLabel').textContent);
     if (boxesCountInput) boxesCountInput.placeholder = dict.boxesCountPh || boxesCountInput.placeholder;
     if (boxValueInput) boxValueInput.placeholder = dict.boxValuePh || boxValueInput.placeholder;
     document.getElementById('langRU').classList.toggle('active', lang==='ru');
@@ -1136,8 +1208,9 @@
 
   document.addEventListener('DOMContentLoaded', ()=>{
     const zin = document.getElementById('globalZoomIn'), zout = document.getElementById('globalZoomOut'), zreset = document.getElementById('globalZoomReset');
-    zin && zin.addEventListener('click', ()=> doZoom(1, window.innerWidth/2, window.innerHeight/2));
-    zout && zout.addEventListener('click', ()=> doZoom(-1, window.innerWidth/2, window.innerHeight/2));
+    // уменьшенный шаг масштабирования: 0.25 (мягкий)
+    zin && zin.addEventListener('click', ()=> doZoom(0.25, window.innerWidth/2, window.innerHeight/2));
+    zout && zout.addEventListener('click', ()=> doZoom(-0.25, window.innerWidth/2, window.innerHeight/2));
     zreset && zreset.addEventListener('click', ()=> {
       window.scale = 1; window.posX = 0; window.posY = 0; applyTransform();
       centerWrapperAtCurrentScale();
@@ -1152,16 +1225,12 @@
     attachLiveThousandsFormatting('#boxesCount, #boxValue, #planetMetal, #planetCrystal, #planetDeut');
     attachInputsHandlers();
     renderTable();
-    restoreAll(); // restore after rendering base DOM
-    // applyLang should rebuild rows and not overwrite user inputs restored above; call applyLang to localize labels only
+    restoreAll();
     const curLang = state.lang || 'ru';
-    // apply textual localization and re-render labels (does not call restoreAll)
     applyLang(curLang);
-    // now re-apply restored values into new inputs (restoreAll called earlier)
     const tr = loadFromLS(KEYS.TRANSFORM, null);
     if(tr && typeof tr.scale === 'number'){ window.scale = tr.scale; window.posX = tr.posX || 0; window.posY = tr.posY || 0; applyTransform(); }
     setActiveTab(state.activeTab || 'buildings');
-    // ensure qty inputs have formatting and listeners
     attachLiveThousandsFormatting('input[data-id]');
     document.querySelectorAll('input[data-id]').forEach(inp=>{
       if(!inp._qtyBound){
