@@ -79,6 +79,71 @@
       background-clip: text;
     }
 
+    /* Обновлённый watermark — плавный перелив + "парение" */
+    #site-watermark {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 100001;
+      font-size: 25px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      pointer-events: none;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+      color: transparent;
+      background: linear-gradient(90deg, #ff6a00 0%, #ffcc00 33%, #00d4ff 66%, #9b59ff 100%);
+      background-size: 300% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 6px 18px rgba(0,0,0,0.45);
+      padding: 6px 8px;
+      border-radius: 8px;
+      backdrop-filter: blur(6px);
+      background-color: rgba(0,0,0,0.12);
+      transform-origin: center;
+      animation: watermarkFloat 6s ease-in-out infinite alternate,
+                 watermarkGradient 6s linear infinite;
+      will-change: transform, filter;
+      transition: transform 200ms ease;
+    }
+
+    /* вертикальное парение */
+    @keyframes watermarkFloat {
+      0%   { transform: translateY(0) scale(1); filter: drop-shadow(0 6px 12px rgba(0,0,0,0.45)); }
+      50%  { transform: translateY(-8px) scale(1.01); filter: drop-shadow(0 10px 20px rgba(0,0,0,0.42)); }
+      100% { transform: translateY(-4px) scale(1.005); filter: drop-shadow(0 8px 16px rgba(0,0,0,0.43)); }
+    }
+
+    /* смещение цвета градиента — создаёт ощущение перелива */
+    @keyframes watermarkGradient {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* улучшение на мобильных — чуть меньше размеров и амплитуды */
+    @media (max-width: 640px) {
+      #site-watermark {
+        right: 8px;
+        bottom: 8px;
+        padding: 4px 6px;
+        font-size: 12px;
+        border-radius: 6px;
+        animation: watermarkFloat 5s ease-in-out infinite alternate,
+                   watermarkGradient 6s linear infinite;
+      }
+      @keyframes watermarkFloat {
+        0%   { transform: translateY(0) scale(1); }
+        50%  { transform: translateY(-4px) scale(1.005); }
+        100% { transform: translateY(-2px) scale(1.002); }
+      }
+    }
+
+    /* hover-эффект (опционально) */
+    #site-watermark:hover { transform: translateY(-12px) scale(1.03); animation-play-state: paused; }
+
     @media (max-width:640px){
       .table-wrapper{ left:12px; top:12px; right:12px; position:relative; transform:none; }
       .header-bar{ flex-wrap:wrap; }
@@ -148,7 +213,8 @@
               <td id="sumPointsB" aria-live="polite">0</td>
             </tr>
             <tr>
-              <td colspan="4" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td><td colspan="4" id="sumTotalMetalB" aria-live="polite">0</td>
+              <td colspan="4" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td>
+              <td colspan="4" id="sumTotalMetalB" aria-live="polite">0</td>
             </tr>
           </tfoot>
         </table>
@@ -186,7 +252,8 @@
               <td id="sumPointsR" aria-live="polite">0</td>
             </tr>
             <tr>
-              <td colspan="3" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td><td colspan="4" id="sumTotalMetalR" aria-live="polite">0</td>
+              <td colspan="3" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td>
+              <td colspan="4" id="sumTotalMetalR" aria-live="polite">0</td>
             </tr>
           </tfoot>
         </table>
@@ -239,6 +306,8 @@
 
   </div>
 
+  <div id="site-watermark" aria-hidden="true">By Netflix</div>
+
   <div class="global-zoom" id="globalZoom" aria-hidden="false">
     <button id="globalZoomIn" title="Приблизить">+</button>
     <button id="globalZoomOut" title="Отдалить">−</button>
@@ -246,12 +315,11 @@
   </div>
 
   <script>
-/* Этот файл — версия с гарантированной локализацией всех видимых строк,
+/* Этот файл — версия с вариантной локализацией всех видимых строк,
    включая блоки ввоза вкладки "Флот".
    Важно: при инициализации вызывается applyLang(state.lang) чтобы были переведены
    динамические и статические метки.
 */
-
 (function(){
   const CONFIG = {
     TM_PER_BOX: 42000,
@@ -349,9 +417,9 @@
     { id:"pathfinder", ru:"Первопроходец", tr:"Rehber", metal:8000, crystal:15000, deut:8000, img:"pathfinder.png" }
   ];
 
-  const BUILDING_NAMES = { ru:["Рудник по добыче металла","Рудник по добыче кристалла","Синтезатор дейтерия","Солнечная электростанция","Термоядерная электростанция","Фабрика роботов","Фабрика нанитов","Верфь","Хранилище металла","Хранилище кристалла","Хранилище дейтерия","Иссл-ская лаборатория","Терраформер","Склад альянса","Космический док","Ракетный док"], tr:["Metal Madeni","Kristal Madeni","Deuterium Sentezleyici","Solar Enerji Santrali","Füzyon Santrali","Robot Fabrikası","Nanite Fabrikası","Tersane","Metal Deposu","Kristal Deposu","Deuterium Tankeri","Bilimsel Araştırma Laboratuvarı","Terraformer","İttifak Deposu","Uzay İskelesi","Roket Silosu"] };
+  const BUILDING_NAMES = { ru:["Рудник по добыче металла","Рудник по добыче кристалла","Синтезатор дейтерия","Солнечная электростанция","Термоядерная электростанция","Фабрика роботов","Фабрика нанитов","Верфь","Хранилище металла","Хранилище кристалла","Хранилище дейтерия","Иссл-ская лаборатория","Терраформер","Склад альянса","Космическая док","Ракетный док"], tr:["Metal Madeni","Kristal Madeni","Deuterium Sentezleyici","Solar Enerji Santrali","Füzyon Santrali","Robot Fabrikası","Nanite Fabrikası","Tersane","Metal Deposu","Kristal Deposu","Deuterium Tankeri","Bilimsel Araştırma Laboratuvarı","Terraformer","İttifak Deposu","Uzay İskelesi","Roket Silosu"] };
 
-  const RESEARCH_NAMES = { ru:["Шпионаж","Компьютерная технология","Оружейная технология","Щитовая технология","Технология брони","Энергетическая технология","Гипер-ная технология","Реактивный двигатель","Импульсный двигатель","Гиперпространственный двигатель","Лазерная технология","Ионная технология","Плазменная технология","Галактическая сеть","Астрофизика","Гравитационная технология"], tr:["Casusluk Tekniği","Bilgisayar Teknolojisi","Silah Teknolojisi","Koruyucu Kalkan Tekniği","Uzay Gemisi Zırhlandırması","Enerji Tekniği","Hiperuzay Tekniği","Yanmalı Motor","İtki Motoru","Hiperuzay İticisi","Lazer Tekniği","İyon Tekniği","Plazma Tekniği","Galaksiler Arası Araştırma Ağı","Astrofizik","Gravitasyon Araştırması"] };
+  const RESEARCH_NAMES = { ru:["Шпионаж","Компьютерная технология","Оружейная технология","Щитовая технология","Технология брони","Энергетическая технология","Гипер-ная технология","Реактивный двигатель","Импульсный двигатель","Гиперпрыжок","Лазерная технология","Ионная технология","Плазменная технология","Галактическая сеть","Астрофизика","Гравитационная технология"], tr:["Casusluk Tekniği","Bilgisayar Teknolojisi","Silah Teknolojisi","Koruyucu Kalkan Tekniği","Uzay Gemisi Zırhlandırması","Enerji Tekniği","Hiperuzay Tekniği","Yanmalı Motor","İtki Motoru","Hiperuzay İticisi","Lazer Tekniği","İyon Tekniği","Plazma Tekniği","Galaksiler Arası Ağ","Astrofizik","Gravitasyon Araştırması"] };
 
   const KEYS = {
     LANG: 'og_calc_lang_v2',
