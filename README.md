@@ -1,1 +1,1 @@
-# Ogame_Calculator
+Calculator
