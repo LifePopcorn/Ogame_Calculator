@@ -5,63 +5,180 @@
   <title>OGame Калькулятор</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    :root{ --accent:#3a7bd5; --metal:#c9aa4a; --crystal:#7ad1ff; --deut:#9be78f; --try-color:#1877f2; }
+    :root{
+      --accent:#3a7bd5;
+      --metal:#c9aa4a;        /* цвет металла в таблице */
+      --crystal:#7ad1ff;
+      --deut:#9be78f;
+      --try-color:#1877f2;
+    }
     *{box-sizing:border-box}
     body{
       margin:0; font-family:Arial,Helvetica,sans-serif; font-size:12px; color:#e6edf3;
-      background:url("images/wallpaper.jpg") center/cover no-repeat fixed; -webkit-font-smoothing:antialiased;
+      background-image:
+        url("./image/wallpaper.jpg"),
+        url("./images/wallpaper.jpg"),
+        linear-gradient(180deg,#071021,#0b1220);
+      background-size: cover, cover, auto;
+      background-position: center center, center center, center;
+      background-repeat: no-repeat, no-repeat, no-repeat;
+      background-attachment: fixed;
+      -webkit-font-smoothing:antialiased;
     }
     .theme-dark { --accent:#3a7bd5; color:#e6edf3; }
 
-    .table-wrapper{ position:absolute; left:50px; top:50px; padding:8px; max-width:calc(100vw - 80px); transform-origin:center top; user-select:none; touch-action:none; }
-    .header-bar{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
-    .drag-handle{ padding:6px 8px; border-radius:6px; border:1px solid var(--accent); background:rgba(58,123,213,0.12); cursor:grab; color:#cfe0ff; user-select:none; }
-    .tab-switch{ display:flex; gap:6px; align-items:center; }
-    .tab-btn{ padding:6px 10px; background:#444; color:#fff; border-radius:6px; border:1px solid #999; cursor:pointer; }
-    .tab-btn.active{ background:var(--accent); }
-    .right-controls{ display:flex; gap:8px; align-items:center; }
+    /* Основной блок (таблица) */
+    .table-wrapper{
+      position:absolute; left:180px; top:50px; padding:8px;
+      max-width:calc(100vw - 220px);
+      transform-origin:center top; user-select:none; touch-action:none; z-index:1000; background: transparent;
+    }
 
+    .top-controls {
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:8px;
+      margin-bottom:6px;
+      width:100%;
+    }
+    .top-controls-left { display:flex; align-items:center; gap:8px; flex: 1 1 auto; }
+    .top-controls-right { display:flex; align-items:center; gap:8px; }
+
+    .drag-handle{
+      padding:6px 8px; border-radius:6px; border:1px solid var(--accent);
+      background:rgba(58,123,213,0.12); cursor:grab; color:#cfe0ff; user-select:none;
+    }
     .lang-switch{ display:flex; gap:6px; align-items:center; }
     .lang-btn{ padding:6px 8px; background:#444; color:#fff; border-radius:6px; border:1px solid #999; cursor:pointer; }
     .lang-btn.active{ background:var(--accent); }
 
-    .box-row{ display:flex; gap:12px; align-items:center; padding:6px; border-radius:8px; background:rgba(24,28,36,0.92); margin:0; border:1px solid rgba(255,255,255,0.05); }
+    .header-bar{ display:flex; align-items:flex-start; gap:8px; width:100%; }
+    .header-left{ display:flex; align-items:flex-start; gap:8px; flex:1 1 auto; }
+
+    /* Верхний блок */
+    .box-row{
+      display:flex; gap:8px; align-items:center; padding:10px 12px; margin:0;
+      background:linear-gradient(180deg, rgba(20,24,32,0.97), rgba(10,12,18,0.97));
+      border:2px solid #253041; border-bottom:none;
+      border-top-left-radius:10px; border-top-right-radius:10px;
+      color:#e6edf3; flex-wrap:wrap; font-size:12px; width:100%;
+    }
     .box-row .label{ display:flex; gap:8px; align-items:center; font-weight:700; color:#dfeefe; }
-    .box-row .info{ color:#cfe0ff; font-weight:600; margin-left:8px; display:flex; gap:10px; align-items:center; }
+    .box-row .info{ color:#cfe0ff; font-weight:600; display:flex; flex-direction:column; gap:4px; align-items:flex-start; white-space:nowrap; }
+    .box-row .need-open, .box-row .leftover{ display:flex; gap:4px; align-items:center; white-space:nowrap; }
 
-    .table-frame{ margin-top:0; padding:8px; border-radius:10px; background:linear-gradient(180deg, rgba(20,24,32,0.97), rgba(10,12,18,0.97)); border:2px solid #253041; outline:1px solid rgba(255,255,255,0.05); box-shadow: 0 8px 20px rgba(0,0,0,0.55), inset 0 0 8px rgba(255,255,255,0.04); display:flex; flex-direction:column; }
+    /* Вкладки слева: максимально плотно к рамке (зазор ~0.1px), длиннее для надписей */
+    .tabs-left {
+      position: absolute;
+      left: calc(-140px + 0.1px); /* плотный «прилип» к левой грани */
+      top: 0; /* фактический top задаёт JS */
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 6px 6px;
+      width: 140px; /* длиннее: чтобы все надписи влазили */
+      border-radius: 10px;
+      background: rgba(20,24,32,0.78);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.45), inset 0 1px 2px rgba(255,255,255,0.08);
+      pointer-events: auto;
+    }
+    .tab-switch {
+      display: flex; flex-direction: column; gap: 6px; align-items: stretch; margin: 0;
+    }
 
-    .cost-table{ width:100%; border-collapse:collapse; margin-top:6px; flex:0 0 auto; border:1px solid rgba(255,255,255,0.08); border-radius:8px; overflow:hidden; background:rgba(18,22,30,0.7); }
+    /* Кнопки: компактные, глянец, базовый цвет = как «Переместить таблицу» */
+    .tab-btn{
+      padding: 7px 12px; /* чуть длиннее и выше для читаемости */
+      background: linear-gradient(180deg, rgba(58,123,213,0.16), rgba(58,123,213,0.10));
+      color:#fff; border-radius:8px; border:1px solid var(--accent);
+      cursor:pointer; text-align:left; font-weight:800; font-size:12px; letter-spacing:0.2px;
+      transition: all 0.2s ease;
+      box-shadow:
+        inset 0 1px 1.5px rgba(255,255,255,0.25),
+        inset 0 -1px 1.5px rgba(0,0,0,0.25),
+        0 3px 8px rgba(0,0,0,0.35);
+    }
+    .tab-btn:hover{ filter:brightness(1.12) saturate(1.08); transform:translateY(-0.5px); }
+    .tab-btn:active{ transform:translateY(0.5px); filter:brightness(0.98); }
+
+    /* Активные состояния:
+       Постройки — цвет металла (как в таблице),
+       Исследования — зелёный,
+       Флот — красный. */
+    .tab-btn[data-tab="buildings"].active{
+      background: linear-gradient(180deg, color-mix(in oklab, var(--metal) 88%, #ffffff 12%), var(--metal));
+      border-color: var(--metal);
+      box-shadow:
+        inset 0 1px 2px rgba(255,255,255,0.35),
+        0 4px 10px rgba(0,0,0,0.45);
+    }
+    .tab-btn[data-tab="research"].active{
+      background: linear-gradient(180deg, #4caf50, #2e7d32);
+      border-color:#2e7d32;
+      box-shadow:
+        inset 0 1px 2px rgba(255,255,255,0.35),
+        0 4px 10px rgba(0,128,0,0.35);
+    }
+    .tab-btn[data-tab="fleet"].active{
+      background: linear-gradient(180deg, #e53935, #b71c1c);
+      border-color:#b71c1c;
+      box-shadow:
+        inset 0 1px 2px rgba(255,255,255,0.35),
+        0 4px 10px rgba(183,28,28,0.45);
+    }
+
+    .table-frame{
+      margin-top:0; padding:8px;
+      border-radius:0 0 10px 10px;
+      background:linear-gradient(180deg, rgba(20,24,32,0.97), rgba(10,12,18,0.97));
+      box-shadow:0 8px 20px rgba(0,0,0,0.55), inset 0 0 8px rgba(255,255,255,0.04);
+      display:flex; flex-direction:column;
+      border:2px solid #253041; border-top:none;
+      overflow: visible; width:100%;
+    }
+
+    .cost-table{
+      width:100%; border-collapse:collapse; margin-top:6px;
+      flex:0 0 auto; border-radius:6px; overflow:visible; background:rgba(18,22,30,0.95);
+      table-layout:auto;
+    }
     .cost-table thead th{ background:#2b313b; color:#cfe0ff; white-space:nowrap; border-bottom:1px solid rgba(255,255,255,0.08); }
-    .cost-table th, .cost-table td{ padding:6px 8px; border:1px solid #29323d; font-size:12px; vertical-align:middle; }
+    .cost-table th, .cost-table td{ padding:6px 8px; border:1px solid #29323d; font-size:12px; vertical-align:middle; background:transparent; }
     .cost-table td:first-child, .cost-table th:first-child{ text-align:left; width:220px; padding-left:10px; }
 
-    .lvl-input, .planet-input, input[type="text"]{ padding:3px 6px; border-radius:4px; background:#0f1217; border:1px solid #4a5562; color:#e6edf3; height:22px; font-size:12px; }
+    .lvl-input, .planet-input, input[type="text"]{
+      padding:3px 6px; border-radius:4px; background:#0f1217; border:1px solid #4a5562; color:#e6edf3; height:22px; font-size:12px;
+    }
     .planet-input{ width:80px; } .lvl-input{ width:70px; }
 
     .icon{ width:20px; height:20px; vertical-align:middle; margin-right:6px; }
     .icon-dm{ width:26px; height:26px; margin:0 6px 0 0; display:inline-block; vertical-align:middle; }
 
-    .tm-block{ display:flex; align-items:center; gap:4px; padding:2px; border-radius:8px; background:rgba(24,28,36,0.92); margin:0; max-width:420px; border:1px solid rgba(255,255,255,0.06); }
+    .try-value { color: var(--try-color); font-weight:800; }
+    .tm-left {
+      font-weight:800;
+      background: linear-gradient(90deg, #41c879, #00e0ff, #ff00ff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
 
-    /* серый цвет плейсхолдера в tm-block */
-    .tm-block .lvl-input::placeholder { color: #9aa3ad; opacity: 1; }
-
-    .delivery{ margin-top:8px; padding:8px; border-radius:8px; background:rgba(24,28,36,0.95); border:1px solid rgba(255,255,255,0.06); display:flex; flex-direction:column; gap:8px; align-items:flex-start; }
+    .delivery{ margin-top:8px; padding:8px; border-radius:8px; background:rgba(24,28,36,0.95); border:1px solid rgba(255,255,255,0.06); display:flex; flex-direction:column; gap:8px; }
     .delivery .blk{ display:block; width:100%; }
-    .delivery .blk.inline{ display:flex; gap:8px; align-items:center; }
 
     .tab-content{ display:none; } .tab-content.active{ display:block; }
 
     #shipsTable th, #shipsTable td { padding:4px 6px; font-size:12px; }
-    #shipsTable td:first-child { width:160px; padding-left:8px; }
+    #shipsTable td:first-child { width:auto; padding-left:8px; }
 
     .planet-single-row{ display:flex; gap:12px; align-items:center; margin-top:8px; }
     .planet-field{ display:flex; align-items:center; gap:6px; }
-    .row-deficit{ background:rgba(255,0,0,0.15); }
+    .row-deficit{ background:rgba(255,0,0,0.12); }
     .ship-name{ font-weight:600; color:inherit; font-size:12px; }
 
-    .icon-fallback{ display:inline-block; width:20px; height:20px; line-height:20px; text-align:center; margin-right:6px; opacity:0.9; font-size:13px; vertical-align:middle; }
+    .icon-fallback{ display:inline-block; width:20px; height:20px; line-height:20px; text-align:center; margin-right:6px; opacity:0.9; font-size:13px; vertical-align:middle; background:#2b313b; border-radius:4px; color:#cfe0ff; }
 
     .global-zoom { position: fixed; top:12px; right:12px; z-index:10000; display:flex; gap:8px; background: rgba(10,12,18,0.6); padding:6px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); backdrop-filter: blur(6px); }
     .global-zoom button { padding:8px 10px; border-radius:6px; background:#222; color:#fff; border:1px solid #666; cursor:pointer; font-weight:700; }
@@ -70,104 +187,57 @@
     .val-crystal { color: var(--crystal); font-weight:700; }
     .val-deut { color: var(--deut); font-weight:700; }
 
-    .try-value { color: var(--try-color); font-weight:800; }
-    .tm-left {
-      font-weight: 800;
-      background: linear-gradient(90deg, #41c879, #00e0ff, #ff00ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+    /* Флот — компактная таблица */
+    #fleetFrame { width:auto; max-width:100%; }
+    #shipsTable { table-layout: fixed; border-collapse: collapse; }
+    #shipsTable th:nth-child(1), #shipsTable td:nth-child(1) { width:200px; text-align:left; }
+    #shipsTable th:nth-child(2), #shipsTable td:nth-child(2),
+    #shipsTable th:nth-child(3), #shipsTable td:nth-child(3),
+    #shipsTable th:nth-child(4), #shipsTable td:nth-child(4) { width:90px; text-align:right; }
+    #shipsTable th:nth-child(5), #shipsTable td:nth-child(5) { width:110px; text-align:right; }
+    #shipsTable input[type="text"] { width:100%; box-sizing:border-box; text-align:right; padding-right:4px; }
 
-    /* Обновлённый watermark — плавный перелив + "парение" */
-    #site-watermark {
-      position: fixed;
-      right: 22px;
-      bottom: 22px;
-      z-index: 100001;
-      font-size: 25px;
-      font-weight: 700;
-      letter-spacing: 0.8px;
-      pointer-events: none;
-      user-select: none;
-      -webkit-font-smoothing: antialiased;
-      color: transparent;
-      background: linear-gradient(90deg, #ff6a00 0%, #ffcc00 33%, #00d4ff 66%, #9b59ff 100%);
-      background-size: 300% 100%;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 6px 18px rgba(0,0,0,0.45);
-      padding: 6px 8px;
-      border-radius: 8px;
-      backdrop-filter: blur(6px);
-      background-color: rgba(0,0,0,0.12);
-      transform-origin: center;
-      animation: watermarkFloat 6s ease-in-out infinite alternate,
-                 watermarkGradient 6s linear infinite;
-      will-change: transform, filter;
-      transition: transform 200ms ease;
-    }
-
-    /* вертикальное парение */
-    @keyframes watermarkFloat {
-      0%   { transform: translateY(0) scale(1); filter: drop-shadow(0 6px 12px rgba(0,0,0,0.45)); }
-      50%  { transform: translateY(-8px) scale(1.01); filter: drop-shadow(0 10px 20px rgba(0,0,0,0.42)); }
-      100% { transform: translateY(-4px) scale(1.005); filter: drop-shadow(0 8px 16px rgba(0,0,0,0.43)); }
-    }
-
-    /* смещение цвета градиента — создаёт ощущение перелива */
-    @keyframes watermarkGradient {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* улучшение на мобильных — чуть меньше размеров и амплитуды */
-    @media (max-width: 640px) {
-      #site-watermark {
-        right: 8px;
-        bottom: 8px;
-        padding: 4px 6px;
-        font-size: 12px;
-        border-radius: 6px;
-        animation: watermarkFloat 5s ease-in-out infinite alternate,
-                   watermarkGradient 6s linear infinite;
-      }
-      @keyframes watermarkFloat {
-        0%   { transform: translateY(0) scale(1); }
-        50%  { transform: translateY(-4px) scale(1.005); }
-        100% { transform: translateY(-2px) scale(1.002); }
-      }
-    }
-
-    /* hover-эффект (опционально) */
-    #site-watermark:hover { transform: translateY(-12px) scale(1.03); animation-play-state: paused; }
+    #tabFleet #shipsTable { width:800px; margin:0 auto; }
 
     @media (max-width:640px){
-      .table-wrapper{ left:12px; top:12px; right:12px; position:relative; transform:none; }
+      .table-wrapper{ left:12px; top:12px; right:12px; position:relative; transform:none; max-width:unset; }
+      .top-controls { flex-wrap:wrap; gap:6px; }
       .header-bar{ flex-wrap:wrap; }
-      .tab-switch{ width:100%; justify-content:center; order:2; }
-      .right-controls{ order:1; width:100%; justify-content:flex-end; }
+
+      .tabs-left{
+        position: relative;
+        left: 0; top: 0;
+        margin: 8px 12px; background: transparent; border: none; padding: 0; backdrop-filter: none; box-shadow: none; width:auto;
+      }
+      .tab-switch{ flex-direction: row; justify-content: center; gap: 6px; }
+      .tab-btn{ text-align:center; }
+
       .global-zoom{ top:auto; bottom:12px; right:12px; }
-      .box-row{ flex-direction:column; align-items:flex-start; gap:8px; }
+      .box-row{ flex-direction:column; align-items:flex-start; gap:8px; padding:8px; border-radius:8px; }
+      .box-row .info{ margin-left:0; }
+      .table-frame{ border-radius:8px; }
+      #tabFleet #shipsTable { width:100%; }
     }
   </style>
 </head>
 <body class="theme-dark">
+
   <div class="table-wrapper" id="tableWrapper" role="region" aria-label="OGame калькулятор" tabindex="-1">
 
-    <div class="header-bar">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div class="drag-handle" id="dragHandle" tabindex="0" role="button" aria-label="Переместить таблицу">Переместить таблицу</div>
-        <div class="tab-switch" role="tablist">
-          <button class="tab-btn active" data-tab="buildings" aria-selected="true" data-i18n="tabBuildings">Постройки</button>
-          <button class="tab-btn" data-tab="research" aria-selected="false" data-i18n="tabResearch">Исследования</button>
-          <button class="tab-btn" data-tab="fleet" aria-selected="false" data-i18n="tabFleet">Флот</button>
-        </div>
+    <!-- Вкладки слева, плотно приклеены к таблице (~0.1px) -->
+    <div class="tabs-left" id="tabsLeft">
+      <div class="tab-switch" role="tablist" aria-label="Tabs">
+        <button class="tab-btn active" data-tab="buildings" aria-selected="true" data-i18n="tabBuildings" role="tab" tabindex="0">Постройки</button>
+        <button class="tab-btn" data-tab="research" aria-selected="false" data-i18n="tabResearch" role="tab" tabindex="-1">Исследования</button>
+        <button class="tab-btn" data-tab="fleet" aria-selected="false" data-i18n="tabFleet" role="tab" tabindex="-1">Флот</button>
       </div>
+    </div>
 
-      <div class="right-controls">
+    <div class="top-controls">
+      <div class="top-controls-left">
+        <div class="drag-handle" id="dragHandle" tabindex="0" role="button" aria-label="Переместить таблицу">Переместить таблицу</div>
+      </div>
+      <div class="top-controls-right">
         <div class="lang-switch" role="toolbar" aria-label="Language">
           <button class="lang-btn" id="langRU" aria-pressed="false">RU</button>
           <button class="lang-btn" id="langTR" aria-pressed="false">TR</button>
@@ -175,22 +245,32 @@
       </div>
     </div>
 
-    <div class="box-row" id="globalBoxRow">
-      <label class="label" id="lblBoxes"><img src="images/metal_box.png" class="icon" alt=""> <span data-i18n="boxesLabel">Коробка с металлом</span></label>
-      <input id="boxesCount" class="lvl-input" type="text" inputmode="numeric" placeholder="Кол-во коробок" style="width:110px">
-      <input id="boxValue" class="lvl-input" type="text" inputmode="numeric" placeholder="Металла в 1 коробке" style="width:160px">
-      <div class="info">
-        <span data-i18n="needOpen">Нужно открыть:</span>
-        <span id="boxesNeeded" aria-live="polite">0</span>
-        <span data-i18n="boxes">коробок</span>
-        <div id="boxesCostTL" class="try-value" aria-live="polite">TRY: —</div>
+    <div class="header-bar" id="headerBar">
+      <div class="header-left">
+        <div class="box-row" id="globalBoxRow">
+          <label class="label" id="lblBoxes"><img src="images/metal_box.png" class="icon" alt=""> <span data-i18n="boxesLabel">Коробка с металлом</span></label>
+          <input id="boxesCount" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="boxesCountPh" placeholder="Кол-во коробок" style="width:120px">
+          <input id="boxValue" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="boxValuePh" placeholder="Металла в 1 коробке" style="width:170px">
+          <div class="info" aria-live="polite">
+            <div class="need-open" style="display:flex;gap:4px;align-items:center;">
+              <span data-i18n="needOpen">Нужно открыть:</span>
+              <span id="boxesNeeded">0</span>
+              <span data-i18n="boxes">коробок</span>
+              <div id="boxesCostTL" class="try-value" style="margin-left:6px;">TRY: —</div>
+            </div>
+            <div class="leftover" aria-live="polite" style="display:flex;gap:4px;align-items:center;">
+              <span data-i18n="leftoverLabel">Остаток ТМ:</span>
+              <span id="leftoverTmValue" class="tm-left">—</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <div id="tabBuildings" class="tab-content active" role="tabpanel" aria-hidden="false">
       <div class="table-frame">
         <table class="cost-table" id="buildingsTable" aria-describedby="buildingsDesc">
-          <caption id="buildingsDesc" style="position:absolute;left:-9999px;">Таблица подсчёта ресурсов для построек</caption>
+          <caption id="buildingsDesc" style="position:absolute;left:-9999px;">Таблица подсчета ресурсов для построек</caption>
           <thead>
             <tr>
               <th data-key="building"><span class="data-key-label" data-i18n="building">Постройка</span></th>
@@ -213,8 +293,7 @@
               <td id="sumPointsB" aria-live="polite">0</td>
             </tr>
             <tr>
-              <td colspan="4" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td>
-              <td colspan="4" id="sumTotalMetalB" aria-live="polite">0</td>
+              <td colspan="4" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td><td colspan="4" id="sumTotalMetalB" aria-live="polite">0</td>
             </tr>
           </tfoot>
         </table>
@@ -223,14 +302,14 @@
 
     <div id="tabResearch" class="tab-content" role="tabpanel" aria-hidden="true">
       <div class="table-frame">
-        <div class="tm-block" id="tmBlock">
+        <div class="tm-block" id="tmBlock" style="display:flex;align-items:center;gap:6px;padding:0;background:transparent;border:none;">
           <img src="images/dm.png" class="icon-dm" alt="DM">
           <input id="tmInput" type="number" class="lvl-input" placeholder="72810" min="0" step="1">
           <span id="tmTotal" aria-live="polite">Итого: 0</span>
         </div>
 
         <table class="cost-table" id="researchTable" aria-describedby="researchDesc">
-          <caption id="researchDesc" style="position:absolute;left:-9999px;">Таблица подсчёта ресурсов для исследований</caption>
+          <caption id="researchDesc" style="position:absolute;left:-9999px;">Таблица подсчета ресурсов для исследований</caption>
           <thead>
             <tr>
               <th data-key="research"><span class="data-key-label" data-i18n="research">Исследование</span></th>
@@ -252,8 +331,7 @@
               <td id="sumPointsR" aria-live="polite">0</td>
             </tr>
             <tr>
-              <td colspan="3" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td>
-              <td colspan="4" id="sumTotalMetalR" aria-live="polite">0</td>
+              <td colspan="3" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td><td colspan="4" id="sumTotalMetalR" aria-live="polite">0</td>
             </tr>
           </tfoot>
         </table>
@@ -274,14 +352,16 @@
             </tr>
           </thead>
           <tbody></tbody>
-          <tr><td colspan="5" style="padding:0; border-top:1px solid #29323d;"></td></tr>
+          <tfoot>
+            <tr><td colspan="5" style="padding:0; border-top:1px solid #29323d;"></td></tr>
+          </tfoot>
         </table>
 
         <div class="planet-single-row" style="margin-top:10px;">
           <div id="planetLabel" style="display:flex;align-items:center;gap:8px;"><img src="images/planet.png" class="icon" alt=""> <span data-i18n="planetResources">Ресурсы на планете</span></div>
-          <div class="planet-field"><img src="images/metal.png" class="icon" alt="Металл"><input id="planetMetal" class="lvl-input" type="text" inputmode="numeric" placeholder="Металл" style="width:120px"></div>
-          <div class="planet-field"><img src="images/crystal.png" class="icon" alt="Кристалл"><input id="planetCrystal" class="lvl-input" type="text" inputmode="numeric" placeholder="Кристалл" style="width:120px"></div>
-          <div class="planet-field"><img src="images/deuterium.png" class="icon" alt="Дейтерий"><input id="planetDeut" class="lvl-input" type="text" inputmode="numeric" placeholder="Дейтерий" style="width:120px"></div>
+          <div class="planet-field"><img src="images/metal.png" class="icon" alt=""><input id="planetMetal" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="planetMetalPh" placeholder="Металл" style="width:120px"></div>
+          <div class="planet-field"><img src="images/crystal.png" class="icon" alt=""><input id="planetCrystal" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="planetCrystalPh" placeholder="Кристалл" style="width:120px"></div>
+          <div class="planet-field"><img src="images/deuterium.png" class="icon" alt=""><input id="planetDeut" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="planetDeutPh" placeholder="Дейтерий" style="width:120px"></div>
         </div>
 
         <div class="delivery" aria-live="polite" id="fleetDelivery" style="display:none;">
@@ -306,8 +386,6 @@
 
   </div>
 
-  <div id="site-watermark" aria-hidden="true">By Netflix</div>
-
   <div class="global-zoom" id="globalZoom" aria-hidden="false">
     <button id="globalZoomIn" title="Приблизить">+</button>
     <button id="globalZoomOut" title="Отдалить">−</button>
@@ -315,12 +393,10 @@
   </div>
 
   <script>
-/* Этот файл — версия с вариантной локализацией всех видимых строк,
-   включая блоки ввоза вкладки "Флот".
-   Важно: при инициализации вызывается applyLang(state.lang) чтобы были переведены
-   динамические и статические метки.
-*/
+/* Полный скрипт: вкладки плотно к таблице, ширина/позиция, активные цвета, расчёты и локализация */
 (function(){
+  'use strict';
+
   const CONFIG = {
     TM_PER_BOX: 42000,
     TM_PACKS: [{ tm:12500000, priceTRY:900 }],
@@ -338,8 +414,6 @@
       tabResearch:"Исследования",
       tabFleet:"Флот",
       locale:"ru-RU",
-      unitMT:"МТ",
-      unitBT:"БТ",
       boxesLabel:"Коробка с металлом",
       needOpen:"Нужно открыть:",
       boxes:"коробок",
@@ -362,7 +436,10 @@
       grandAfter:"Остаток после вычета:",
       leftoverLabel:"Остаток ТМ",
       boxesCountPh: "Кол-во коробок",
-      boxValuePh: "Металла в 1 коробке"
+      boxValuePh: "Металла в 1 коробке",
+      planetMetalPh: "Металл",
+      planetCrystalPh: "Кристалл",
+      planetDeutPh: "Дейтерий"
     },
     tr: {
       tmLabel:"Karanlık Madde",
@@ -371,8 +448,6 @@
       tabResearch:"Araştırmalar",
       tabFleet:"Filo",
       locale:"tr-TR",
-      unitMT:"Metal",
-      unitBT:"BT",
       boxesLabel:"Metal Paketi",
       needOpen:"Açılmalı:",
       boxes:"kutu",
@@ -395,12 +470,14 @@
       grandAfter:"Kısıtlamadan sonra kalan:",
       leftoverLabel:"Kalan KM",
       boxesCountPh: "Kutu sayısı",
-      boxValuePh: "Metalin bir günlük üretimi"
+      boxValuePh: "Metalin bir günlük üretimi",
+      planetMetalPh: "Metal",
+      planetCrystalPh: "Kristal",
+      planetDeutPh: "Deuterium"
     }
   };
 
   const BUILDINGS_DATA = [ { base:{m:60,c:15,d:0}, factor:1.5 }, { base:{m:48,c:24,d:0}, factor:1.6 }, { base:{m:225,c:75,d:0}, factor:1.5 }, { base:{m:75,c:30,d:0}, factor:1.5 }, { base:{m:900,c:360,d:180}, factor:1.8 }, { base:{m:400,c:120,d:200}, factor:2.0 }, { base:{m:1000000,c:500000,d:100000}, factor:2.0 }, { base:{m:400,c:200,d:100}, factor:2.0 }, { base:{m:2000,c:0,d:0}, factor:2.0 }, { base:{m:2000,c:1000,d:0}, factor:2.0 }, { base:{m:2000,c:2000,d:0}, factor:2.0 }, { base:{m:200,c:400,d:200}, factor:2.0 }, { base:{m:50000,c:100000,d:0}, factor:2.0 }, { base:{m:20000,c:40000,d:0}, factor:2.0 }, { base:{m:200,c:0,d:50}, factor:2.0 }, { base:{m:20000,c:20000,d:0}, factor:2.0 } ];
-
   const RESEARCH_DATA = [ { base:{m:200,c:1000,d:200}, factor:2.0 }, { base:{m:0,c:400,d:600}, factor:2.0 }, { base:{m:800,c:200,d:0}, factor:2.0 }, { base:{m:200,c:600,d:0}, factor:2.0 }, { base:{m:1000,c:0,d:0}, factor:2.0 }, { base:{m:0,c:800,d:400}, factor:2.0 }, { base:{m:0,c:4000,d:2000}, factor:2.0 }, { base:{m:400,c:0,d:600}, factor:2.0 }, { base:{m:2000,c:4000,d:600}, factor:2.0 }, { base:{m:10000,c:20000,d:6000}, factor:2.0 }, { base:{m:200,c:100,d:0}, factor:2.0 }, { base:{m:1000,c:300,d:100}, factor:2.0 }, { base:{m:2000,c:4000,d:1000}, factor:2.0 }, { base:{m:240000,c:400000,d:160000}, factor:2.0 }, { base:{m:4000,c:8000,d:4000}, factor:1.75 }, { base:{m:0,c:0,d:0}, factor:3.0 } ];
 
   const shipList = [
@@ -414,12 +491,13 @@
     { id:"bomber", ru:"Бомбардировщик", tr:"Bombardıman Gemisi", metal:50000, crystal:25000, deut:15000, img:"bombardirovshik.png" },
     { id:"destroyer", ru:"Уничтожитель", tr:"Muhrip", metal:60000, crystal:50000, deut:15000, img:"unichtozhitel.png" },
     { id:"zhnec", ru:"Жнец", tr:"Azrail", metal:85000, crystal:55000, deut:20000, img:"zhnec.png" },
-    { id:"pathfinder", ru:"Первопроходец", tr:"Rehber", metal:8000, crystal:15000, deut:8000, img:"pathfinder.png" }
+    { id:"pathfinder", ru:"Перво-проходец", tr:"Rehber", metal:8000, crystal:15000, deut:8000, img:"pathfinder.png" },
+    { id:"recycler", ru:"Переработчик", tr:"Geri Dönüşümcü", metal:10000, crystal:6000, deut:2000, img:"recycler.png" },
+    { id:"death_star", ru:"Звезда смерти", tr:"Ölüm Yıldızı", metal:5000000, crystal:4000000, deut:1000000, img:"death_star.png" }
   ];
 
-  const BUILDING_NAMES = { ru:["Рудник по добыче металла","Рудник по добыче кристалла","Синтезатор дейтерия","Солнечная электростанция","Термоядерная электростанция","Фабрика роботов","Фабрика нанитов","Верфь","Хранилище металла","Хранилище кристалла","Хранилище дейтерия","Иссл-ская лаборатория","Терраформер","Склад альянса","Космическая док","Ракетный док"], tr:["Metal Madeni","Kristal Madeni","Deuterium Sentezleyici","Solar Enerji Santrali","Füzyon Santrali","Robot Fabrikası","Nanite Fabrikası","Tersane","Metal Deposu","Kristal Deposu","Deuterium Tankeri","Bilimsel Araştırma Laboratuvarı","Terraformer","İttifak Deposu","Uzay İskelesi","Roket Silosu"] };
-
-  const RESEARCH_NAMES = { ru:["Шпионаж","Компьютерная технология","Оружейная технология","Щитовая технология","Технология брони","Энергетическая технология","Гипер-ная технология","Реактивный двигатель","Импульсный двигатель","Гиперпрыжок","Лазерная технология","Ионная технология","Плазменная технология","Галактическая сеть","Астрофизика","Гравитационная технология"], tr:["Casusluk Tekniği","Bilgisayar Teknolojisi","Silah Teknolojisi","Koruyucu Kalkan Tekniği","Uzay Gemisi Zırhlandırması","Enerji Tekniği","Hiperuzay Tekniği","Yanmalı Motor","İtki Motoru","Hiperuzay İticisi","Lazer Tekniği","İyon Tekniği","Plazma Tekniği","Galaksiler Arası Ağ","Astrofizik","Gravitasyon Araştırması"] };
+  const BUILDING_NAMES = { ru:["Рудник по добыче металла","Рудник по добыче кристалла","Синтезатор дейтерия","Солнечная электростанция","Термоядерная электростанция","Фабрика роботов","Фабрика нанитов","Верфь","Хранилище металла","Хранилище кристалла","Хранилище дейтерия","Исслед-кая лаборатория","Терраформер","Склад альянса","Космическая док","Ракетная шахта"], tr:["Metal Madeni","Kristal Madeni","Deuterium Sentezleyici","Solar Enerji Santrali","Füzyon Santrali","Robot Fabrikası","Nanite Fabrikası","Tersane","Metal Deposu","Kristal Deposu","Deuterium Tankeri","Bilimsel Araştırma Laboratuvarı","Terraformer","İttifak Deposu","Uzay İskelesi","Roket Silosu"] };
+  const RESEARCH_NAMES = { ru:["Шпионаж","Компьютерная технология","Оружейная технология","Щитовая технология","Броня космических кораблей","Энергетическая технология","Гипер-нная технология","Реактивный Двигатель","Импульсный Двигатель","Гипер-нный Двигатель","Лазерная технология","Ионная технология","Плазменная технология","М.И.С","Астрофизика","Гравитационная технология"], tr:["Casusluk Tekniği","Bilgisayar Teknolojisi","Silah Teknolojisi","Koruyucu Kalkan Tekniği","Uzay Gemisi Zırhlandırması","Enerji Tekniği","Hiperuzay Tekniği","Yanmalı Motor Takımı","İtki Motoru","Hiperuzay İticisi","Lazer Tekniği","İyon Tekniği","Plazma Tekniği","Galaksiler Arası Araştırma Ağı","Astrofizik","Gravitasyon Araştırması"] };
 
   const KEYS = {
     LANG: 'og_calc_lang_v2',
@@ -432,18 +510,7 @@
     ACTIVE_TAB: 'og_calc_active_tab_v2'
   };
 
-  const state = {
-    lang: localStorage.getItem(KEYS.LANG) || 'ru',
-    transform: { scale:1, posX:0, posY:0 },
-    buildings: [],
-    research: [],
-    ships: {},
-    boxes: { boxesCount:0, boxValue:0 },
-    planets: { m:0, c:0, d:0 },
-    tmPrice: 0,
-    activeTab: localStorage.getItem(KEYS.ACTIVE_TAB) || 'buildings'
-  };
-
+  // cached elements
   const tbodyB = document.getElementById('tbodyBuildings');
   const tbodyR = document.getElementById('tbodyResearch');
   const tmInput = document.getElementById('tmInput');
@@ -453,278 +520,9 @@
   const boxesCountInput = document.getElementById('boxesCount');
   const boxValueInput = document.getElementById('boxValue');
   const boxesCostTLEl = document.getElementById('boxesCostTL');
-
-  function formatNumber(n){
-    if (n === null || n === undefined || isNaN(n)) return '0';
-    const sign = n < 0 ? '-' : '';
-    n = Math.round(Math.abs(Number(n)));
-    const s = String(n);
-    if (s.length <= 3) return sign + s;
-    const parts = [];
-    for (let i = s.length; i > 0; i -= 3) {
-      const start = Math.max(0, i - 3);
-      parts.unshift(s.slice(start, i));
-    }
-    return sign + parts.join('.');
-  }
-
-  function toNumberSafe(v, def = 0){
-    if (v === null || v === undefined) return def;
-    if (typeof v === 'number') return Number.isFinite(v) ? v : def;
-    const s = String(v).trim();
-    if (s === '' || s === '-') return def;
-    const cleaned = s.replace(/[^0-9\-]/g,'');
-    if (cleaned === '' || cleaned === '-') return def;
-    const n = parseInt(cleaned, 10);
-    return Number.isFinite(n) ? n : def;
-  }
-
-  function saveToLS(key, value){ try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){} }
-  function loadFromLS(key, fallback){ try{ const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }catch(e){ return fallback; } }
-
-  function geomSum(base, factor, from, to){
-    const len = Math.max(0, to - from);
-    if(len <= 0) return { m:0,c:0,d:0, points:0, levels:0 };
-    const expoStart = Math.max(0, from);
-    const count = len;
-    const sum = (b) => {
-      if (b === 0 || count === 0) return 0;
-      if (factor === 1) return b * count * Math.pow(factor, expoStart);
-      return b * Math.pow(factor, expoStart) * (Math.pow(factor, count) - 1) / (factor - 1);
-    };
-    const m = Math.round(sum(base.m));
-    const c = Math.round(sum(base.c));
-    const d = Math.round(sum(base.d));
-    const points = Math.round((m + c + d) / 1000);
-    return { m, c, d, points, levels: count };
-  }
-
-  function formatSpanMetal(n){ return `<span class="val-metal">${formatNumber(n)}</span>`; }
-  function formatSpanCrystal(n){ return `<span class="val-crystal">${formatNumber(n)}</span>`; }
-  function formatSpanDeut(n){ return `<span class="val-deut">${formatNumber(n)}</span>`; }
-
-  const ICONS_BUILDINGS = [ "metal_mine.png","crystal_mine.png","deuterium_synth.png","solar_plant.png","fusion_plant.png","robot_factory.png","nanite_factory.png","shipyard.png","metal_storage.png","crystal_storage.png","deuterium_tank.png","research_lab.png","terraformer.png","alliance_depot.png","dock.png","missile_silo.png" ];
-  const ICONS_RESEARCH = [ "spy.png","computer.png","weapons.png","shield.png","armor.png","energy.png","hyperspace.png","combustion.png","impulse.png","hyperdrive.png","laser.png","ion.png","plasma.png","irn.png","astro.png","graviton.png" ];
-
-  function createImageFallback(img){ const span=document.createElement('span'); span.className='icon-fallback'; span.textContent='🔧'; return span; }
-
-  function buildRowsBuildings(){
-    tbodyB.innerHTML='';
-    const names = BUILDING_NAMES[state.lang] || BUILDING_NAMES.ru;
-    names.forEach((name,i)=>{
-      const tr=document.createElement('tr');
-      tr.dataset.index=i;
-      const icon=ICONS_BUILDINGS[i] || '';
-      tr.innerHTML =
-        `<td class="name-cell">${icon?`<img src="images/${icon}" class="icon" alt="">`:''}${name}</td>
-         <td><input type="text" class="lvl-input" data-type="from" data-index="${i}" inputmode="numeric"></td>
-         <td><input type="text" class="lvl-input" data-type="to" data-index="${i}" inputmode="numeric"></td>
-         <td><img src="images/planet.png" class="icon" alt=""><input type="text" class="planet-input" data-type="planets" data-index="${i}" inputmode="numeric" value="1"></td>
-         <td class="m"><span class="val-metal">0</span></td>
-         <td class="c"><span class="val-crystal">0</span></td>
-         <td class="d"><span class="val-deut">0</span></td>
-         <td class="p">0</td>`;
-      const img=tr.querySelector('img.icon');
-      if(img) img.addEventListener('error', () => { if(!img._fallback){ const fb=createImageFallback(img); img.style.display='none'; img.parentNode && img.parentNode.insertBefore(fb,img.nextSibling); img._fallback=true; } });
-      tbodyB.appendChild(tr);
-    });
-  }
-
-  function buildRowsResearch(){
-    tbodyR.innerHTML='';
-    const names = RESEARCH_NAMES[state.lang] || RESEARCH_NAMES.ru;
-    names.forEach((name,i)=>{
-      const tr=document.createElement('tr');
-      tr.dataset.index=i;
-      const icon=ICONS_RESEARCH[i] || '';
-      tr.innerHTML =
-        `<td class="name-cell">${icon?`<img src="images/${icon}" class="icon" alt="">`:''}${name}</td>
-         <td><input type="text" class="lvl-input" data-type="from" data-index="${i}" inputmode="numeric"></td>
-         <td><input type="text" class="lvl-input" data-type="to" data-index="${i}" inputmode="numeric"></td>
-         <td class="m"><span class="val-metal">0</span></td>
-         <td class="c"><span class="val-crystal">0</span></td>
-         <td class="d"><span class="val-deut">0</span></td>
-         <td class="p">0</td>`;
-      const img=tr.querySelector('img.icon');
-      if(img) img.addEventListener('error', () => { if(!img._fallback){ const fb=createImageFallback(img); img.style.display='none'; img.parentNode && img.parentNode.insertBefore(fb,img.nextSibling); img._fallback=true; } });
-      tbodyR.appendChild(tr);
-    });
-  }
-
-  function recalcRowBuildings(tr){
-    const idx = Number(tr.dataset.index);
-    const data = BUILDINGS_DATA[idx];
-    const from = toNumberSafe(tr.querySelector('input[data-type="from"]').value, 0);
-    const toVal = tr.querySelector('input[data-type="to"]').value;
-    let to = toVal === '' ? from : toNumberSafe(toVal, from);
-    to = Math.max(from, to);
-    if (to - from > CONFIG.MAX_LEVEL_SPAN) to = from + CONFIG.MAX_LEVEL_SPAN;
-    const planets = Math.max(1, toNumberSafe(tr.querySelector('input[data-type="planets"]').value, 1));
-    const sum = geomSum(data.base, data.factor, from, to);
-    const m = Math.round(sum.m * planets);
-    const c = Math.round(sum.c * planets);
-    const d = Math.round(sum.d * planets);
-    const p = Math.round(sum.points * planets);
-    const tdM = tr.querySelector('td.m'), tdC = tr.querySelector('td.c'), tdD = tr.querySelector('td.d'), tdP = tr.querySelector('td.p');
-    if(tdM) tdM.innerHTML = formatSpanMetal(m);
-    if(tdC) tdC.innerHTML = formatSpanCrystal(c);
-    if(tdD) tdD.innerHTML = formatSpanDeut(d);
-    if(tdP) tdP.textContent = formatNumber(p);
-    return { m, c, d, p };
-  }
-
-  function recalcRowResearch(tr){
-    const idx = Number(tr.dataset.index);
-    const data = RESEARCH_DATA[idx];
-    const from = toNumberSafe(tr.querySelector('input[data-type="from"]').value, 0);
-    const toVal = tr.querySelector('input[data-type="to"]').value;
-    let to = toVal === '' ? from : toNumberSafe(toVal, from);
-    to = Math.max(from, to);
-    if (to - from > CONFIG.MAX_LEVEL_SPAN) to = from + CONFIG.MAX_LEVEL_SPAN;
-    const sum = geomSum(data.base, data.factor, from, to);
-    const m = sum.m;
-    const c = sum.c;
-    const d = sum.d;
-    const p = sum.points;
-    const tdM = tr.querySelector('td.m'), tdC = tr.querySelector('td.c'), tdD = tr.querySelector('td.d'), tdP = tr.querySelector('td.p');
-    if(tdM) tdM.innerHTML = formatSpanMetal(m);
-    if(tdC) tdC.innerHTML = formatSpanCrystal(c);
-    if(tdD) tdD.innerHTML = formatSpanDeut(d);
-    if(tdP) tdP.textContent = formatNumber(p);
-    return { m, c, d, p, levels: sum.levels };
-  }
-
-  function recalcAllBuildings(){
-    let tm=0, tc=0, td=0, tp=0;
-    tbodyB.querySelectorAll('tr').forEach(tr=>{ const r=recalcRowBuildings(tr); tm+=r.m; tc+=r.c; td+=r.d; tp+=r.p; });
-    document.getElementById('sumMetalB').innerHTML = formatSpanMetal(tm);
-    document.getElementById('sumCrystalB').innerHTML = formatSpanCrystal(tc);
-    document.getElementById('sumDeutB').innerHTML = formatSpanDeut(td);
-    document.getElementById('sumPointsB').textContent = formatNumber(tp);
-    const totalMetal = Math.round(convertToMetal(tm,tc,td));
-    document.getElementById('sumTotalMetalB').textContent = formatNumber(totalMetal);
-    persistInputs('buildings');
-    updateBoxesNeeded();
-  }
-
-  function recalcAllResearch(){
-    let sm=0, sc=0, sd=0, sp=0, totalLevels=0;
-    tbodyR.querySelectorAll('tr').forEach(tr=>{
-      const r = recalcRowResearch(tr);
-      sm += r.m; sc += r.c; sd += r.d; sp += r.p; totalLevels += r.levels || 0;
-    });
-
-    document.getElementById('sumMetalR').innerHTML = formatSpanMetal(sm);
-    document.getElementById('sumCrystalR').innerHTML = formatSpanCrystal(sc);
-    document.getElementById('sumDeutR').innerHTML = formatSpanDeut(sd);
-    document.getElementById('sumPointsR').textContent = formatNumber(sp);
-
-    const totalMetal = Math.round(convertToMetal(sm, sc, sd));
-    document.getElementById('sumTotalMetalR').textContent = formatNumber(totalMetal);
-
-    const perLevelRaw = (state.tmPrice && state.tmPrice > 0) ? state.tmPrice : toNumberSafe(tmInput?.value, 0);
-    const perLevel = toNumberSafe(perLevelRaw, 0);
-    const totalTM = Math.round(perLevel * totalLevels * CONFIG.TM_PER_LEVEL_FACTOR);
-
-    tmTotal.textContent = (LANG[state.lang].totalTMLabel || 'Итого: ') + formatNumber(totalTM);
-
-    if (tmInput) {
-      const v = toNumberSafe(tmInput.value, 0);
-      state.tmPrice = v;
-      saveToLS(KEYS.TM, v);
-    }
-
-    persistInputs('research');
-    updateBoxesNeeded();
-  }
-
-  function convertToMetal(m,c,d){ return m + c * CONFIG.METAL_EQ_CRYSTAL + d * CONFIG.METAL_EQ_DEUT; }
-
-  function persistInputs(kind){
-    if(kind === 'buildings'){
-      const arr = [];
-      tbodyB.querySelectorAll('tr').forEach(tr=>{
-        arr.push({
-          from: toNumberSafe(tr.querySelector('input[data-type="from"]').value, 0),
-          to: toNumberSafe(tr.querySelector('input[data-type="to"]').value, 0),
-          planets: toNumberSafe(tr.querySelector('input[data-type="planets"]').value, 1)
-        });
-      });
-      saveToLS(KEYS.INPUTS_BUILD, arr);
-    } else if(kind === 'research'){
-      const arr = [];
-      tbodyR.querySelectorAll('tr').forEach(tr=>{
-        arr.push({
-          from: toNumberSafe(tr.querySelector('input[data-type="from"]').value, 0),
-          to: toNumberSafe(tr.querySelector('input[data-type="to"]').value, 0)
-        });
-      });
-      saveToLS(KEYS.INPUTS_RESEARCH, arr);
-    }
-  }
-
-  function persistBoxesAndPlanets(){
-    const data = {
-      boxesCount: toNumberSafe(boxesCountInput?.value, 0),
-      boxValue: toNumberSafe(boxValueInput?.value, 0),
-      planetMetal: toNumberSafe(document.getElementById('planetMetal')?.value, 0),
-      planetCrystal: toNumberSafe(document.getElementById('planetCrystal')?.value, 0),
-      planetDeut: toNumberSafe(document.getElementById('planetDeut')?.value, 0)
-    };
-    saveToLS(KEYS.BOXES, data);
-  }
-
-  function saveShipQuantities(){
-    const qtyMap = {};
-    document.querySelectorAll('input[data-id]').forEach(inp=>{
-      qtyMap[inp.dataset.id] = toNumberSafe(inp.value, 0);
-    });
-    saveToLS(KEYS.SHIP_QTY, qtyMap);
-  }
-
-  function restoreAll(){
-    const b = loadFromLS(KEYS.INPUTS_BUILD, null);
-    if(Array.isArray(b)){
-      tbodyB.querySelectorAll('tr').forEach((tr, i)=>{
-        if(!b[i]) return;
-        tr.querySelector('input[data-type="from"]').value = b[i].from ? formatNumber(b[i].from) : '';
-        tr.querySelector('input[data-type="to"]').value = b[i].to ? formatNumber(b[i].to) : '';
-        tr.querySelector('input[data-type="planets"]').value = b[i].planets ? formatNumber(b[i].planets) : '1';
-      });
-    }
-    const r = loadFromLS(KEYS.INPUTS_RESEARCH, null);
-    if(Array.isArray(r)){
-      tbodyR.querySelectorAll('tr').forEach((tr, i)=>{
-        if(!r[i]) return;
-        tr.querySelector('input[data-type="from"]').value = r[i].from ? formatNumber(r[i].from) : '';
-        tr.querySelector('input[data-type="to"]').value = r[i].to ? formatNumber(r[i].to) : '';
-      });
-    }
-
-    const boxes = loadFromLS(KEYS.BOXES, {});
-    if(boxesCountInput && boxes.boxesCount != null) boxesCountInput.value = boxes.boxesCount ? formatNumber(boxes.boxesCount) : '';
-    if(boxValueInput && boxes.boxValue != null) boxValueInput.value = boxes.boxValue ? formatNumber(boxes.boxValue) : '';
-    if(document.getElementById('planetMetal') && boxes.planetMetal != null) document.getElementById('planetMetal').value = boxes.planetMetal ? formatNumber(boxes.planetMetal) : '';
-    if(document.getElementById('planetCrystal') && boxes.planetCrystal != null) document.getElementById('planetCrystal').value = boxes.planetCrystal ? formatNumber(boxes.planetCrystal) : '';
-    if(document.getElementById('planetDeut') && boxes.planetDeut != null) document.getElementById('planetDeut').value = boxes.planetDeut ? formatNumber(boxes.planetDeut) : '';
-
-    const ships = loadFromLS(KEYS.SHIP_QTY, {});
-    document.querySelectorAll('input[data-id]').forEach(inp=>{
-      if(ships[inp.dataset.id] != null) inp.value = ships[inp.dataset.id] ? formatNumber(ships[inp.dataset.id]) : '';
-    });
-
-    const tmSaved = loadFromLS(KEYS.TM, null);
-    if(tmSaved != null && tmInput) tmInput.value = tmSaved ? String(tmSaved) : '';
-
-    const transform = loadFromLS(KEYS.TRANSFORM, null);
-    if(transform && typeof transform.scale === 'number'){ state.transform = transform; window.scale = transform.scale; window.posX = transform.posX; window.posY = transform.posY; }
-
-    const lang = loadFromLS(KEYS.LANG, null);
-    if(lang) state.lang = lang;
-
-    const atab = loadFromLS(KEYS.ACTIVE_TAB, null);
-    if(atab) state.activeTab = atab;
-  }
+  const leftoverTmValueEl = document.getElementById('leftoverTmValue');
+  const tabsLeftEl = document.getElementById('tabsLeft');
+  const headerBarEl = document.getElementById('headerBar');
 
   function formatWithDotsRaw(inputStr){
     if(inputStr === null || inputStr === undefined) return '';
@@ -739,27 +537,193 @@
     }
     return sign + out;
   }
+  function formatNumberWithDots(n){ if (n === null || n === undefined || isNaN(n)) return '0'; return formatWithDotsRaw(Math.round(Number(n) || 0)); }
+  function parseNumberInput(s){
+    if (s === null || s === undefined) return 0;
+    const str = String(s).trim(); if (str === '' || str === '-') return 0;
+    const negative = str[0] === '-';
+    const cleaned = str.replace(/[^0-9]/g, '');
+    const num = cleaned ? Number(cleaned) : 0;
+    if (!Number.isFinite(num)) return 0;
+    const safe = Math.min(num, Number.MAX_SAFE_INTEGER);
+    return negative ? -safe : safe;
+  }
+  function getNumberFormatter(lang){ try{ return new Intl.NumberFormat(LANG[lang]?.locale || 'ru-RU'); }catch(e){ return new Intl.NumberFormat('ru-RU'); } }
+  function formatNumber(n, lang = localStorage.getItem(KEYS.LANG) || 'ru'){
+    if (n === null || n === undefined || isNaN(n)) return '0';
+    const nf = getNumberFormatter(lang); return nf.format(Math.round(Number(n) || 0));
+  }
+
+  function geomSum(base, factor, from, to){
+    const len = Math.max(0, to - from);
+    if(len <= 0) return { m:0,c:0,d:0, points:0, levels:0 };
+    const expoStart = Math.max(0, from);
+    const count = len;
+    const sum = (b) => {
+      if (!b || count === 0) return 0;
+      if (factor === 1) return b * count * Math.pow(factor, expoStart);
+      return b * Math.pow(factor, expoStart) * (Math.pow(factor, count) - 1) / (factor - 1);
+    };
+    const m = Math.round(sum(base.m));
+    const c = Math.round(sum(base.c));
+    const d = Math.round(sum(base.d));
+    const points = Math.round((m + c + d) / 1000);
+    return { m, c, d, points, levels: count };
+  }
+  function formatSpanMetal(n){ return `<span class="val-metal">${formatNumber(n)}</span>`; }
+  function formatSpanCrystal(n){ return `<span class="val-crystal">${formatNumber(n)}</span>`; }
+  function formatSpanDeut(n){ return `<span class="val-deut">${formatNumber(n)}</span>`; }
+  function convertToMetal(m,c,d){ return m + c * CONFIG.METAL_EQ_CRYSTAL + d * CONFIG.METAL_EQ_DEUT; }
+  function debounce(fn, wait) { let t=null; return function(...a){ clearTimeout(t); t=setTimeout(()=>fn.apply(this,a), wait); }; }
+
+  const ICONS_BUILDINGS = [ "metal_mine.png","crystal_mine.png","deuterium_synth.png","solar_plant.png","fusion_plant.png","robot_factory.png","nanite_factory.png","shipyard.png","metal_storage.png","crystal_storage.png","deuterium_tank.png","research_lab.png","terraformer.png","alliance_depot.png","dock.png","missile_silo.png" ];
+  const ICONS_RESEARCH = [ "spy.png","computer.png","weapons.png","shield.png","armor.png","energy.png","hyperspace.png","combustion.png","impulse.png","hyperdrive.png","laser.png","ion.png","plasma.png","irn.png","astro.png","graviton.png" ];
+
+  function createImageFallbackEl(label){
+    const span = document.createElement('span');
+    span.className = 'icon-fallback'; span.setAttribute('aria-hidden','true'); span.textContent = label ? label[0] : '—';
+    return span;
+  }
+
+  function buildRowsBuildings(){
+    if(!tbodyB) return;
+    tbodyB.innerHTML = '';
+    const names = BUILDING_NAMES[localStorage.getItem(KEYS.LANG) || 'ru'] || BUILDING_NAMES.ru;
+    const frag = document.createDocumentFragment();
+    names.forEach((name, i) => {
+      const tr = document.createElement('tr'); tr.dataset.index = i;
+      const tdName = document.createElement('td'); tdName.className = 'name-cell';
+      const icon = ICONS_BUILDINGS[i];
+      if (icon){
+        const img = document.createElement('img');
+        img.src = `images/${icon}`; img.className = 'icon'; img.alt = '';
+        img.addEventListener('error', () => {
+          if (!img._fallback){
+            const fb = createImageFallbackEl(name);
+            img.style.display = 'none';
+            img.parentNode && img.parentNode.insertBefore(fb, img.nextSibling);
+            img._fallback = true;
+          }
+        });
+        tdName.appendChild(img);
+      } else { tdName.appendChild(createImageFallbackEl(name)); }
+      tdName.appendChild(document.createTextNode(name));
+      tr.appendChild(tdName);
+
+      const tdFrom = document.createElement('td'); tdFrom.innerHTML = `<input type="text" class="lvl-input" data-type="from" data-index="${i}" inputmode="numeric">`;
+      const tdTo = document.createElement('td'); tdTo.innerHTML = `<input type="text" class="lvl-input" data-type="to" data-index="${i}" inputmode="numeric">`;
+      const tdPlanets = document.createElement('td'); tdPlanets.innerHTML = `<img src="images/planet.png" class="icon" alt=""><input type="text" class="planet-input" data-type="planets" data-index="${i}" inputmode="numeric" value="1">`;
+      const tdM = document.createElement('td'); tdM.className = 'm'; tdM.innerHTML = `<span class="val-metal">0</span>`;
+      const tdC = document.createElement('td'); tdC.className = 'c'; tdC.innerHTML = `<span class="val-crystal">0</span>`;
+      const tdD = document.createElement('td'); tdD.className = 'd'; tdD.innerHTML = `<span class="val-deut">0</span>`;
+      const tdP = document.createElement('td'); tdP.className = 'p'; tdP.textContent = '0';
+
+      tr.appendChild(tdFrom); tr.appendChild(tdTo); tr.appendChild(tdPlanets);
+      tr.appendChild(tdM); tr.appendChild(tdC); tr.appendChild(tdD); tr.appendChild(tdP);
+      frag.appendChild(tr);
+    });
+    tbodyB.appendChild(frag);
+  }
+
+  function buildRowsResearch(){
+    if(!tbodyR) return;
+    tbodyR.innerHTML = '';
+    const names = RESEARCH_NAMES[localStorage.getItem(KEYS.LANG) || 'ru'] || RESEARCH_NAMES.ru;
+    const frag = document.createDocumentFragment();
+    names.forEach((name, i) => {
+      const tr = document.createElement('tr'); tr.dataset.index = i;
+      const tdName = document.createElement('td'); tdName.className = 'name-cell';
+      const icon = ICONS_RESEARCH[i];
+      if (icon){
+        const img = document.createElement('img');
+        img.src = `images/${icon}`; img.className = 'icon'; img.alt = '';
+        img.addEventListener('error', () => {
+          if (!img._fallback){
+            const fb = createImageFallbackEl(name);
+            img.style.display = 'none';
+            img.parentNode && img.parentNode.insertBefore(fb, img.nextSibling);
+            img._fallback = true;
+          }
+        });
+        tdName.appendChild(img);
+      } else { tdName.appendChild(createImageFallbackEl(name)); }
+      tdName.appendChild(document.createTextNode(name));
+      tr.appendChild(tdName);
+
+      const tdFrom = document.createElement('td'); tdFrom.innerHTML = `<input type="text" class="lvl-input" data-type="from" data-index="${i}" inputmode="numeric">`;
+      const tdTo = document.createElement('td'); tdTo.innerHTML = `<input type="text" class="lvl-input" data-type="to" data-index="${i}" inputmode="numeric">`;
+      const tdM = document.createElement('td'); tdM.className = 'm'; tdM.innerHTML = `<span class="val-metal">0</span>`;
+      const tdC = document.createElement('td'); tdC.className = 'c'; tdC.innerHTML = `<span class="val-crystal">0</span>`;
+      const tdD = document.createElement('td'); tdD.className = 'd'; tdD.innerHTML = `<span class="val-deut">0</span>`;
+      const tdP = document.createElement('td'); tdP.className = 'p'; tdP.textContent = '0';
+
+      tr.appendChild(tdFrom); tr.appendChild(tdTo);
+      tr.appendChild(tdM); tr.appendChild(tdC); tr.appendChild(tdD); tr.appendChild(tdP);
+      frag.appendChild(tr);
+    });
+    tbodyR.appendChild(frag);
+  }
+
+  function renderTable(){
+    const tableBody = document.querySelector("#shipsTable tbody");
+    if(!tableBody) return;
+    const qtyMap = JSON.parse(localStorage.getItem(KEYS.SHIP_QTY) || '{}');
+    tableBody.innerHTML='';
+    const frag = document.createDocumentFragment();
+    shipList.forEach(ship=>{
+      const v = qtyMap[ship.id] || '';
+      const row = document.createElement('tr'); row.setAttribute('data-row-id', ship.id);
+      const shipName = (localStorage.getItem(KEYS.LANG) === 'tr') ? (ship.tr || ship.ru) : (ship.ru || ship.tr);
+
+      const tdName = document.createElement('td'); tdName.style.textAlign = 'left';
+      const img = document.createElement('img');
+      img.src = `images/ships/${ship.img}`; img.alt = shipName;
+      img.width = 28; img.height = 28; img.loading = 'lazy';
+      img.style.width = '28px'; img.style.height = '28px'; img.style.verticalAlign = 'middle'; img.style.marginRight = '8px'; img.style.borderRadius='4px';
+      img.addEventListener('error', () => {
+        if(!img._fallback){
+          const fb = createImageFallbackEl(shipName);
+          img.style.display='none';
+          img.parentNode && img.parentNode.insertBefore(fb, img.nextSibling);
+          img._fallback=true;
+        }
+      });
+      tdName.appendChild(img);
+      const span = document.createElement('span'); span.className='ship-name'; span.textContent = shipName; tdName.appendChild(span);
+
+      const tdM = document.createElement('td'); tdM.innerHTML = formatSpanMetal(ship.metal);
+      const tdC = document.createElement('td'); tdC.innerHTML = formatSpanCrystal(ship.crystal);
+      const tdD = document.createElement('td'); tdD.innerHTML = formatSpanDeut(ship.deut);
+      const tdQty = document.createElement('td'); tdQty.innerHTML = `<input type="text" inputmode="numeric" pattern="[0-9\\.]*" value="${v ? formatWithDotsRaw(v) : ''}" data-id="${ship.id}">`;
+
+      row.appendChild(tdName); row.appendChild(tdM); row.appendChild(tdC); row.appendChild(tdD); row.appendChild(tdQty);
+      frag.appendChild(row);
+    });
+    tableBody.appendChild(frag);
+
+    attachLiveThousandsFormatting('input[data-id]');
+
+    document.querySelectorAll("input[data-id]").forEach(inp=>{
+      if(!inp._qtyBound){
+        inp.addEventListener('input', ()=>{ saveShipQuantities(); computeFleet(); });
+        inp.addEventListener('change', ()=>{ saveShipQuantities(); computeFleet(); });
+        inp._qtyBound = true;
+      }
+    });
+  }
 
   function attachLiveThousandsFormatting(selector){
     const inputs = document.querySelectorAll(selector);
     inputs.forEach(inp => {
-      if(!inp) return;
-      if(inp._thousandsBound) return;
+      if(!inp || inp._thousandsBound) return;
       inp._thousandsBound = true;
 
       inp.addEventListener('input', function(){
-        const el = this;
-        const raw = el.value;
-        const selStart = el.selectionStart || 0;
-
+        const el = this; const raw = el.value; const selStart = el.selectionStart || 0;
         let left = raw.slice(0, selStart).replace(/[^0-9\-]/g, '');
         const leftDigitsCount = (left[0] === '-' ? left.slice(1) : left).length;
-
-        const formatted = formatWithDotsRaw(raw);
-        el.value = formatted;
-
-        let digitsSeen = 0;
-        let newPos = 0;
+        const formatted = formatWithDotsRaw(raw); el.value = formatted;
+        let digitsSeen = 0, newPos = 0;
         for(let i=0;i<formatted.length;i++){
           if(/\d/.test(formatted[i])) digitsSeen++;
           newPos++;
@@ -771,8 +735,8 @@
       inp.addEventListener('blur', function(){
         const v = this.value;
         if (v === '' || v === '-') { this.value = ''; return; }
-        const num = toNumberSafe(v, 0);
-        this.value = num === 0 ? '' : formatNumber(num);
+        const num = parseNumberInput(v);
+        this.value = num === 0 ? '' : formatWithDotsRaw(num);
         this.dispatchEvent(new Event('change', { bubbles: true }));
       });
 
@@ -806,157 +770,141 @@
     });
   }
 
-  function renderTable(){
-    const tableBody = document.querySelector("#shipsTable tbody");
-    if(!tableBody) return;
-    const qtyMap = loadFromLS(KEYS.SHIP_QTY, {});
-    tableBody.innerHTML='';
-    shipList.forEach(ship=>{
-      const v = qtyMap[ship.id] || '';
-      const row=document.createElement('tr'); row.setAttribute('data-row-id', ship.id);
-      const shipName = state.lang === 'tr' ? (ship.tr || ship.ru) : (ship.ru || ship.tr);
-      row.innerHTML =
-        `<td style="text-align:left"><img src="images/ships/${ship.img}" alt="${shipName}" style="width:28px;height:28px;vertical-align:middle;margin-right:8px;border-radius:4px;" loading="lazy" width="28" height="28"><span class="ship-name">${shipName}</span></td>
-         <td>${formatSpanMetal(ship.metal)}</td>
-         <td>${formatSpanCrystal(ship.crystal)}</td>
-         <td>${formatSpanDeut(ship.deut)}</td>
-         <td><input type="text" inputmode="numeric" pattern="[0-9\\.]*" value="${v}" data-id="${ship.id}"></td>`;
-      const img=row.querySelector('img');
-      if(img) img.addEventListener('error', () => {
-        if(!img._fallback){
-          const fb=createImageFallback(img); img.style.display='none';
-          img.parentNode && img.parentNode.insertBefore(fb, img.nextSibling);
-          img._fallback=true;
-        }
+  function saveShipQuantities(){
+    try{
+      const qtyMap = {};
+      document.querySelectorAll('input[data-id]').forEach(inp=>{
+        qtyMap[inp.dataset.id] = parseNumberInput(inp.value);
       });
-      tableBody.appendChild(row);
-    });
-
-    attachLiveThousandsFormatting('input[data-id]');
-    document.querySelectorAll("input[data-id]").forEach(inp=>{
-      if(!inp._qtyBound){
-        inp.addEventListener('change', ()=>{ saveShipQuantities(); computeFleet(); });
-        inp._qtyBound = true;
-      }
-    });
+      localStorage.setItem(KEYS.SHIP_QTY, JSON.stringify(qtyMap));
+    }catch(e){}
   }
 
   function computeFleet(){
-    const factorC = CONFIG.METAL_EQ_CRYSTAL;
-    const factorD = CONFIG.METAL_EQ_DEUT;
-    let totalM=0, totalC=0, totalD=0;
-    document.querySelectorAll("input[data-id]").forEach(inp=>{
-      const qty = toNumberSafe(inp.value, 0);
-      if(qty <= 0) { inp.value = ''; return; }
-      const ship = shipList.find(s=>s.id===inp.dataset.id); if(!ship) return;
-      totalM += qty * ship.metal; totalC += qty * ship.crystal; totalD += qty * ship.deut;
-      inp.value = formatNumber(qty);
-    });
+    try{
+      const factorC = CONFIG.METAL_EQ_CRYSTAL;
+      const factorD = CONFIG.METAL_EQ_DEUT;
+      let totalM=0, totalC=0, totalD=0;
+      document.querySelectorAll("input[data-id]").forEach(inp=>{
+        const qty = parseNumberInput(inp.value);
+        if(qty <= 0) { inp.value = ''; return; }
+        const ship = shipList.find(s=>s.id===inp.dataset.id); if(!ship) return;
+        totalM += qty * ship.metal; totalC += qty * ship.crystal; totalD += qty * ship.deut;
+        inp.value = formatWithDotsRaw(qty);
+      });
 
-    const totalResEl = document.getElementById('totalRes'), totalMetalEqEl = document.getElementById('totalMetalEq'), grandTotalEl = document.getElementById('grandTotal');
-    if(totalResEl) totalResEl.innerHTML = `${formatSpanMetal(totalM)} ${LANG[state.lang].metal}, ${formatSpanCrystal(totalC)} ${LANG[state.lang].crystal}, ${formatSpanDeut(totalD)} ${LANG[state.lang].deut}`;
-    const metalEq = Math.round(totalM + totalC * factorC + totalD * factorD);
-    if(totalMetalEqEl) totalMetalEqEl.textContent = formatNumber(metalEq);
+      const totalResEl = document.getElementById('totalRes');
+      const totalMetalEqEl = document.getElementById('totalMetalEq');
+      const grandTotalEl = document.getElementById('grandTotal');
+      if(totalResEl) totalResEl.innerHTML = `${formatSpanMetal(totalM)} ${LANG[localStorage.getItem(KEYS.LANG) || 'ru'].metal}, ${formatSpanCrystal(totalC)} ${LANG[localStorage.getItem(KEYS.LANG) || 'ru'].crystal}, ${formatSpanDeut(totalD)} ${LANG[localStorage.getItem(KEYS.LANG) || 'ru'].deut}`;
+      const metalEq = Math.round(totalM + totalC * factorC + totalD * factorD);
+      if(totalMetalEqEl) totalMetalEqEl.textContent = formatNumber(metalEq);
 
-    const boxesCount = toNumberSafe(boxesCountInput?.value, 0);
-    const boxValue = toNumberSafe(boxValueInput?.value, 0);
-    const boxesMetal = boxesCount * boxValue;
-    const planetM = toNumberSafe(document.getElementById('planetMetal')?.value, 0);
-    const planetC = toNumberSafe(document.getElementById('planetCrystal')?.value, 0);
-    const planetD = toNumberSafe(document.getElementById('planetDeut')?.value, 0);
-    const planetMetalEq = planetM + planetC * factorC + planetD * factorD;
-    const grand = boxesMetal + planetMetalEq - metalEq;
-    if(grandTotalEl) { grandTotalEl.textContent = formatNumber(Math.round(grand)); grandTotalEl.style.color = grand>=0 ? "#41c879" : "#ff4d4d"; }
-
-    const availableMetalPool = boxesMetal + planetMetalEq;
-    let cumulativeEq = 0;
-    document.querySelectorAll("#shipsTable tbody tr[data-row-id]").forEach(row=>{
-      const id = row.getAttribute('data-row-id');
-      const inp = row.querySelector('input[data-id]');
-      const qty = toNumberSafe(inp?.value, 0);
-      const ship = shipList.find(s=>s.id===id);
-      let rowEq = 0;
-      if(ship && qty > 0){
-        const m = ship.metal * qty, c = ship.crystal * qty, d = ship.deut * qty;
-        rowEq = m + c * factorC + d * factorD;
+      const boxesCount = parseNumberInput(boxesCountInput?.value);
+      const boxValue = parseNumberInput(boxValueInput?.value);
+      const boxesMetal = boxesCount * boxValue;
+      const planetM = parseNumberInput(document.getElementById('planetMetal')?.value);
+      const planetC = parseNumberInput(document.getElementById('planetCrystal')?.value);
+      const planetD = parseNumberInput(document.getElementById('planetDeut')?.value);
+      const planetMetalEq = planetM + planetC * factorC + planetD * factorD;
+      const grand = boxesMetal + planetMetalEq - metalEq;
+      if(grandTotalEl){
+        grandTotalEl.textContent = formatNumber(Math.round(grand));
+        grandTotalEl.style.color = grand>=0 ? "#41c879" : "#ff4d4d";
       }
-      cumulativeEq += rowEq;
-      if(availableMetalPool > 0 && rowEq > 0 && cumulativeEq > availableMetalPool) row.classList.add('row-deficit'); else row.classList.remove('row-deficit');
-    });
 
-    persistBoxesAndPlanets();
-    saveShipQuantities();
-    updateBoxesNeeded();
+      const availableMetalPool = boxesMetal + planetMetalEq;
+      let cumulativeEq = 0;
+      document.querySelectorAll("#shipsTable tbody tr[data-row-id]").forEach(row=>{
+        const id = row.getAttribute('data-row-id');
+        const inp = row.querySelector('input[data-id]');
+        const qty = parseNumberInput(inp?.value);
+        const ship = shipList.find(s=>s.id===id);
+        let rowEq = 0;
+        if(ship && qty > 0){
+          const m = ship.metal * qty, c = ship.crystal * qty, d = ship.deut * qty;
+          rowEq = m + c * factorC + d * factorD;
+        }
+        cumulativeEq += rowEq;
+        if(availableMetalPool > 0 && rowEq > 0 && cumulativeEq > availableMetalPool) row.classList.add('row-deficit'); else row.classList.remove('row-deficit');
+      });
+
+      localStorage.setItem(KEYS.BOXES, JSON.stringify({ boxesCount, boxValue, planetMetal: planetM, planetCrystal: planetC, planetDeut: planetD }));
+      updateBoxesNeeded();
+    }catch(e){}
   }
 
   function updateBoxesNeeded(){
-    const boxValue = toNumberSafe(boxValueInput?.value || '', 0);
-    const targetMetal = getCurrentTotalMetalValue();
-    if(!boxValue || boxValue <= 0){ boxesNeededEl && (boxesNeededEl.textContent='—'); boxesCostTLEl && (boxesCostTLEl.innerHTML = `<span class="try-value">TRY: —</span>`); return; }
-    const needed = Math.ceil(targetMetal / boxValue);
-    boxesNeededEl && (boxesNeededEl.textContent = formatNumber(needed));
-    updateBoxesCostTL();
+    try{
+      const boxValue = parseNumberInput(boxValueInput?.value || '');
+      const targetMetal = getCurrentTotalMetalValue();
+      if(!boxValue || boxValue <= 0){
+        boxesNeededEl && (boxesNeededEl.textContent='—');
+        boxesCostTLEl && (boxesCostTLEl.innerHTML = `<span class="try-value">TRY: —</span>`);
+        leftoverTmValueEl && (leftoverTmValueEl.textContent = '—');
+      } else {
+        const needed = Math.ceil(targetMetal / boxValue);
+        boxesNeededEl && (boxesNeededEl.textContent = formatWithDotsRaw(needed));
+        updateBoxesCostTL();
+      }
+    }catch(e){}
   }
 
   function getCurrentTotalMetalValue(){
-    if(state.activeTab === 'buildings') return toNumberSafe(document.getElementById('sumTotalMetalB')?.textContent, 0);
-    if(state.activeTab === 'research') return toNumberSafe(document.getElementById('sumTotalMetalR')?.textContent, 0);
-    if(state.activeTab === 'fleet') return toNumberSafe(document.getElementById('totalMetalEq')?.textContent, 0);
-    return 0;
+    try{
+      const active = document.querySelector('.tab-btn.active')?.dataset.tab;
+      if(active === 'research'){
+        return parseNumberInput(document.getElementById('sumTotalMetalR')?.textContent);
+      }
+      if(active === 'fleet'){
+        return parseNumberInput(document.getElementById('totalMetalEq')?.textContent);
+      }
+      return parseNumberInput(document.getElementById('sumTotalMetalB')?.textContent);
+    }catch(e){ return 0; }
   }
 
   function updateBoxesCostTL(){
-    if(!boxesCostTLEl) return;
-    const boxValue = toNumberSafe(boxValueInput?.value || '', 0);
-    if(boxValue <= 0){ boxesCostTLEl.innerHTML = `<span class="try-value">TRY: —</span>`; return; }
-    const targetMetalEq = getCurrentTotalMetalValue();
-    const neededBoxes = Math.ceil(targetMetalEq / boxValue);
-    if(neededBoxes <= 0){ boxesCostTLEl.innerHTML = `<span class="try-value">TRY: 0</span>`; return; }
-    const requiredTM = neededBoxes * CONFIG.TM_PER_BOX;
-    const pack = (CONFIG.TM_PACKS && CONFIG.TM_PACKS[0]) || null;
-    const packTm = pack && Number.isFinite(Number(pack.tm)) ? Number(pack.tm) : 0;
-    const packPriceTRY = pack && (Number.isFinite(Number(pack.priceTRY)) ? Number(pack.priceTRY)
-                         : Number.isFinite(Number(pack.priceTry)) ? Number(pack.priceTry)
-                         : Number.isFinite(Number(pack.price)) ? Number(pack.price)
-                         : 0);
+    try{
+      if(!boxesCostTLEl) return;
+      const boxValue = parseNumberInput(boxValueInput?.value || '');
+      if(boxValue <= 0){
+        boxesCostTLEl.innerHTML = `<span class="try-value">TRY: —</span>`;
+        leftoverTmValueEl && (leftoverTmValueEl.textContent = '—');
+        return;
+      }
 
-    if(packTm <= 0 || packPriceTRY <= 0){
-      boxesCostTLEl.innerHTML = `<span class="try-value">TRY: —</span>`;
-      return;
-    }
+      const targetMetalEq = getCurrentTotalMetalValue();
+      if(!Number.isFinite(targetMetalEq) || targetMetalEq <= 0){
+        boxesCostTLEl.innerHTML = `<span class="try-value">TRY: 0</span>`;
+        leftoverTmValueEl && (leftoverTmValueEl.textContent = '0');
+        return;
+      }
 
-    const packsCount = Math.max(1, Math.ceil(requiredTM / packTm));
-    const totalTRY = packsCount * packPriceTRY;
-    const leftoverTM = packsCount * packTm - requiredTM;
-    const leftoverLabel = LANG[state.lang]?.leftoverLabel || 'Остаток ТМ';
+      const neededBoxesRaw = Math.ceil(targetMetalEq / boxValue);
+      const MAX_ALLOWED_BOXES = 1e9;
+      if(neededBoxesRaw > MAX_ALLOWED_BOXES){
+        boxesCostTLEl.innerHTML = `<span class="try-value">TRY: —</span>`;
+        leftoverTmValueEl && (leftoverTmValueEl.textContent = '—');
+        return;
+      }
+      const requiredTM = neededBoxesRaw * CONFIG.TM_PER_BOX;
+      const pack = (CONFIG.TM_PACKS && CONFIG.TM_PACKS[0]) || null;
+      const packTm = pack && Number.isFinite(Number(pack.tm)) ? Number(pack.tm) : 0;
+      const packPriceTRY = pack && (Number.isFinite(Number(pack.priceTRY)) ? Number(pack.priceTRY) : 0);
 
-    let html = `<span class="try-value">TRY: ${formatNumber(totalTRY)}</span>`;
-    if(leftoverTM > 0) html += ` <span class="tm-left">${leftoverLabel}: ${formatNumber(leftoverTM)}</span>`;
+      if(packTm <= 0 || packPriceTRY <= 0){
+        boxesCostTLEl.innerHTML = `<span class="try-value">TRY: —</span>`;
+        leftoverTmValueEl && (leftoverTmValueEl.textContent = '—');
+        return;
+      }
 
-    boxesCostTLEl.innerHTML = html;
-  }
+      const packsCount = Math.max(1, Math.ceil(requiredTM / packTm));
+      const totalTRY = packsCount * packPriceTRY;
+      const leftoverTM = packsCount * packTm - requiredTM;
 
-  function resetAllValues(){
-    document.querySelectorAll('#tbodyBuildings input[data-type], #tbodyResearch input[data-type]').forEach(inp=>{ inp.value = ''; });
-    if(boxesCountInput) boxesCountInput.value = '';
-    if(boxValueInput) boxValueInput.value = '';
-    ['planetMetal','planetCrystal','planetDeut'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value = ''; });
-    document.querySelectorAll('input[data-id]').forEach(inp=> inp.value = '');
-    if(tmInput) tmInput.value = '';
-    ['sumMetalB','sumCrystalB','sumDeutB','sumPointsB','sumTotalMetalB','sumMetalR','sumCrystalR','sumDeutR','sumPointsR','sumTotalMetalR','totalRes','totalMetalEq','grandTotal'].forEach(id=>{
-      const el = document.getElementById(id);
-      if(el) el.textContent = '0';
-    });
-    document.getElementById('boxesNeeded') && (document.getElementById('boxesNeeded').textContent = '0');
-    document.getElementById('boxesCostTL') && (document.getElementById('boxesCostTL').innerHTML = `<span class="try-value">TRY: —</span>`);
-
-    try{ Object.values(KEYS).forEach(k => localStorage.removeItem(k)); }catch(e){}
-    attachLiveThousandsFormatting('#boxesCount, #boxValue, #planetMetal, #planetCrystal, #planetDeut, input[data-id]');
-    renderTable();
-    computeFleet();
-    recalcAllBuildings();
-    recalcAllResearch();
-    updateBoxesCostTL();
+      boxesCostTLEl.innerHTML = `<span class="try-value">TRY: ${formatNumberWithDots(totalTRY)}</span>`;
+      leftoverTmValueEl && (leftoverTmValueEl.textContent = leftoverTM > 0 ? formatWithDotsRaw(leftoverTM) : '0');
+    }catch(e){}
   }
 
   function attachInputsHandlers(){
@@ -964,112 +912,357 @@
     const debouncedRecalcResearch = debounce(recalcAllResearch, 120);
     const debouncedComputeFleet = debounce(computeFleet, 120);
 
-    tbodyB.addEventListener('input', e=>{ const t=e.target; if(!(t.matches('.lvl-input')||t.matches('.planet-input'))) return; debouncedRecalcBuildings(); });
-    tbodyB.addEventListener('change', e=>{ persistInputs('buildings'); debouncedRecalcBuildings(); });
+    tbodyB && tbodyB.addEventListener('input', e=>{ const t=e.target; if(!(t.matches('.lvl-input')||t.matches('.planet-input'))) return; debouncedRecalcBuildings(); });
+    tbodyB && tbodyB.addEventListener('change', e=>{ debouncedRecalcBuildings(); });
 
-    tbodyR.addEventListener('input', e=>{ const t=e.target; if(!t.matches('.lvl-input')) return; debouncedRecalcResearch(); });
-    tbodyR.addEventListener('change', e=>{ persistInputs('research'); debouncedRecalcResearch(); });
+    tbodyR && tbodyR.addEventListener('input', e=>{ const t=e.target; if(!t.matches('.lvl-input')) return; debouncedRecalcResearch(); });
+    tbodyR && tbodyR.addEventListener('change', e=>{ debouncedRecalcResearch(); });
 
-    tmInput && tmInput.addEventListener('input', ()=>{ const v = toNumberSafe(tmInput.value, 0); state.tmPrice = v; saveToLS(KEYS.TM, v); debouncedRecalcResearch(); });
-    tmInput && tmInput.addEventListener('blur', ()=>{ const v = toNumberSafe(tmInput.value, 0); state.tmPrice = v; tmInput.value = v ? String(v) : ''; saveToLS(KEYS.TM, v); debouncedRecalcResearch(); });
+    if (tmInput){
+      tmInput.addEventListener('input', ()=>{ debouncedRecalcResearch(); });
+      tmInput.addEventListener('blur', ()=>{ debouncedRecalcResearch(); });
+    }
 
-    boxesCountInput && boxesCountInput.addEventListener('change', ()=>{ persistBoxesAndPlanets(); debouncedComputeFleet(); });
-    boxValueInput && boxValueInput.addEventListener('change', ()=>{ persistBoxesAndPlanets(); debouncedComputeFleet(); });
-    document.getElementById('planetMetal')?.addEventListener('change', ()=>{ persistBoxesAndPlanets(); debouncedComputeFleet(); });
-    document.getElementById('planetCrystal')?.addEventListener('change', ()=>{ persistBoxesAndPlanets(); debouncedComputeFleet(); });
-    document.getElementById('planetDeut')?.addEventListener('change', ()=>{ persistBoxesAndPlanets(); debouncedComputeFleet(); });
+    boxesCountInput && boxesCountInput.addEventListener('input', ()=>{ debouncedComputeFleet(); });
+    boxValueInput && boxValueInput.addEventListener('input', ()=>{ debouncedComputeFleet(); updateBoxesNeeded(); });
+
+    boxesCountInput && boxesCountInput.addEventListener('change', ()=>{ debouncedComputeFleet(); });
+    boxValueInput && boxValueInput.addEventListener('change', ()=>{ debouncedComputeFleet(); updateBoxesNeeded(); });
+
+    document.getElementById('planetMetal')?.addEventListener('change', ()=>{ debouncedComputeFleet(); });
+    document.getElementById('planetCrystal')?.addEventListener('change', ()=>{ debouncedComputeFleet(); });
+    document.getElementById('planetDeut')?.addEventListener('change', ()=>{ debouncedComputeFleet(); });
   }
 
-  function debounce(fn, wait) { let t=null; return function(...a){ clearTimeout(t); t=setTimeout(()=>fn.apply(this,a), wait); }; }
-
-  window.scale = 1; window.posX = 0; window.posY = 0;
-  function applyTransform(){ wrapperEl.style.transform = `translate(${window.posX}px, ${window.posY}px) scale(${window.scale})`; saveTransform(); }
-  function saveTransform(){ saveToLS(KEYS.TRANSFORM, { scale: window.scale, posX: window.posX, posY: window.posY }); }
-  function doZoom(delta, centerX = window.innerWidth/2, centerY = window.innerHeight/2){
-    const oldScale = window.scale; const factor = Math.pow(1.2, delta); const newScale = Math.max(0.4, Math.min(3.5, window.scale * factor));
-    const rect = wrapperEl.getBoundingClientRect(); const cx = centerX - rect.left; const cy = centerY - rect.top;
-    window.posX -= (cx / oldScale) * (newScale - oldScale) / newScale;
-    window.posY -= (cy / oldScale) * (newScale - oldScale) / newScale;
-    window.scale = newScale; applyTransform();
+  function recalcAllBuildings(){
+    try{
+      if(!tbodyB) return;
+      let tm=0, tc=0, td=0, tp=0;
+      tbodyB.querySelectorAll('tr').forEach(tr=>{
+        const idx=Number(tr.dataset.index)||0;
+        const data=BUILDINGS_DATA[idx]||{base:{m:0,c:0,d:0},factor:1};
+        const from = parseNumberInput(tr.querySelector('input[data-type="from"]').value);
+        const toVal = tr.querySelector('input[data-type="to"]').value;
+        let to = (toVal === '' ? from : parseNumberInput(toVal));
+        to = Math.max(from, to);
+        if (to - from > CONFIG.MAX_LEVEL_SPAN) to = from + CONFIG.MAX_LEVEL_SPAN;
+        const planets = Math.max(1, parseNumberInput(tr.querySelector('input[data-type="planets"]').value) || 1);
+        const sum = geomSum(data.base, data.factor, from, to);
+        const m = Math.round(sum.m * planets);
+        const c = Math.round(sum.c * planets);
+        const d = Math.round(sum.d * planets);
+        const p = Math.round(sum.points * planets);
+        tr.querySelector('td.m').innerHTML = formatSpanMetal(m);
+        tr.querySelector('td.c').innerHTML = formatSpanCrystal(c);
+        tr.querySelector('td.d').innerHTML = formatSpanDeut(d);
+        tr.querySelector('td.p').textContent = formatNumber(p);
+        tm+=m; tc+=c; td+=d; tp+=p;
+      });
+      document.getElementById('sumMetalB').innerHTML = formatSpanMetal(tm);
+      document.getElementById('sumCrystalB').innerHTML = formatSpanCrystal(tc);
+      document.getElementById('sumDeutB').innerHTML = formatSpanDeut(td);
+      document.getElementById('sumPointsB').textContent = formatNumber(tp);
+      document.getElementById('sumTotalMetalB').textContent = formatNumber(Math.round(convertToMetal(tm,tc,td)));
+      updateBoxesNeeded();
+    }catch(e){}
   }
-  function centerWrapperAtCurrentScale(){ const el = wrapperEl; if(!el) return; const unscaledW = el.offsetWidth, unscaledH = el.offsetHeight; const desiredLeft = Math.round((window.innerWidth - unscaledW * window.scale)/2); const desiredTop = Math.round((window.innerHeight - unscaledH * window.scale)/2); window.posX = desiredLeft / window.scale; window.posY = desiredTop / window.scale; applyTransform(); }
 
-  (function attachDragFix(){ const dragHandle = document.getElementById('dragHandle'); const wrapper = document.getElementById('tableWrapper'); if(!dragHandle || !wrapper) return; let dragging=false, startX=0, startY=0, startPosX=0, startPosY=0; dragHandle.style.touchAction='none'; dragHandle.addEventListener('pointerdown', ev=>{ ev.preventDefault(); dragging=true; startX=ev.clientX; startY=ev.clientY; startPosX = window.posX || 0; startPosY = window.posY || 0; try{ dragHandle.setPointerCapture(ev.pointerId); }catch{} dragHandle.style.cursor='grabbing'; }); document.addEventListener('pointermove', ev=>{ if(!dragging) return; ev.preventDefault(); const dx = (ev.clientX - startX) / (window.scale || 1); const dy = (ev.clientY - startY) / (window.scale || 1); window.posX = startPosX + dx; window.posY = startPosY + dy; wrapper.style.transform = `translate(${window.posX}px, ${window.posY}px) scale(${window.scale})`; }); function stopDrag(ev){ if(!dragging) return; dragging=false; try{ dragHandle.releasePointerCapture && dragHandle.releasePointerCapture(ev && ev.pointerId); }catch{} dragHandle.style.cursor='grab'; saveTransform(); } document.addEventListener('pointerup', stopDrag); document.addEventListener('pointercancel', stopDrag); dragHandle.addEventListener('keydown', e=>{ const step=10; if(e.key==='ArrowLeft'){ window.posX = (window.posX||0) - step; } if(e.key==='ArrowRight'){ window.posX = (window.posX||0) + step; } if(e.key==='ArrowUp'){ window.posY = (window.posY||0) - step; } if(e.key==='ArrowDown'){ window.posY = (window.posY||0) + step; } wrapper.style.transform = `translate(${window.posX}px, ${window.posY}px) scale(${window.scale})`; saveTransform(); }); dragHandle.style.cursor='grab'; })();
-
-  function setActiveTab(tab){
-    state.activeTab = tab; saveToLS(KEYS.ACTIVE_TAB, tab);
-    document.querySelectorAll('.tab-btn').forEach(b=>{ const is=b.dataset.tab===tab; b.classList.toggle('active', is); b.setAttribute('aria-selected', String(is)); });
-    const panels={ buildings: document.getElementById('tabBuildings'), research: document.getElementById('tabResearch'), fleet: document.getElementById('tabFleet') };
-    Object.keys(panels).forEach(k=>{ const el=panels[k]; if(!el) return; const show = k===tab; el.classList.toggle('active', show); el.setAttribute('aria-hidden', String(!show)); });
-    const panel = panels[tab];
-    if(panel){ const firstFocusable = panel.querySelector('input, button, [tabindex]:not([tabindex="-1"])'); if(firstFocusable) try{ firstFocusable.focus(); }catch(e){} }
-    if(tab==='fleet'){ document.getElementById('fleetDelivery').style.display = 'flex'; renderTable(); computeFleet(); } else { document.getElementById('fleetDelivery').style.display = 'none'; if(tab==='buildings') recalcAllBuildings(); else if(tab==='research') recalcAllResearch(); }
-    updateBoxesNeeded();
+  function recalcAllResearch(){
+    try{
+      if(!tbodyR) return;
+      let sm=0, sc=0, sd=0, sp=0, totalLevels=0;
+      tbodyR.querySelectorAll('tr').forEach(tr=>{
+        const idx=Number(tr.dataset.index)||0;
+        const data=RESEARCH_DATA[idx]||{base:{m:0,c:0,d:0},factor:1};
+        const from = parseNumberInput(tr.querySelector('input[data-type="from"]').value);
+        const toVal = tr.querySelector('input[data-type="to"]').value;
+        let to = (toVal === '' ? from : parseNumberInput(toVal));
+        to = Math.max(from, to);
+        if (to - from > CONFIG.MAX_LEVEL_SPAN) to = from + CONFIG.MAX_LEVEL_SPAN;
+        const sum = geomSum(data.base, data.factor, from, to);
+        const m = sum.m, c = sum.c, d = sum.d, p = sum.points;
+        tr.querySelector('td.m').innerHTML = formatSpanMetal(m);
+        tr.querySelector('td.c').innerHTML = formatSpanCrystal(c);
+        tr.querySelector('td.d').innerHTML = formatSpanDeut(d);
+        tr.querySelector('td.p').textContent = formatNumber(p);
+        sm+=m; sc+=c; sd+=d; sp+=p; totalLevels+=sum.levels||0;
+      });
+      document.getElementById('sumMetalR').innerHTML = formatSpanMetal(sm);
+      document.getElementById('sumCrystalR').innerHTML = formatSpanCrystal(sc);
+      document.getElementById('sumDeutR').innerHTML = formatSpanDeut(sd);
+      document.getElementById('sumPointsR').textContent = formatNumber(sp);
+      document.getElementById('sumTotalMetalR').textContent = formatNumber(Math.round(convertToMetal(sm,sc,sd)));
+      const perLevel = parseNumberInput(tmInput?.value);
+      const totalTM = Math.round(perLevel * totalLevels * CONFIG.TM_PER_LEVEL_FACTOR);
+      tmTotal.textContent = (LANG[localStorage.getItem(KEYS.LANG) || 'ru'].totalTMLabel || 'Итого: ') + formatNumber(totalTM);
+      updateBoxesNeeded();
+    }catch(e){}
   }
-  document.querySelectorAll('.tab-btn').forEach(btn=> btn.addEventListener('click', ()=> setActiveTab(btn.dataset.tab) ));
+
+  function syncTabButtonToContent(){
+    const activePanel =
+      document.getElementById('tabBuildings').classList.contains('active') ? 'buildings' :
+      document.getElementById('tabResearch').classList.contains('active') ? 'research' :
+      document.getElementById('tabFleet').classList.contains('active') ? 'fleet' : 'buildings';
+    setActiveTab(activePanel);
+  }
 
   function applyLang(lang){
-    if(!lang || (lang!=='ru' && lang!=='tr')) return;
-    state.lang = lang; saveToLS(KEYS.LANG, lang);
+    if(!lang) return;
+    localStorage.setItem(KEYS.LANG, lang);
+
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const key = el.getAttribute('data-i18n');
+      if(key && LANG[lang] && LANG[lang][key] !== undefined){ el.textContent = LANG[lang][key]; }
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
+      const key = el.getAttribute('data-i18n-ph');
+      if(key && LANG[lang] && LANG[lang][key] !== undefined){ el.setAttribute('placeholder', LANG[lang][key]); }
+    });
+
     buildRowsBuildings();
     buildRowsResearch();
-    const dict = LANG[lang] || LANG.ru;
-    document.querySelectorAll('[data-i18n]').forEach(el=>{
-      const key = el.getAttribute('data-i18n'); if(key && dict[key] !== undefined) el.textContent = dict[key];
-    });
-    document.querySelectorAll('[data-key]').forEach(el=>{
-      const key = el.dataset.key; const label = el.querySelector('.data-key-label'); if(label && dict[key] !== undefined) label.textContent = dict[key];
-    });
-    document.getElementById('tmLabel') && (document.getElementById('tmLabel').textContent = dict.tmLabel || document.getElementById('tmLabel').textContent);
-    if (boxesCountInput) boxesCountInput.placeholder = dict.boxesCountPh || boxesCountInput.placeholder;
-    if (boxValueInput) boxValueInput.placeholder = dict.boxValuePh || boxValueInput.placeholder;
-    document.getElementById('langRU').classList.toggle('active', lang==='ru');
-    document.getElementById('langTR').classList.toggle('active', lang==='tr');
     renderTable();
-    restoreAll();
+    restoreFromStorage();
     attachInputsHandlers();
     recalcAllBuildings();
     recalcAllResearch();
     computeFleet();
+    syncTabButtonToContent();
+
+    positionTabs();
   }
   document.getElementById('langRU').addEventListener('click', ()=> applyLang('ru'));
   document.getElementById('langTR').addEventListener('click', ()=> applyLang('tr'));
 
-  document.addEventListener('DOMContentLoaded', ()=>{
-    const zin = document.getElementById('globalZoomIn'), zout = document.getElementById('globalZoomOut'), zreset = document.getElementById('globalZoomReset');
-    zin && zin.addEventListener('click', ()=> doZoom(1, window.innerWidth/2, window.innerHeight/2));
-    zout && zout.addEventListener('click', ()=> doZoom(-1, window.innerWidth/2, window.innerHeight/2));
-    zreset && zreset.addEventListener('click', ()=>{
-      window.scale = 1; window.posX = 0; window.posY = 0; applyTransform();
-      centerWrapperAtCurrentScale();
-      saveTransform();
-      resetAllValues();
+  // Drag wrapper (таблица) — вкладки двигаются вместе, т.к. абсолютны внутри wrapper
+  (function(){
+    const dragHandle = document.getElementById('dragHandle'); const wrapper = document.getElementById('tableWrapper'); if(!dragHandle || !wrapper) return;
+    let dragging=false, startX=0, startY=0, startPosX=0, startPosY=0; dragHandle.style.touchAction='none';
+    dragHandle.addEventListener('pointerdown', ev=>{ ev.preventDefault(); dragging=true; startX=ev.clientX; startY=ev.clientY; startPosX = window.posX || 0; startPosY = window.posY || 0; try{ dragHandle.setPointerCapture(ev.pointerId); }catch{} dragHandle.style.cursor='grabbing'; });
+    document.addEventListener('pointermove', ev=>{
+      if(!dragging) return; ev.preventDefault();
+      const dx = (ev.clientX - startX) / (window.scale || 1);
+      const dy = (ev.clientY - startY) / (window.scale || 1);
+      window.posX = startPosX + dx; window.posY = startPosY + dy;
+      wrapper.style.transform = `translate(${window.posX}px, ${window.posY}px) scale(${window.scale||1})`;
+    });
+    function stopDrag(ev){
+      if(!dragging) return; dragging=false;
+      try{ dragHandle.releasePointerCapture && dragHandle.releasePointerCapture(ev && ev.pointerId); }catch{}
+      dragHandle.style.cursor='grab';
+      localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale||1, posX: window.posX||0, posY: window.posY||0 }));
+      positionTabs();
+    }
+    document.addEventListener('pointerup', stopDrag); document.addEventListener('pointercancel', stopDrag);
+    dragHandle.addEventListener('keydown', e=>{
+      const step=10;
+      if(e.key==='ArrowLeft'){ window.posX = (window.posX||0) - step; }
+      if(e.key==='ArrowRight'){ window.posX = (window.posX||0) + step; }
+      if(e.key==='ArrowUp'){ window.posY = (window.posY||0) - step; }
+      if(e.key==='ArrowDown'){ window.posY = (window.posY||0) + step; }
+      wrapper.style.transform = `translate(${window.posX}px, ${window.posY}px) scale(${window.scale||1})`;
+      localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale||1, posX: window.posX||0, posY: window.posY||0 }));
+      positionTabs();
+    });
+    dragHandle.style.cursor='grab';
+  })();
+
+  // Tabs click
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>{
+        b.classList.remove('active'); b.setAttribute('aria-selected','false'); b.setAttribute('tabindex','-1');
+      });
+      btn.classList.add('active'); btn.setAttribute('aria-selected','true'); btn.setAttribute('tabindex','0');
+
+      document.querySelectorAll('.tab-content').forEach(p=> p.classList.remove('active'));
+      if(btn.dataset.tab === 'buildings'){ document.getElementById('tabBuildings').classList.add('active'); setActiveTab('buildings'); }
+      if(btn.dataset.tab === 'research'){ document.getElementById('tabResearch').classList.add('active'); setActiveTab('research'); }
+      if(btn.dataset.tab === 'fleet'){ document.getElementById('tabFleet').classList.add('active'); setActiveTab('fleet'); }
+
+      positionTabs();
     });
   });
 
-  function initCore(){
-    buildRowsBuildings(); buildRowsResearch();
-    attachLiveThousandsFormatting('#boxesCount, #boxValue, #planetMetal, #planetCrystal, #planetDeut, input[data-id], #tbodyBuildings input, #tbodyResearch input');
-    attachInputsHandlers();
-    renderTable();
-    restoreAll();
-    applyLang(state.lang || 'ru');
-    const tr = loadFromLS(KEYS.TRANSFORM, null);
-    if(tr && typeof tr.scale === 'number'){ window.scale = tr.scale; window.posX = tr.posX || 0; window.posY = tr.posY || 0; applyTransform(); }
-    setActiveTab(state.activeTab || 'buildings');
-    attachLiveThousandsFormatting('#boxesCount, #boxValue, #planetMetal, #planetCrystal, #planetDeut, input[data-id]');
-    document.querySelectorAll('input[data-id]').forEach(inp=>{
-      if(!inp._qtyBound){
-        inp.addEventListener('change', ()=>{ saveShipQuantities(); computeFleet(); });
-        inp._qtyBound = true;
-      }
+  function setActiveTab(tab){
+    document.querySelectorAll('.tab-btn').forEach(b=>{
+      const isActive = (b.dataset.tab===tab);
+      b.classList.toggle('active', isActive);
+      b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      b.setAttribute('tabindex', isActive ? '0' : '-1');
     });
-    computeFleet();
-    recalcAllBuildings();
-    recalcAllResearch();
+
+    document.getElementById('tabBuildings').classList.toggle('active', tab==='buildings');
+    document.getElementById('tabResearch').classList.toggle('active', tab==='research');
+    document.getElementById('tabFleet').classList.toggle('active', tab==='fleet');
+
+    if(tab==='fleet'){
+      document.getElementById('fleetDelivery').style.display = 'flex';
+      renderTable(); computeFleet();
+    } else {
+      document.getElementById('fleetDelivery').style.display = 'none';
+      if(tab==='buildings') recalcAllBuildings(); else if(tab==='research') recalcAllResearch();
+    }
+    updateBoxesNeeded();
+    try{ localStorage.setItem(KEYS.ACTIVE_TAB, tab); }catch(e){}
   }
 
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initCore); else initCore();
+  function restoreFromStorage(){
+    try{
+      const inputsBuild = JSON.parse(localStorage.getItem(KEYS.INPUTS_BUILD) || 'null');
+      if(inputsBuild && tbodyB){
+        tbodyB.querySelectorAll('tr').forEach((tr,i)=>{
+          if(inputsBuild[i]){
+            tr.querySelector('input[data-type="from"]').value = inputsBuild[i].from ? formatWithDotsRaw(inputsBuild[i].from) : '';
+            tr.querySelector('input[data-type="to"]').value = inputsBuild[i].to ? formatWithDotsRaw(inputsBuild[i].to) : '';
+            tr.querySelector('input[data-type="planets"]').value = inputsBuild[i].planets ? formatWithDotsRaw(inputsBuild[i].planets) : '1';
+          }
+        });
+      }
+      const inputsResearch = JSON.parse(localStorage.getItem(KEYS.INPUTS_RESEARCH) || 'null');
+      if(inputsResearch && tbodyR){
+        tbodyR.querySelectorAll('tr').forEach((tr,i)=>{
+          if(inputsResearch[i]){
+            tr.querySelector('input[data-type="from"]').value = inputsResearch[i].from ? formatWithDotsRaw(inputsResearch[i].from) : '';
+            tr.querySelector('input[data-type="to"]').value = inputsResearch[i].to ? formatWithDotsRaw(inputsResearch[i].to) : '';
+          }
+        });
+      }
+      const boxes = JSON.parse(localStorage.getItem(KEYS.BOXES) || '{}');
+      if(boxes){
+        if(boxes.boxesCount) boxesCountInput.value = formatWithDotsRaw(boxes.boxesCount);
+        if(boxes.boxValue) boxValueInput.value = formatWithDotsRaw(boxes.boxValue);
+        if(boxes.planetMetal) document.getElementById('planetMetal').value = formatWithDotsRaw(boxes.planetMetal);
+        if(boxes.planetCrystal) document.getElementById('planetCrystal').value = formatWithDotsRaw(boxes.planetCrystal);
+        if(boxes.planetDeut) document.getElementById('planetDeut').value = formatWithDotsRaw(boxes.planetDeut);
+      }
+      const tmSaved = localStorage.getItem(KEYS.TM);
+      if(tmSaved) tmInput.value = tmSaved;
+      const shipQty = JSON.parse(localStorage.getItem(KEYS.SHIP_QTY) || '{}');
+      if(shipQty){
+        document.querySelectorAll('input[data-id]').forEach(inp=>{
+          const v = shipQty[inp.dataset.id]; if(v) inp.value = formatWithDotsRaw(v);
+        });
+      }
+      const trf = JSON.parse(localStorage.getItem(KEYS.TRANSFORM) || 'null');
+      if(trf){
+        window.scale = trf.scale || 1; window.posX = trf.posX || 0; window.posY = trf.posY || 0;
+        wrapperEl.style.transform = `translate(${window.posX}px, ${window.posY}px) scale(${window.scale})`;
+      }
+      const lang = localStorage.getItem(KEYS.LANG) || 'ru';
+      document.getElementById('langRU').classList.toggle('active', lang==='ru');
+      document.getElementById('langTR').classList.toggle('active', lang==='tr');
+    }catch(e){}
+  }
+
+  function centerWrapper(){
+    const scale = 1; window.scale = scale;
+    const rect = wrapperEl.getBoundingClientRect();
+    const pageLeft = parseFloat(getComputedStyle(wrapperEl).left) || 0;
+    const pageTop = parseFloat(getComputedStyle(wrapperEl).top) || 0;
+    const targetX = (window.innerWidth - rect.width) / 2 - pageLeft;
+    const targetY = (window.innerHeight - rect.height) / 2 - pageTop;
+    window.posX = targetX; window.posY = targetY;
+    wrapperEl.style.transform = `translate(${window.posX}px, ${window.posY}px) scale(${window.scale})`;
+    localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale, posX: window.posX, posY: window.posY }));
+    positionTabs();
+  }
+
+  function fullResetToZero(){
+    try{
+      localStorage.removeItem(KEYS.INPUTS_BUILD);
+      localStorage.removeItem(KEYS.INPUTS_RESEARCH);
+      localStorage.removeItem(KEYS.TM);
+      localStorage.removeItem(KEYS.BOXES);
+      localStorage.removeItem(KEYS.SHIP_QTY);
+
+      document.querySelectorAll('#tbodyBuildings input').forEach(i=>{ i.value=''; });
+      document.querySelectorAll('#tbodyResearch input').forEach(i=>{ i.value=''; });
+      document.querySelectorAll('input[data-id]').forEach(i=>{ i.value=''; });
+
+      boxesCountInput && (boxesCountInput.value='');
+      boxValueInput && (boxValueInput.value='');
+
+      const planetMetalEl = document.getElementById('planetMetal');
+      const planetCrystalEl = document.getElementById('planetCrystal');
+      const planetDeutEl = document.getElementById('planetDeut');
+      if(planetMetalEl) planetMetalEl.value='';
+      if(planetCrystalEl) planetCrystalEl.value='';
+      if(planetDeutEl) planetDeutEl.value='';
+
+      if(tmInput) tmInput.value='';
+
+      recalcAllBuildings();
+      recalcAllResearch();
+      renderTable();
+      computeFleet();
+
+      document.getElementById('sumPointsB').textContent = '0';
+      document.getElementById('sumPointsR').textContent = '0';
+      document.getElementById('totalMetalEq').textContent = '0';
+      document.getElementById('grandTotal').textContent = '0';
+      document.getElementById('totalRes').textContent = '0 Металл, 0 Кристалл, 0 Дейтерий';
+      boxesNeededEl && (boxesNeededEl.textContent='0');
+      boxesCostTLEl && (boxesCostTLEl.innerHTML='TRY: —');
+      leftoverTmValueEl && (leftoverTmValueEl.textContent='—');
+    }catch(e){}
+  }
+
+  // Позиционируем вкладки на уровень блока «Коробка с металлом»
+  function positionTabs(){
+    try{
+      if(!tabsLeftEl || !headerBarEl || !wrapperEl) return;
+      const boxRow = document.getElementById('globalBoxRow') || headerBarEl;
+      const wrapperRect = wrapperEl.getBoundingClientRect();
+      const targetRect = boxRow.getBoundingClientRect();
+      const offsetWithinWrapper = targetRect.top - wrapperRect.top;
+      const extra = -2; // тонкая подгонка
+      tabsLeftEl.style.top = `${Math.max(0, Math.round(offsetWithinWrapper + extra))}px`;
+    }catch(e){}
+  }
+
+  function init(){
+    try{
+      buildRowsBuildings();
+      buildRowsResearch();
+      attachLiveThousandsFormatting('#boxesCount, #boxValue, #planetMetal, #planetCrystal, #planetDeut, input[data-id], #tbodyBuildings input, #tbodyResearch input');
+      attachInputsHandlers();
+      renderTable();
+      restoreFromStorage();
+
+      const lang = localStorage.getItem(KEYS.LANG) || 'ru';
+      applyLang(lang);
+
+      syncTabButtonToContent();
+
+      const ZOOM_STEP = 1.08;
+      document.getElementById('globalZoomIn')?.addEventListener('click', ()=>{
+        window.scale = Math.min(3.5, (window.scale||1)*ZOOM_STEP);
+        wrapperEl.style.transform = `translate(${window.posX||0}px, ${window.posY||0}px) scale(${window.scale||1})`;
+        localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale||1, posX: window.posX||0, posY: window.posY||0 }));
+        positionTabs();
+      });
+      document.getElementById('globalZoomOut')?.addEventListener('click', ()=>{
+        window.scale = Math.max(0.4, (window.scale||1)/ZOOM_STEP);
+        wrapperEl.style.transform = `translate(${window.posX||0}px, ${window.posY||0}px) scale(${window.scale||1})`;
+        localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale||1, posX: window.posX||0, posY: window.posY||0 }));
+        positionTabs();
+      });
+
+      document.getElementById('globalZoomReset')?.addEventListener('click', ()=>{
+        fullResetToZero();
+        centerWrapper();
+        setActiveTab('buildings');
+        positionTabs();
+      });
+
+      window.addEventListener('resize', positionTabs);
+      positionTabs();
+    }catch(e){}
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
 })();
   </script>
