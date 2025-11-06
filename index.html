@@ -4,235 +4,21 @@
   <meta charset="utf-8" />
   <title>OGame Калькулятор</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    :root{
-      --accent:#3a7bd5;
-      --metal:#c9aa4a;        /* цвет металла в таблице */
-      --crystal:#7ad1ff;
-      --deut:#9be78f;
-      --try-color:#1877f2;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family:Arial,Helvetica,sans-serif; font-size:12px; color:#e6edf3;
-      background-image:
-        url("./image/wallpaper.jpg"),
-        url("./images/wallpaper.jpg"),
-        linear-gradient(180deg,#071021,#0b1220);
-      background-size: cover, cover, auto;
-      background-position: center center, center center, center;
-      background-repeat: no-repeat, no-repeat, no-repeat;
-      background-attachment: fixed;
-      -webkit-font-smoothing:antialiased;
-    }
-    .theme-dark { --accent:#3a7bd5; color:#e6edf3; }
-
-    /* Основной блок (таблица) */
-    .table-wrapper{
-      position:absolute; left:180px; top:50px; padding:8px;
-      max-width:calc(100vw - 220px);
-      transform-origin:center top; user-select:none; touch-action:none; z-index:1000; background: transparent;
-    }
-
-    .top-controls {
-      display:flex;
-      align-items:center;
-      justify-content:flex-start;
-      gap:8px;
-      margin-bottom:6px;
-      width:100%;
-    }
-    .top-controls-left { display:flex; align-items:center; gap:8px; flex: 1 1 auto; }
-    .top-controls-right { display:flex; align-items:center; gap:8px; }
-
-    .drag-handle{
-      padding:6px 8px; border-radius:6px; border:1px solid var(--accent);
-      background:rgba(58,123,213,0.12); cursor:grab; color:#cfe0ff; user-select:none;
-    }
-    .lang-switch{ display:flex; gap:6px; align-items:center; }
-    .lang-btn{ padding:6px 8px; background:#444; color:#fff; border-radius:6px; border:1px solid #999; cursor:pointer; }
-    .lang-btn.active{ background:var(--accent); }
-
-    .header-bar{ display:flex; align-items:flex-start; gap:8px; width:100%; }
-    .header-left{ display:flex; align-items:flex-start; gap:8px; flex:1 1 auto; }
-
-    /* Верхний блок */
-    .box-row{
-      display:flex; gap:8px; align-items:center; padding:10px 12px; margin:0;
-      background:linear-gradient(180deg, rgba(20,24,32,0.97), rgba(10,12,18,0.97));
-      border:2px solid #253041; border-bottom:none;
-      border-top-left-radius:10px; border-top-right-radius:10px;
-      color:#e6edf3; flex-wrap:wrap; font-size:12px; width:100%;
-    }
-    .box-row .label{ display:flex; gap:8px; align-items:center; font-weight:700; color:#dfeefe; }
-    .box-row .info{ color:#cfe0ff; font-weight:600; display:flex; flex-direction:column; gap:4px; align-items:flex-start; white-space:nowrap; }
-    .box-row .need-open, .box-row .leftover{ display:flex; gap:4px; align-items:center; white-space:nowrap; }
-
-    /* Вкладки слева: максимально плотно к рамке (зазор ~0.1px), длиннее для надписей */
-    .tabs-left {
-      position: absolute;
-      left: calc(-140px + 0.1px); /* плотный «прилип» к левой грани */
-      top: 0; /* фактический top задаёт JS */
-      z-index: 1001;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      padding: 6px 6px;
-      width: 140px; /* длиннее: чтобы все надписи влазили */
-      border-radius: 10px;
-      background: rgba(20,24,32,0.78);
-      border: 1px solid rgba(255,255,255,0.12);
-      backdrop-filter: blur(6px);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.45), inset 0 1px 2px rgba(255,255,255,0.08);
-      pointer-events: auto;
-    }
-    .tab-switch {
-      display: flex; flex-direction: column; gap: 6px; align-items: stretch; margin: 0;
-    }
-
-    /* Кнопки: компактные, глянец, базовый цвет = как «Переместить таблицу» */
-    .tab-btn{
-      padding: 7px 12px; /* чуть длиннее и выше для читаемости */
-      background: linear-gradient(180deg, rgba(58,123,213,0.16), rgba(58,123,213,0.10));
-      color:#fff; border-radius:8px; border:1px solid var(--accent);
-      cursor:pointer; text-align:left; font-weight:800; font-size:12px; letter-spacing:0.2px;
-      transition: all 0.2s ease;
-      box-shadow:
-        inset 0 1px 1.5px rgba(255,255,255,0.25),
-        inset 0 -1px 1.5px rgba(0,0,0,0.25),
-        0 3px 8px rgba(0,0,0,0.35);
-    }
-    .tab-btn:hover{ filter:brightness(1.12) saturate(1.08); transform:translateY(-0.5px); }
-    .tab-btn:active{ transform:translateY(0.5px); filter:brightness(0.98); }
-
-    /* Активные состояния:
-       Постройки — цвет металла (как в таблице),
-       Исследования — зелёный,
-       Флот — красный. */
-    .tab-btn[data-tab="buildings"].active{
-      background: linear-gradient(180deg, color-mix(in oklab, var(--metal) 88%, #ffffff 12%), var(--metal));
-      border-color: var(--metal);
-      box-shadow:
-        inset 0 1px 2px rgba(255,255,255,0.35),
-        0 4px 10px rgba(0,0,0,0.45);
-    }
-    .tab-btn[data-tab="research"].active{
-      background: linear-gradient(180deg, #4caf50, #2e7d32);
-      border-color:#2e7d32;
-      box-shadow:
-        inset 0 1px 2px rgba(255,255,255,0.35),
-        0 4px 10px rgba(0,128,0,0.35);
-    }
-    .tab-btn[data-tab="fleet"].active{
-      background: linear-gradient(180deg, #e53935, #b71c1c);
-      border-color:#b71c1c;
-      box-shadow:
-        inset 0 1px 2px rgba(255,255,255,0.35),
-        0 4px 10px rgba(183,28,28,0.45);
-    }
-
-    .table-frame{
-      margin-top:0; padding:8px;
-      border-radius:0 0 10px 10px;
-      background:linear-gradient(180deg, rgba(20,24,32,0.97), rgba(10,12,18,0.97));
-      box-shadow:0 8px 20px rgba(0,0,0,0.55), inset 0 0 8px rgba(255,255,255,0.04);
-      display:flex; flex-direction:column;
-      border:2px solid #253041; border-top:none;
-      overflow: visible; width:100%;
-    }
-
-    .cost-table{
-      width:100%; border-collapse:collapse; margin-top:6px;
-      flex:0 0 auto; border-radius:6px; overflow:visible; background:rgba(18,22,30,0.95);
-      table-layout:auto;
-    }
-    .cost-table thead th{ background:#2b313b; color:#cfe0ff; white-space:nowrap; border-bottom:1px solid rgba(255,255,255,0.08); }
-    .cost-table th, .cost-table td{ padding:6px 8px; border:1px solid #29323d; font-size:12px; vertical-align:middle; background:transparent; }
-    .cost-table td:first-child, .cost-table th:first-child{ text-align:left; width:220px; padding-left:10px; }
-
-    .lvl-input, .planet-input, input[type="text"]{
-      padding:3px 6px; border-radius:4px; background:#0f1217; border:1px solid #4a5562; color:#e6edf3; height:22px; font-size:12px;
-    }
-    .planet-input{ width:80px; } .lvl-input{ width:70px; }
-
-    .icon{ width:20px; height:20px; vertical-align:middle; margin-right:6px; }
-    .icon-dm{ width:26px; height:26px; margin:0 6px 0 0; display:inline-block; vertical-align:middle; }
-
-    .try-value { color: var(--try-color); font-weight:800; }
-    .tm-left {
-      font-weight:800;
-      background: linear-gradient(90deg, #41c879, #00e0ff, #ff00ff);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-
-    .delivery{ margin-top:8px; padding:8px; border-radius:8px; background:rgba(24,28,36,0.95); border:1px solid rgba(255,255,255,0.06); display:flex; flex-direction:column; gap:8px; }
-    .delivery .blk{ display:block; width:100%; }
-
-    .tab-content{ display:none; } .tab-content.active{ display:block; }
-
-    #shipsTable th, #shipsTable td { padding:4px 6px; font-size:12px; }
-    #shipsTable td:first-child { width:auto; padding-left:8px; }
-
-    .planet-single-row{ display:flex; gap:12px; align-items:center; margin-top:8px; }
-    .planet-field{ display:flex; align-items:center; gap:6px; }
-    .row-deficit{ background:rgba(255,0,0,0.12); }
-    .ship-name{ font-weight:600; color:inherit; font-size:12px; }
-
-    .icon-fallback{ display:inline-block; width:20px; height:20px; line-height:20px; text-align:center; margin-right:6px; opacity:0.9; font-size:13px; vertical-align:middle; background:#2b313b; border-radius:4px; color:#cfe0ff; }
-
-    .global-zoom { position: fixed; top:12px; right:12px; z-index:10000; display:flex; gap:8px; background: rgba(10,12,18,0.6); padding:6px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); backdrop-filter: blur(6px); }
-    .global-zoom button { padding:8px 10px; border-radius:6px; background:#222; color:#fff; border:1px solid #666; cursor:pointer; font-weight:700; }
-
-    .val-metal { color: var(--metal); font-weight:700; }
-    .val-crystal { color: var(--crystal); font-weight:700; }
-    .val-deut { color: var(--deut); font-weight:700; }
-
-    /* Флот — компактная таблица */
-    #fleetFrame { width:auto; max-width:100%; }
-    #shipsTable { table-layout: fixed; border-collapse: collapse; }
-    #shipsTable th:nth-child(1), #shipsTable td:nth-child(1) { width:200px; text-align:left; }
-    #shipsTable th:nth-child(2), #shipsTable td:nth-child(2),
-    #shipsTable th:nth-child(3), #shipsTable td:nth-child(3),
-    #shipsTable th:nth-child(4), #shipsTable td:nth-child(4) { width:90px; text-align:right; }
-    #shipsTable th:nth-child(5), #shipsTable td:nth-child(5) { width:110px; text-align:right; }
-    #shipsTable input[type="text"] { width:100%; box-sizing:border-box; text-align:right; padding-right:4px; }
-
-    #tabFleet #shipsTable { width:800px; margin:0 auto; }
-
-    @media (max-width:640px){
-      .table-wrapper{ left:12px; top:12px; right:12px; position:relative; transform:none; max-width:unset; }
-      .top-controls { flex-wrap:wrap; gap:6px; }
-      .header-bar{ flex-wrap:wrap; }
-
-      .tabs-left{
-        position: relative;
-        left: 0; top: 0;
-        margin: 8px 12px; background: transparent; border: none; padding: 0; backdrop-filter: none; box-shadow: none; width:auto;
-      }
-      .tab-switch{ flex-direction: row; justify-content: center; gap: 6px; }
-      .tab-btn{ text-align:center; }
-
-      .global-zoom{ top:auto; bottom:12px; right:12px; }
-      .box-row{ flex-direction:column; align-items:flex-start; gap:8px; padding:8px; border-radius:8px; }
-      .box-row .info{ margin-left:0; }
-      .table-frame{ border-radius:8px; }
-      #tabFleet #shipsTable { width:100%; }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body class="theme-dark">
-
+  <!-- Обёртка таблицы (wrapper) -->
   <div class="table-wrapper" id="tableWrapper" role="region" aria-label="OGame калькулятор" tabindex="-1">
-
-    <!-- Вкладки слева, плотно приклеены к таблице (~0.1px) -->
+    <!-- Кнопки (перенесены внутрь wrapper чтобы "приклеиваться" к таблице) -->
     <div class="tabs-left" id="tabsLeft">
       <div class="tab-switch" role="tablist" aria-label="Tabs">
         <button class="tab-btn active" data-tab="buildings" aria-selected="true" data-i18n="tabBuildings" role="tab" tabindex="0">Постройки</button>
         <button class="tab-btn" data-tab="research" aria-selected="false" data-i18n="tabResearch" role="tab" tabindex="-1">Исследования</button>
         <button class="tab-btn" data-tab="fleet" aria-selected="false" data-i18n="tabFleet" role="tab" tabindex="-1">Флот</button>
+        <button class="tab-btn" data-tab="lifeforms" aria-selected="false" data-i18n="tabLifeforms" role="tab" tabindex="-1">Формы жизни</button>
       </div>
     </div>
-
+    <!-- Внешний контроллер (захват для перетаскивания, языки и т.д.) -->
     <div class="top-controls">
       <div class="top-controls-left">
         <div class="drag-handle" id="dragHandle" tabindex="0" role="button" aria-label="Переместить таблицу">Переместить таблицу</div>
@@ -244,29 +30,28 @@
         </div>
       </div>
     </div>
-
     <div class="header-bar" id="headerBar">
       <div class="header-left">
         <div class="box-row" id="globalBoxRow">
           <label class="label" id="lblBoxes"><img src="images/metal_box.png" class="icon" alt=""> <span data-i18n="boxesLabel">Коробка с металлом</span></label>
-          <input id="boxesCount" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="boxesCountPh" placeholder="Кол-во коробок" style="width:120px">
-          <input id="boxValue" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="boxValuePh" placeholder="Металла в 1 коробке" style="width:170px">
+          <input id="boxesCount" type="text" inputmode="numeric" data-i18n-ph="boxesCountPh" placeholder="Кол-во коробок" style="width:120px">
+          <input id="boxValue" type="text" inputmode="numeric" data-i18n-ph="boxValuePh" placeholder="Металла в 1 коробке" style="width:170px">
           <div class="info" aria-live="polite">
             <div class="need-open" style="display:flex;gap:4px;align-items:center;">
               <span data-i18n="needOpen">Нужно открыть:</span>
-              <span id="boxesNeeded">0</span>
+              <span id="boxesNeeded">—</span>
               <span data-i18n="boxes">коробок</span>
               <div id="boxesCostTL" class="try-value" style="margin-left:6px;">TRY: —</div>
             </div>
             <div class="leftover" aria-live="polite" style="display:flex;gap:4px;align-items:center;">
-              <span data-i18n="leftoverLabel">Остаток ТМ:</span>
+              <span data-i18n="leftoverLabel">Остаток ТМ</span>
               <span id="leftoverTmValue" class="tm-left">—</span>
             </div>
           </div>
         </div>
       </div>
     </div>
-
+    <!-- Содержимое табов -->
     <div id="tabBuildings" class="tab-content active" role="tabpanel" aria-hidden="false">
       <div class="table-frame">
         <table class="cost-table" id="buildingsTable" aria-describedby="buildingsDesc">
@@ -293,21 +78,21 @@
               <td id="sumPointsB" aria-live="polite">0</td>
             </tr>
             <tr>
-              <td colspan="4" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td><td colspan="4" id="sumTotalMetalB" aria-live="polite">0</td>
+              <td colspan="4" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td>
+              <td colspan="4" id="sumTotalMetalB" aria-live="polite">0</td>
             </tr>
           </tfoot>
         </table>
       </div>
     </div>
-
     <div id="tabResearch" class="tab-content" role="tabpanel" aria-hidden="true">
       <div class="table-frame">
         <div class="tm-block" id="tmBlock" style="display:flex;align-items:center;gap:6px;padding:0;background:transparent;border:none;">
-          <img src="images/dm.png" class="icon-dm" alt="DM">
-          <input id="tmInput" type="number" class="lvl-input" placeholder="72810" min="0" step="1">
-          <span id="tmTotal" aria-live="polite">Итого: 0</span>
-        </div>
-
+  <img src="images/dm.png" class="icon-dm" alt="DM">
+  <!-- ✅ ИСПРАВЛЕНО: убран класс lvl-input и добавлена ширина -->
+  <input id="tmInput" type="number" placeholder="72810" min="0" step="1" style="width: 75px;">
+  <span id="tmTotal" aria-live="polite">Итого: 0</span>
+</div>
         <table class="cost-table" id="researchTable" aria-describedby="researchDesc">
           <caption id="researchDesc" style="position:absolute;left:-9999px;">Таблица подсчета ресурсов для исследований</caption>
           <thead>
@@ -331,13 +116,13 @@
               <td id="sumPointsR" aria-live="polite">0</td>
             </tr>
             <tr>
-              <td colspan="3" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td><td colspan="4" id="sumTotalMetalR" aria-live="polite">0</td>
+              <td colspan="3" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td>
+              <td colspan="4" id="sumTotalMetalR" aria-live="polite">0</td>
             </tr>
           </tfoot>
         </table>
       </div>
     </div>
-
     <div id="tabFleet" class="tab-content" role="tabpanel" aria-hidden="true">
       <div class="table-frame" id="fleetFrame">
         <table class="cost-table" id="shipsTable" aria-describedby="fleetDesc">
@@ -352,919 +137,124 @@
             </tr>
           </thead>
           <tbody></tbody>
-          <tfoot>
-            <tr><td colspan="5" style="padding:0; border-top:1px solid #29323d;"></td></tr>
-          </tfoot>
         </table>
-
         <div class="planet-single-row" style="margin-top:10px;">
           <div id="planetLabel" style="display:flex;align-items:center;gap:8px;"><img src="images/planet.png" class="icon" alt=""> <span data-i18n="planetResources">Ресурсы на планете</span></div>
           <div class="planet-field"><img src="images/metal.png" class="icon" alt=""><input id="planetMetal" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="planetMetalPh" placeholder="Металл" style="width:120px"></div>
           <div class="planet-field"><img src="images/crystal.png" class="icon" alt=""><input id="planetCrystal" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="planetCrystalPh" placeholder="Кристалл" style="width:120px"></div>
           <div class="planet-field"><img src="images/deuterium.png" class="icon" alt=""><input id="planetDeut" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="planetDeutPh" placeholder="Дейтерий" style="width:120px"></div>
         </div>
-
         <div class="delivery" aria-live="polite" id="fleetDelivery" style="display:none;">
           <div class="blk" id="deliveryTotalsBlock" style="display:flex;" aria-live="polite">
             <div style="font-weight:700" data-i18n="deliveryTotals">Итого по ресурсам:</div>
             <div style="margin-left:8px;"><span id="totalRes">0 Металл, 0 Кристалл, 0 Дейтерий</span></div>
           </div>
-
           <div class="blk" id="deliveryMetalEqBlock" style="display:flex;" aria-live="polite">
             <div style="font-weight:700" data-i18n="metalEq">Эквивалент в металле:</div>
             <div style="margin-left:8px;"><span id="totalMetalEq">0</span></div>
           </div>
-
           <div class="blk" id="deliveryGrandBlock" style="display:flex;" aria-live="polite">
             <div style="font-weight:700" data-i18n="grandAfter">Остаток после вычета:</div>
             <div style="margin-left:8px;"><span id="grandTotal">0</span></div>
           </div>
         </div>
-
       </div>
     </div>
-
+    <div id="tabLifeforms" class="tab-content" role="tabpanel" aria-hidden="true">
+      <div class="table-frame">
+        <div class="lf-subtabs" role="tablist" aria-label="LifeformTabs">
+          <button class="lf-subtab-btn active" data-subtab="lf-buildings" aria-selected="true" tabindex="0" data-i18n="lfTabBuildings">Постройки</button>
+          <button class="lf-subtab-btn" data-subtab="lf-research" aria-selected="false" tabindex="-1" data-i18n="lfTabResearch">Исследования</button>
+          <select id="lifeformSelect" class="lifeform-select" aria-label="Lifeform">
+            <option value="humans" selected>Люди</option>
+            <option value="rocktal">Рок'тал</option>
+            <option value="mechas">Мехи</option>
+            <option value="kaelesh">Кэлиш</option>
+          </select>
+        </div>
+        <div class="lf-bonuses" id="lfBonuses" aria-live="polite">
+          <div class="field">
+            <label for="megalithLevel">Мегалит (ур.)</label>
+            <input id="megalithLevel" type="number" min="0" max="100" step="1" placeholder="0">
+          </div>
+          <div class="field">
+            <label for="mrcLevel">Центр минералов (ур.)</label>
+            <input id="mrcLevel" type="number" min="0" max="100" step="1" placeholder="0">
+          </div>
+        </div>
+        <div id="lf-buildings" class="subtab-content active" role="tabpanel" aria-hidden="false">
+          <table class="cost-table" id="lfBuildingsTable" aria-describedby="lfBuildingsDesc">
+            <caption id="lfBuildingsDesc" style="position:absolute;left:-9999px;">Таблица форм жизни: постройки</caption>
+            <thead>
+              <tr>
+                <th data-key="lfBuilding"><span class="data-key-label" data-i18n="lfBuilding">Постройка</span></th>
+                <th data-key="from"><span class="data-key-label" data-i18n="from">От</span></th>
+                <th data-key="to"><span class="data-key-label" data-i18n="to">До</span></th>
+                <th data-key="metal"><img src="images/metal.png" class="icon" alt=""><span class="data-key-label" data-i18n="metal">Металл</span></th>
+                <th data-key="crystal"><img src="images/crystal.png" class="icon" alt=""><span class="data-key-label" data-i18n="crystal">Кристалл</span></th>
+                <th data-key="deut"><img src="images/deuterium.png" class="icon" alt=""><span class="data-key-label" data-i18n="deut">Дейтерий</span></th>
+                <th data-key="energy"><span class="data-key-label" data-i18n="energy">Энергия</span></th>
+                <th data-key="points"><span class="data-key-label" data-i18n="points">Очки</span></th>
+              </tr>
+            </thead>
+            <tbody id="tbodyLfBuildings"></tbody>
+            <tfoot>
+              <tr>
+                <td><span class="data-key-label" data-i18n="total">Итого</span></td><td></td><td></td>
+                <td id="sumMetalLfB"><span class="val-metal">0</span></td>
+                <td id="sumCrystalLfB"><span class="val-crystal">0</span></td>
+                <td id="sumDeutLfB"><span class="val-deut">0</span></td>
+                <td id="sumEnergyLfB">0</td>
+                <td id="sumPointsLfB">0</td>
+              </tr>
+              <tr>
+                <td colspan="3" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td>
+                <td colspan="5" id="sumTotalMetalLfB">0</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div id="lf-research" class="subtab-content" role="tabpanel" aria-hidden="true">
+          <table class="cost-table" id="lfResearchTable" aria-describedby="lfResearchDesc">
+            <caption id="lfResearchDesc" style="position:absolute;left:-9999px;">Таблица форм жизни: исследования</caption>
+            <thead>
+              <tr>
+                <th data-key="lfResearch"><span class="data-key-label" data-i18n="lfResearch">Исследование</span></th>
+                <th data-key="from"><span class="data-key-label" data-i18n="from">От</span></th>
+                <th data-key="to"><span class="data-key-label" data-i18n="to">До</span></th>
+                <th data-key="metal"><img src="images/metal.png" class="icon" alt=""><span class="data-key-label" data-i18n="metal">Металл</span></th>
+                <th data-key="crystal"><img src="images/crystal.png" class="icon" alt=""><span class="data-key-label" data-i18n="crystal">Кристалл</span></th>
+                <th data-key="deut"><img src="images/deuterium.png" class="icon" alt=""><span class="data-key-label" data-i18n="deut">Дейтерий</span></th>
+                <th data-key="energy"><span class="data-key-label" data-i18n="energy">Энергия</span></th>
+                <th data-key="points"><span class="data-key-label" data-i18n="points">Очки</span></th>
+              </tr>
+            </thead>
+            <tbody id="tbodyLfResearch"></tbody>
+            <tfoot>
+              <tr>
+                <td><span class="data-key-label" data-i18n="total">Итого</span></td><td></td><td></td>
+                <td id="sumMetalLfR"><span class="val-metal">0</span></td>
+                <td id="sumCrystalLfR"><span class="val-crystal">0</span></td>
+                <td id="sumDeutLfR"><span class="val-deut">0</span></td>
+                <td id="sumEnergyLfR">0</td>
+                <td id="sumPointsLfR">0</td>
+              </tr>
+              <tr>
+                <td colspan="3" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td>
+                <td colspan="5" id="sumTotalMetalLfR">0</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
-
+  <!-- Глобальные кнопки масштабирования -->
   <div class="global-zoom" id="globalZoom" aria-hidden="false">
     <button id="globalZoomIn" title="Приблизить">+</button>
     <button id="globalZoomOut" title="Отдалить">−</button>
-    <button id="globalZoomReset" title="Сброс и центр">⤢</button>
+    <button id="globalZoomReset" title="Сброс и центр">⤦</button>
   </div>
-
-  <script>
-/* Полный скрипт: вкладки плотно к таблице, ширина/позиция, активные цвета, расчёты и локализация */
-(function(){
-  'use strict';
-
-  const CONFIG = {
-    TM_PER_BOX: 42000,
-    TM_PACKS: [{ tm:12500000, priceTRY:900 }],
-    METAL_EQ_CRYSTAL: 1.5,
-    METAL_EQ_DEUT: 3,
-    MAX_LEVEL_SPAN: 1000,
-    TM_PER_LEVEL_FACTOR: 2
-  };
-
-  const LANG = {
-    ru: {
-      tmLabel:"Тёмная материя",
-      totalTMLabel:"Итого: ",
-      tabBuildings:"Постройки",
-      tabResearch:"Исследования",
-      tabFleet:"Флот",
-      locale:"ru-RU",
-      boxesLabel:"Коробка с металлом",
-      needOpen:"Нужно открыть:",
-      boxes:"коробок",
-      building:"Постройка",
-      from:"От",
-      to:"До",
-      planets:"Планеты",
-      metal:"Металл",
-      crystal:"Кристалл",
-      deut:"Дейтерий",
-      points:"Очки",
-      total:"Итого",
-      totalInMetal:"Всего в металле",
-      research:"Исследование",
-      ship:"Корабль",
-      qty:"Количество",
-      planetResources:"Ресурсы на планете",
-      deliveryTotals:"Итого по ресурсам:",
-      metalEq:"Эквивалент в металле:",
-      grandAfter:"Остаток после вычета:",
-      leftoverLabel:"Остаток ТМ",
-      boxesCountPh: "Кол-во коробок",
-      boxValuePh: "Металла в 1 коробке",
-      planetMetalPh: "Металл",
-      planetCrystalPh: "Кристалл",
-      planetDeutPh: "Дейтерий"
-    },
-    tr: {
-      tmLabel:"Karanlık Madde",
-      totalTMLabel:"Toplam: ",
-      tabBuildings:"Binalar",
-      tabResearch:"Araştırmalar",
-      tabFleet:"Filo",
-      locale:"tr-TR",
-      boxesLabel:"Metal Paketi",
-      needOpen:"Açılmalı:",
-      boxes:"kutu",
-      building:"Bina",
-      from:"Başlangıç",
-      to:"Hedef",
-      planets:"Gezegenler",
-      metal:"Metal",
-      crystal:"Kristal",
-      deut:"Deuterium",
-      points:"Puan",
-      total:"Toplam",
-      totalInMetal:"Metalde toplam",
-      research:"Araştırma",
-      ship:"Gemi",
-      qty:"Adet",
-      planetResources:"Gezegendeki kaynaklar",
-      deliveryTotals:"Toplam kaynaklar:",
-      metalEq:"Metale eşdeğer:",
-      grandAfter:"Kısıtlamadan sonra kalan:",
-      leftoverLabel:"Kalan KM",
-      boxesCountPh: "Kutu sayısı",
-      boxValuePh: "Metalin bir günlük üretimi",
-      planetMetalPh: "Metal",
-      planetCrystalPh: "Kristal",
-      planetDeutPh: "Deuterium"
-    }
-  };
-
-  const BUILDINGS_DATA = [ { base:{m:60,c:15,d:0}, factor:1.5 }, { base:{m:48,c:24,d:0}, factor:1.6 }, { base:{m:225,c:75,d:0}, factor:1.5 }, { base:{m:75,c:30,d:0}, factor:1.5 }, { base:{m:900,c:360,d:180}, factor:1.8 }, { base:{m:400,c:120,d:200}, factor:2.0 }, { base:{m:1000000,c:500000,d:100000}, factor:2.0 }, { base:{m:400,c:200,d:100}, factor:2.0 }, { base:{m:2000,c:0,d:0}, factor:2.0 }, { base:{m:2000,c:1000,d:0}, factor:2.0 }, { base:{m:2000,c:2000,d:0}, factor:2.0 }, { base:{m:200,c:400,d:200}, factor:2.0 }, { base:{m:50000,c:100000,d:0}, factor:2.0 }, { base:{m:20000,c:40000,d:0}, factor:2.0 }, { base:{m:200,c:0,d:50}, factor:2.0 }, { base:{m:20000,c:20000,d:0}, factor:2.0 } ];
-  const RESEARCH_DATA = [ { base:{m:200,c:1000,d:200}, factor:2.0 }, { base:{m:0,c:400,d:600}, factor:2.0 }, { base:{m:800,c:200,d:0}, factor:2.0 }, { base:{m:200,c:600,d:0}, factor:2.0 }, { base:{m:1000,c:0,d:0}, factor:2.0 }, { base:{m:0,c:800,d:400}, factor:2.0 }, { base:{m:0,c:4000,d:2000}, factor:2.0 }, { base:{m:400,c:0,d:600}, factor:2.0 }, { base:{m:2000,c:4000,d:600}, factor:2.0 }, { base:{m:10000,c:20000,d:6000}, factor:2.0 }, { base:{m:200,c:100,d:0}, factor:2.0 }, { base:{m:1000,c:300,d:100}, factor:2.0 }, { base:{m:2000,c:4000,d:1000}, factor:2.0 }, { base:{m:240000,c:400000,d:160000}, factor:2.0 }, { base:{m:4000,c:8000,d:4000}, factor:1.75 }, { base:{m:0,c:0,d:0}, factor:3.0 } ];
-
-  const shipList = [
-    { id:"small_cargo", ru:"Малый транспорт", tr:"Küçük Nakliye", metal:2000, crystal:2000, deut:0, img:"maly_transport.png" },
-    { id:"large_cargo", ru:"Большой транспорт", tr:"Büyük Nakliye", metal:6000, crystal:6000, deut:0, img:"bolshoy_transport.png" },
-    { id:"light_fighter", ru:"Лёгкий истребитель", tr:"Hafif Avcı", metal:3000, crystal:1000, deut:0, img:"legkiy_istrebitel.png" },
-    { id:"heavy_fighter", ru:"Тяжёлый истребитель", tr:"Ağır Avcı", metal:6000, crystal:4000, deut:0, img:"tyazhely_istrebitel.png" },
-    { id:"cruiser", ru:"Крейсер", tr:"Kruvazör", metal:20000, crystal:7000, deut:2000, img:"kreiser.png" },
-    { id:"battleship", ru:"Линкор", tr:"Komuta Gemisi", metal:45000, crystal:15000, deut:0, img:"linkor.png" },
-    { id:"battlecruiser", ru:"Линейный крейсер", tr:"Fırkateyn", metal:30000, crystal:40000, deut:15000, img:"battlecruiser.png" },
-    { id:"bomber", ru:"Бомбардировщик", tr:"Bombardıman Gemisi", metal:50000, crystal:25000, deut:15000, img:"bombardirovshik.png" },
-    { id:"destroyer", ru:"Уничтожитель", tr:"Muhrip", metal:60000, crystal:50000, deut:15000, img:"unichtozhitel.png" },
-    { id:"zhnec", ru:"Жнец", tr:"Azrail", metal:85000, crystal:55000, deut:20000, img:"zhnec.png" },
-    { id:"pathfinder", ru:"Перво-проходец", tr:"Rehber", metal:8000, crystal:15000, deut:8000, img:"pathfinder.png" },
-    { id:"recycler", ru:"Переработчик", tr:"Geri Dönüşümcü", metal:10000, crystal:6000, deut:2000, img:"recycler.png" },
-    { id:"death_star", ru:"Звезда смерти", tr:"Ölüm Yıldızı", metal:5000000, crystal:4000000, deut:1000000, img:"death_star.png" }
-  ];
-
-  const BUILDING_NAMES = { ru:["Рудник по добыче металла","Рудник по добыче кристалла","Синтезатор дейтерия","Солнечная электростанция","Термоядерная электростанция","Фабрика роботов","Фабрика нанитов","Верфь","Хранилище металла","Хранилище кристалла","Хранилище дейтерия","Исслед-кая лаборатория","Терраформер","Склад альянса","Космическая док","Ракетная шахта"], tr:["Metal Madeni","Kristal Madeni","Deuterium Sentezleyici","Solar Enerji Santrali","Füzyon Santrali","Robot Fabrikası","Nanite Fabrikası","Tersane","Metal Deposu","Kristal Deposu","Deuterium Tankeri","Bilimsel Araştırma Laboratuvarı","Terraformer","İttifak Deposu","Uzay İskelesi","Roket Silosu"] };
-  const RESEARCH_NAMES = { ru:["Шпионаж","Компьютерная технология","Оружейная технология","Щитовая технология","Броня космических кораблей","Энергетическая технология","Гипер-нная технология","Реактивный Двигатель","Импульсный Двигатель","Гипер-нный Двигатель","Лазерная технология","Ионная технология","Плазменная технология","М.И.С","Астрофизика","Гравитационная технология"], tr:["Casusluk Tekniği","Bilgisayar Teknolojisi","Silah Teknolojisi","Koruyucu Kalkan Tekniği","Uzay Gemisi Zırhlandırması","Enerji Tekniği","Hiperuzay Tekniği","Yanmalı Motor Takımı","İtki Motoru","Hiperuzay İticisi","Lazer Tekniği","İyon Tekniği","Plazma Tekniği","Galaksiler Arası Araştırma Ağı","Astrofizik","Gravitasyon Araştırması"] };
-
-  const KEYS = {
-    LANG: 'og_calc_lang_v2',
-    TRANSFORM: 'og_calc_transform_v2',
-    INPUTS_BUILD: 'og_calc_inputs_build_v2',
-    INPUTS_RESEARCH: 'og_calc_inputs_research_v2',
-    TM: 'og_calc_tm_v2',
-    BOXES: 'og_calc_boxes_v2',
-    SHIP_QTY: 'og_calc_ship_qty_v2',
-    ACTIVE_TAB: 'og_calc_active_tab_v2'
-  };
-
-  // cached elements
-  const tbodyB = document.getElementById('tbodyBuildings');
-  const tbodyR = document.getElementById('tbodyResearch');
-  const tmInput = document.getElementById('tmInput');
-  const tmTotal = document.getElementById('tmTotal');
-  const wrapperEl = document.getElementById('tableWrapper');
-  const boxesNeededEl = document.getElementById('boxesNeeded');
-  const boxesCountInput = document.getElementById('boxesCount');
-  const boxValueInput = document.getElementById('boxValue');
-  const boxesCostTLEl = document.getElementById('boxesCostTL');
-  const leftoverTmValueEl = document.getElementById('leftoverTmValue');
-  const tabsLeftEl = document.getElementById('tabsLeft');
-  const headerBarEl = document.getElementById('headerBar');
-
-  function formatWithDotsRaw(inputStr){
-    if(inputStr === null || inputStr === undefined) return '';
-    const s = String(inputStr);
-    const sign = s[0] === '-' ? '-' : '';
-    const digits = (sign ? s.slice(1) : s).replace(/[^0-9]/g, '');
-    if(digits.length === 0) return sign ? '-' : '';
-    let out = '';
-    for(let i = digits.length; i > 0; i -= 3){
-      const start = Math.max(0, i - 3);
-      out = digits.slice(start, i) + (out ? '.' + out : '');
-    }
-    return sign + out;
-  }
-  function formatNumberWithDots(n){ if (n === null || n === undefined || isNaN(n)) return '0'; return formatWithDotsRaw(Math.round(Number(n) || 0)); }
-  function parseNumberInput(s){
-    if (s === null || s === undefined) return 0;
-    const str = String(s).trim(); if (str === '' || str === '-') return 0;
-    const negative = str[0] === '-';
-    const cleaned = str.replace(/[^0-9]/g, '');
-    const num = cleaned ? Number(cleaned) : 0;
-    if (!Number.isFinite(num)) return 0;
-    const safe = Math.min(num, Number.MAX_SAFE_INTEGER);
-    return negative ? -safe : safe;
-  }
-  function getNumberFormatter(lang){ try{ return new Intl.NumberFormat(LANG[lang]?.locale || 'ru-RU'); }catch(e){ return new Intl.NumberFormat('ru-RU'); } }
-  function formatNumber(n, lang = localStorage.getItem(KEYS.LANG) || 'ru'){
-    if (n === null || n === undefined || isNaN(n)) return '0';
-    const nf = getNumberFormatter(lang); return nf.format(Math.round(Number(n) || 0));
-  }
-
-  function geomSum(base, factor, from, to){
-    const len = Math.max(0, to - from);
-    if(len <= 0) return { m:0,c:0,d:0, points:0, levels:0 };
-    const expoStart = Math.max(0, from);
-    const count = len;
-    const sum = (b) => {
-      if (!b || count === 0) return 0;
-      if (factor === 1) return b * count * Math.pow(factor, expoStart);
-      return b * Math.pow(factor, expoStart) * (Math.pow(factor, count) - 1) / (factor - 1);
-    };
-    const m = Math.round(sum(base.m));
-    const c = Math.round(sum(base.c));
-    const d = Math.round(sum(base.d));
-    const points = Math.round((m + c + d) / 1000);
-    return { m, c, d, points, levels: count };
-  }
-  function formatSpanMetal(n){ return `<span class="val-metal">${formatNumber(n)}</span>`; }
-  function formatSpanCrystal(n){ return `<span class="val-crystal">${formatNumber(n)}</span>`; }
-  function formatSpanDeut(n){ return `<span class="val-deut">${formatNumber(n)}</span>`; }
-  function convertToMetal(m,c,d){ return m + c * CONFIG.METAL_EQ_CRYSTAL + d * CONFIG.METAL_EQ_DEUT; }
-  function debounce(fn, wait) { let t=null; return function(...a){ clearTimeout(t); t=setTimeout(()=>fn.apply(this,a), wait); }; }
-
-  const ICONS_BUILDINGS = [ "metal_mine.png","crystal_mine.png","deuterium_synth.png","solar_plant.png","fusion_plant.png","robot_factory.png","nanite_factory.png","shipyard.png","metal_storage.png","crystal_storage.png","deuterium_tank.png","research_lab.png","terraformer.png","alliance_depot.png","dock.png","missile_silo.png" ];
-  const ICONS_RESEARCH = [ "spy.png","computer.png","weapons.png","shield.png","armor.png","energy.png","hyperspace.png","combustion.png","impulse.png","hyperdrive.png","laser.png","ion.png","plasma.png","irn.png","astro.png","graviton.png" ];
-
-  function createImageFallbackEl(label){
-    const span = document.createElement('span');
-    span.className = 'icon-fallback'; span.setAttribute('aria-hidden','true'); span.textContent = label ? label[0] : '—';
-    return span;
-  }
-
-  function buildRowsBuildings(){
-    if(!tbodyB) return;
-    tbodyB.innerHTML = '';
-    const names = BUILDING_NAMES[localStorage.getItem(KEYS.LANG) || 'ru'] || BUILDING_NAMES.ru;
-    const frag = document.createDocumentFragment();
-    names.forEach((name, i) => {
-      const tr = document.createElement('tr'); tr.dataset.index = i;
-      const tdName = document.createElement('td'); tdName.className = 'name-cell';
-      const icon = ICONS_BUILDINGS[i];
-      if (icon){
-        const img = document.createElement('img');
-        img.src = `images/${icon}`; img.className = 'icon'; img.alt = '';
-        img.addEventListener('error', () => {
-          if (!img._fallback){
-            const fb = createImageFallbackEl(name);
-            img.style.display = 'none';
-            img.parentNode && img.parentNode.insertBefore(fb, img.nextSibling);
-            img._fallback = true;
-          }
-        });
-        tdName.appendChild(img);
-      } else { tdName.appendChild(createImageFallbackEl(name)); }
-      tdName.appendChild(document.createTextNode(name));
-      tr.appendChild(tdName);
-
-      const tdFrom = document.createElement('td'); tdFrom.innerHTML = `<input type="text" class="lvl-input" data-type="from" data-index="${i}" inputmode="numeric">`;
-      const tdTo = document.createElement('td'); tdTo.innerHTML = `<input type="text" class="lvl-input" data-type="to" data-index="${i}" inputmode="numeric">`;
-      const tdPlanets = document.createElement('td'); tdPlanets.innerHTML = `<img src="images/planet.png" class="icon" alt=""><input type="text" class="planet-input" data-type="planets" data-index="${i}" inputmode="numeric" value="1">`;
-      const tdM = document.createElement('td'); tdM.className = 'm'; tdM.innerHTML = `<span class="val-metal">0</span>`;
-      const tdC = document.createElement('td'); tdC.className = 'c'; tdC.innerHTML = `<span class="val-crystal">0</span>`;
-      const tdD = document.createElement('td'); tdD.className = 'd'; tdD.innerHTML = `<span class="val-deut">0</span>`;
-      const tdP = document.createElement('td'); tdP.className = 'p'; tdP.textContent = '0';
-
-      tr.appendChild(tdFrom); tr.appendChild(tdTo); tr.appendChild(tdPlanets);
-      tr.appendChild(tdM); tr.appendChild(tdC); tr.appendChild(tdD); tr.appendChild(tdP);
-      frag.appendChild(tr);
-    });
-    tbodyB.appendChild(frag);
-  }
-
-  function buildRowsResearch(){
-    if(!tbodyR) return;
-    tbodyR.innerHTML = '';
-    const names = RESEARCH_NAMES[localStorage.getItem(KEYS.LANG) || 'ru'] || RESEARCH_NAMES.ru;
-    const frag = document.createDocumentFragment();
-    names.forEach((name, i) => {
-      const tr = document.createElement('tr'); tr.dataset.index = i;
-      const tdName = document.createElement('td'); tdName.className = 'name-cell';
-      const icon = ICONS_RESEARCH[i];
-      if (icon){
-        const img = document.createElement('img');
-        img.src = `images/${icon}`; img.className = 'icon'; img.alt = '';
-        img.addEventListener('error', () => {
-          if (!img._fallback){
-            const fb = createImageFallbackEl(name);
-            img.style.display = 'none';
-            img.parentNode && img.parentNode.insertBefore(fb, img.nextSibling);
-            img._fallback = true;
-          }
-        });
-        tdName.appendChild(img);
-      } else { tdName.appendChild(createImageFallbackEl(name)); }
-      tdName.appendChild(document.createTextNode(name));
-      tr.appendChild(tdName);
-
-      const tdFrom = document.createElement('td'); tdFrom.innerHTML = `<input type="text" class="lvl-input" data-type="from" data-index="${i}" inputmode="numeric">`;
-      const tdTo = document.createElement('td'); tdTo.innerHTML = `<input type="text" class="lvl-input" data-type="to" data-index="${i}" inputmode="numeric">`;
-      const tdM = document.createElement('td'); tdM.className = 'm'; tdM.innerHTML = `<span class="val-metal">0</span>`;
-      const tdC = document.createElement('td'); tdC.className = 'c'; tdC.innerHTML = `<span class="val-crystal">0</span>`;
-      const tdD = document.createElement('td'); tdD.className = 'd'; tdD.innerHTML = `<span class="val-deut">0</span>`;
-      const tdP = document.createElement('td'); tdP.className = 'p'; tdP.textContent = '0';
-
-      tr.appendChild(tdFrom); tr.appendChild(tdTo);
-      tr.appendChild(tdM); tr.appendChild(tdC); tr.appendChild(tdD); tr.appendChild(tdP);
-      frag.appendChild(tr);
-    });
-    tbodyR.appendChild(frag);
-  }
-
-  function renderTable(){
-    const tableBody = document.querySelector("#shipsTable tbody");
-    if(!tableBody) return;
-    const qtyMap = JSON.parse(localStorage.getItem(KEYS.SHIP_QTY) || '{}');
-    tableBody.innerHTML='';
-    const frag = document.createDocumentFragment();
-    shipList.forEach(ship=>{
-      const v = qtyMap[ship.id] || '';
-      const row = document.createElement('tr'); row.setAttribute('data-row-id', ship.id);
-      const shipName = (localStorage.getItem(KEYS.LANG) === 'tr') ? (ship.tr || ship.ru) : (ship.ru || ship.tr);
-
-      const tdName = document.createElement('td'); tdName.style.textAlign = 'left';
-      const img = document.createElement('img');
-      img.src = `images/ships/${ship.img}`; img.alt = shipName;
-      img.width = 28; img.height = 28; img.loading = 'lazy';
-      img.style.width = '28px'; img.style.height = '28px'; img.style.verticalAlign = 'middle'; img.style.marginRight = '8px'; img.style.borderRadius='4px';
-      img.addEventListener('error', () => {
-        if(!img._fallback){
-          const fb = createImageFallbackEl(shipName);
-          img.style.display='none';
-          img.parentNode && img.parentNode.insertBefore(fb, img.nextSibling);
-          img._fallback=true;
-        }
-      });
-      tdName.appendChild(img);
-      const span = document.createElement('span'); span.className='ship-name'; span.textContent = shipName; tdName.appendChild(span);
-
-      const tdM = document.createElement('td'); tdM.innerHTML = formatSpanMetal(ship.metal);
-      const tdC = document.createElement('td'); tdC.innerHTML = formatSpanCrystal(ship.crystal);
-      const tdD = document.createElement('td'); tdD.innerHTML = formatSpanDeut(ship.deut);
-      const tdQty = document.createElement('td'); tdQty.innerHTML = `<input type="text" inputmode="numeric" pattern="[0-9\\.]*" value="${v ? formatWithDotsRaw(v) : ''}" data-id="${ship.id}">`;
-
-      row.appendChild(tdName); row.appendChild(tdM); row.appendChild(tdC); row.appendChild(tdD); row.appendChild(tdQty);
-      frag.appendChild(row);
-    });
-    tableBody.appendChild(frag);
-
-    attachLiveThousandsFormatting('input[data-id]');
-
-    document.querySelectorAll("input[data-id]").forEach(inp=>{
-      if(!inp._qtyBound){
-        inp.addEventListener('input', ()=>{ saveShipQuantities(); computeFleet(); });
-        inp.addEventListener('change', ()=>{ saveShipQuantities(); computeFleet(); });
-        inp._qtyBound = true;
-      }
-    });
-  }
-
-  function attachLiveThousandsFormatting(selector){
-    const inputs = document.querySelectorAll(selector);
-    inputs.forEach(inp => {
-      if(!inp || inp._thousandsBound) return;
-      inp._thousandsBound = true;
-
-      inp.addEventListener('input', function(){
-        const el = this; const raw = el.value; const selStart = el.selectionStart || 0;
-        let left = raw.slice(0, selStart).replace(/[^0-9\-]/g, '');
-        const leftDigitsCount = (left[0] === '-' ? left.slice(1) : left).length;
-        const formatted = formatWithDotsRaw(raw); el.value = formatted;
-        let digitsSeen = 0, newPos = 0;
-        for(let i=0;i<formatted.length;i++){
-          if(/\d/.test(formatted[i])) digitsSeen++;
-          newPos++;
-          if(digitsSeen >= leftDigitsCount) break;
-        }
-        try{ el.setSelectionRange(newPos, newPos); }catch(e){}
-      });
-
-      inp.addEventListener('blur', function(){
-        const v = this.value;
-        if (v === '' || v === '-') { this.value = ''; return; }
-        const num = parseNumberInput(v);
-        this.value = num === 0 ? '' : formatWithDotsRaw(num);
-        this.dispatchEvent(new Event('change', { bubbles: true }));
-      });
-
-      inp.addEventListener('keydown', function(e){
-        const allowed = ['Backspace','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Delete','Tab','Home','End'];
-        if (e.ctrlKey || e.metaKey) return;
-        if(allowed.indexOf(e.key) !== -1) return;
-        if(e.key >= '0' && e.key <= '9') return;
-        if(e.key === '-' || e.key === '.' || e.key === ',') return;
-        e.preventDefault();
-      });
-
-      inp.addEventListener('paste', function(e){
-        e.preventDefault();
-        const text = (e.clipboardData || window.clipboardData)?.getData('text') || '';
-        const cleanedChunk = formatWithDotsRaw(text);
-        const start = this.selectionStart || 0;
-        const end = this.selectionEnd || start;
-        const before = this.value.slice(0, start);
-        const after = this.value.slice(end);
-        const nextRaw = before + cleanedChunk + after;
-        const next = formatWithDotsRaw(nextRaw);
-        this.value = next;
-
-        const caretTargetDigits = (before + cleanedChunk).replace(/[^0-9]/g,'').length;
-        let pos = 0, seen = 0;
-        while (pos < next.length && seen < caretTargetDigits) { if (/\d/.test(next[pos])) seen++; pos++; }
-        try { this.setSelectionRange(pos, pos); } catch {}
-        this.dispatchEvent(new Event('change', { bubbles: true }));
-      });
-    });
-  }
-
-  function saveShipQuantities(){
-    try{
-      const qtyMap = {};
-      document.querySelectorAll('input[data-id]').forEach(inp=>{
-        qtyMap[inp.dataset.id] = parseNumberInput(inp.value);
-      });
-      localStorage.setItem(KEYS.SHIP_QTY, JSON.stringify(qtyMap));
-    }catch(e){}
-  }
-
-  function computeFleet(){
-    try{
-      const factorC = CONFIG.METAL_EQ_CRYSTAL;
-      const factorD = CONFIG.METAL_EQ_DEUT;
-      let totalM=0, totalC=0, totalD=0;
-      document.querySelectorAll("input[data-id]").forEach(inp=>{
-        const qty = parseNumberInput(inp.value);
-        if(qty <= 0) { inp.value = ''; return; }
-        const ship = shipList.find(s=>s.id===inp.dataset.id); if(!ship) return;
-        totalM += qty * ship.metal; totalC += qty * ship.crystal; totalD += qty * ship.deut;
-        inp.value = formatWithDotsRaw(qty);
-      });
-
-      const totalResEl = document.getElementById('totalRes');
-      const totalMetalEqEl = document.getElementById('totalMetalEq');
-      const grandTotalEl = document.getElementById('grandTotal');
-      if(totalResEl) totalResEl.innerHTML = `${formatSpanMetal(totalM)} ${LANG[localStorage.getItem(KEYS.LANG) || 'ru'].metal}, ${formatSpanCrystal(totalC)} ${LANG[localStorage.getItem(KEYS.LANG) || 'ru'].crystal}, ${formatSpanDeut(totalD)} ${LANG[localStorage.getItem(KEYS.LANG) || 'ru'].deut}`;
-      const metalEq = Math.round(totalM + totalC * factorC + totalD * factorD);
-      if(totalMetalEqEl) totalMetalEqEl.textContent = formatNumber(metalEq);
-
-      const boxesCount = parseNumberInput(boxesCountInput?.value);
-      const boxValue = parseNumberInput(boxValueInput?.value);
-      const boxesMetal = boxesCount * boxValue;
-      const planetM = parseNumberInput(document.getElementById('planetMetal')?.value);
-      const planetC = parseNumberInput(document.getElementById('planetCrystal')?.value);
-      const planetD = parseNumberInput(document.getElementById('planetDeut')?.value);
-      const planetMetalEq = planetM + planetC * factorC + planetD * factorD;
-      const grand = boxesMetal + planetMetalEq - metalEq;
-      if(grandTotalEl){
-        grandTotalEl.textContent = formatNumber(Math.round(grand));
-        grandTotalEl.style.color = grand>=0 ? "#41c879" : "#ff4d4d";
-      }
-
-      const availableMetalPool = boxesMetal + planetMetalEq;
-      let cumulativeEq = 0;
-      document.querySelectorAll("#shipsTable tbody tr[data-row-id]").forEach(row=>{
-        const id = row.getAttribute('data-row-id');
-        const inp = row.querySelector('input[data-id]');
-        const qty = parseNumberInput(inp?.value);
-        const ship = shipList.find(s=>s.id===id);
-        let rowEq = 0;
-        if(ship && qty > 0){
-          const m = ship.metal * qty, c = ship.crystal * qty, d = ship.deut * qty;
-          rowEq = m + c * factorC + d * factorD;
-        }
-        cumulativeEq += rowEq;
-        if(availableMetalPool > 0 && rowEq > 0 && cumulativeEq > availableMetalPool) row.classList.add('row-deficit'); else row.classList.remove('row-deficit');
-      });
-
-      localStorage.setItem(KEYS.BOXES, JSON.stringify({ boxesCount, boxValue, planetMetal: planetM, planetCrystal: planetC, planetDeut: planetD }));
-      updateBoxesNeeded();
-    }catch(e){}
-  }
-
-  function updateBoxesNeeded(){
-    try{
-      const boxValue = parseNumberInput(boxValueInput?.value || '');
-      const targetMetal = getCurrentTotalMetalValue();
-      if(!boxValue || boxValue <= 0){
-        boxesNeededEl && (boxesNeededEl.textContent='—');
-        boxesCostTLEl && (boxesCostTLEl.innerHTML = `<span class="try-value">TRY: —</span>`);
-        leftoverTmValueEl && (leftoverTmValueEl.textContent = '—');
-      } else {
-        const needed = Math.ceil(targetMetal / boxValue);
-        boxesNeededEl && (boxesNeededEl.textContent = formatWithDotsRaw(needed));
-        updateBoxesCostTL();
-      }
-    }catch(e){}
-  }
-
-  function getCurrentTotalMetalValue(){
-    try{
-      const active = document.querySelector('.tab-btn.active')?.dataset.tab;
-      if(active === 'research'){
-        return parseNumberInput(document.getElementById('sumTotalMetalR')?.textContent);
-      }
-      if(active === 'fleet'){
-        return parseNumberInput(document.getElementById('totalMetalEq')?.textContent);
-      }
-      return parseNumberInput(document.getElementById('sumTotalMetalB')?.textContent);
-    }catch(e){ return 0; }
-  }
-
-  function updateBoxesCostTL(){
-    try{
-      if(!boxesCostTLEl) return;
-      const boxValue = parseNumberInput(boxValueInput?.value || '');
-      if(boxValue <= 0){
-        boxesCostTLEl.innerHTML = `<span class="try-value">TRY: —</span>`;
-        leftoverTmValueEl && (leftoverTmValueEl.textContent = '—');
-        return;
-      }
-
-      const targetMetalEq = getCurrentTotalMetalValue();
-      if(!Number.isFinite(targetMetalEq) || targetMetalEq <= 0){
-        boxesCostTLEl.innerHTML = `<span class="try-value">TRY: 0</span>`;
-        leftoverTmValueEl && (leftoverTmValueEl.textContent = '0');
-        return;
-      }
-
-      const neededBoxesRaw = Math.ceil(targetMetalEq / boxValue);
-      const MAX_ALLOWED_BOXES = 1e9;
-      if(neededBoxesRaw > MAX_ALLOWED_BOXES){
-        boxesCostTLEl.innerHTML = `<span class="try-value">TRY: —</span>`;
-        leftoverTmValueEl && (leftoverTmValueEl.textContent = '—');
-        return;
-      }
-      const requiredTM = neededBoxesRaw * CONFIG.TM_PER_BOX;
-      const pack = (CONFIG.TM_PACKS && CONFIG.TM_PACKS[0]) || null;
-      const packTm = pack && Number.isFinite(Number(pack.tm)) ? Number(pack.tm) : 0;
-      const packPriceTRY = pack && (Number.isFinite(Number(pack.priceTRY)) ? Number(pack.priceTRY) : 0);
-
-      if(packTm <= 0 || packPriceTRY <= 0){
-        boxesCostTLEl.innerHTML = `<span class="try-value">TRY: —</span>`;
-        leftoverTmValueEl && (leftoverTmValueEl.textContent = '—');
-        return;
-      }
-
-      const packsCount = Math.max(1, Math.ceil(requiredTM / packTm));
-      const totalTRY = packsCount * packPriceTRY;
-      const leftoverTM = packsCount * packTm - requiredTM;
-
-      boxesCostTLEl.innerHTML = `<span class="try-value">TRY: ${formatNumberWithDots(totalTRY)}</span>`;
-      leftoverTmValueEl && (leftoverTmValueEl.textContent = leftoverTM > 0 ? formatWithDotsRaw(leftoverTM) : '0');
-    }catch(e){}
-  }
-
-  function attachInputsHandlers(){
-    const debouncedRecalcBuildings = debounce(recalcAllBuildings, 120);
-    const debouncedRecalcResearch = debounce(recalcAllResearch, 120);
-    const debouncedComputeFleet = debounce(computeFleet, 120);
-
-    tbodyB && tbodyB.addEventListener('input', e=>{ const t=e.target; if(!(t.matches('.lvl-input')||t.matches('.planet-input'))) return; debouncedRecalcBuildings(); });
-    tbodyB && tbodyB.addEventListener('change', e=>{ debouncedRecalcBuildings(); });
-
-    tbodyR && tbodyR.addEventListener('input', e=>{ const t=e.target; if(!t.matches('.lvl-input')) return; debouncedRecalcResearch(); });
-    tbodyR && tbodyR.addEventListener('change', e=>{ debouncedRecalcResearch(); });
-
-    if (tmInput){
-      tmInput.addEventListener('input', ()=>{ debouncedRecalcResearch(); });
-      tmInput.addEventListener('blur', ()=>{ debouncedRecalcResearch(); });
-    }
-
-    boxesCountInput && boxesCountInput.addEventListener('input', ()=>{ debouncedComputeFleet(); });
-    boxValueInput && boxValueInput.addEventListener('input', ()=>{ debouncedComputeFleet(); updateBoxesNeeded(); });
-
-    boxesCountInput && boxesCountInput.addEventListener('change', ()=>{ debouncedComputeFleet(); });
-    boxValueInput && boxValueInput.addEventListener('change', ()=>{ debouncedComputeFleet(); updateBoxesNeeded(); });
-
-    document.getElementById('planetMetal')?.addEventListener('change', ()=>{ debouncedComputeFleet(); });
-    document.getElementById('planetCrystal')?.addEventListener('change', ()=>{ debouncedComputeFleet(); });
-    document.getElementById('planetDeut')?.addEventListener('change', ()=>{ debouncedComputeFleet(); });
-  }
-
-  function recalcAllBuildings(){
-    try{
-      if(!tbodyB) return;
-      let tm=0, tc=0, td=0, tp=0;
-      tbodyB.querySelectorAll('tr').forEach(tr=>{
-        const idx=Number(tr.dataset.index)||0;
-        const data=BUILDINGS_DATA[idx]||{base:{m:0,c:0,d:0},factor:1};
-        const from = parseNumberInput(tr.querySelector('input[data-type="from"]').value);
-        const toVal = tr.querySelector('input[data-type="to"]').value;
-        let to = (toVal === '' ? from : parseNumberInput(toVal));
-        to = Math.max(from, to);
-        if (to - from > CONFIG.MAX_LEVEL_SPAN) to = from + CONFIG.MAX_LEVEL_SPAN;
-        const planets = Math.max(1, parseNumberInput(tr.querySelector('input[data-type="planets"]').value) || 1);
-        const sum = geomSum(data.base, data.factor, from, to);
-        const m = Math.round(sum.m * planets);
-        const c = Math.round(sum.c * planets);
-        const d = Math.round(sum.d * planets);
-        const p = Math.round(sum.points * planets);
-        tr.querySelector('td.m').innerHTML = formatSpanMetal(m);
-        tr.querySelector('td.c').innerHTML = formatSpanCrystal(c);
-        tr.querySelector('td.d').innerHTML = formatSpanDeut(d);
-        tr.querySelector('td.p').textContent = formatNumber(p);
-        tm+=m; tc+=c; td+=d; tp+=p;
-      });
-      document.getElementById('sumMetalB').innerHTML = formatSpanMetal(tm);
-      document.getElementById('sumCrystalB').innerHTML = formatSpanCrystal(tc);
-      document.getElementById('sumDeutB').innerHTML = formatSpanDeut(td);
-      document.getElementById('sumPointsB').textContent = formatNumber(tp);
-      document.getElementById('sumTotalMetalB').textContent = formatNumber(Math.round(convertToMetal(tm,tc,td)));
-      updateBoxesNeeded();
-    }catch(e){}
-  }
-
-  function recalcAllResearch(){
-    try{
-      if(!tbodyR) return;
-      let sm=0, sc=0, sd=0, sp=0, totalLevels=0;
-      tbodyR.querySelectorAll('tr').forEach(tr=>{
-        const idx=Number(tr.dataset.index)||0;
-        const data=RESEARCH_DATA[idx]||{base:{m:0,c:0,d:0},factor:1};
-        const from = parseNumberInput(tr.querySelector('input[data-type="from"]').value);
-        const toVal = tr.querySelector('input[data-type="to"]').value;
-        let to = (toVal === '' ? from : parseNumberInput(toVal));
-        to = Math.max(from, to);
-        if (to - from > CONFIG.MAX_LEVEL_SPAN) to = from + CONFIG.MAX_LEVEL_SPAN;
-        const sum = geomSum(data.base, data.factor, from, to);
-        const m = sum.m, c = sum.c, d = sum.d, p = sum.points;
-        tr.querySelector('td.m').innerHTML = formatSpanMetal(m);
-        tr.querySelector('td.c').innerHTML = formatSpanCrystal(c);
-        tr.querySelector('td.d').innerHTML = formatSpanDeut(d);
-        tr.querySelector('td.p').textContent = formatNumber(p);
-        sm+=m; sc+=c; sd+=d; sp+=p; totalLevels+=sum.levels||0;
-      });
-      document.getElementById('sumMetalR').innerHTML = formatSpanMetal(sm);
-      document.getElementById('sumCrystalR').innerHTML = formatSpanCrystal(sc);
-      document.getElementById('sumDeutR').innerHTML = formatSpanDeut(sd);
-      document.getElementById('sumPointsR').textContent = formatNumber(sp);
-      document.getElementById('sumTotalMetalR').textContent = formatNumber(Math.round(convertToMetal(sm,sc,sd)));
-      const perLevel = parseNumberInput(tmInput?.value);
-      const totalTM = Math.round(perLevel * totalLevels * CONFIG.TM_PER_LEVEL_FACTOR);
-      tmTotal.textContent = (LANG[localStorage.getItem(KEYS.LANG) || 'ru'].totalTMLabel || 'Итого: ') + formatNumber(totalTM);
-      updateBoxesNeeded();
-    }catch(e){}
-  }
-
-  function syncTabButtonToContent(){
-    const activePanel =
-      document.getElementById('tabBuildings').classList.contains('active') ? 'buildings' :
-      document.getElementById('tabResearch').classList.contains('active') ? 'research' :
-      document.getElementById('tabFleet').classList.contains('active') ? 'fleet' : 'buildings';
-    setActiveTab(activePanel);
-  }
-
-  function applyLang(lang){
-    if(!lang) return;
-    localStorage.setItem(KEYS.LANG, lang);
-
-    document.querySelectorAll('[data-i18n]').forEach(el=>{
-      const key = el.getAttribute('data-i18n');
-      if(key && LANG[lang] && LANG[lang][key] !== undefined){ el.textContent = LANG[lang][key]; }
-    });
-    document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
-      const key = el.getAttribute('data-i18n-ph');
-      if(key && LANG[lang] && LANG[lang][key] !== undefined){ el.setAttribute('placeholder', LANG[lang][key]); }
-    });
-
-    buildRowsBuildings();
-    buildRowsResearch();
-    renderTable();
-    restoreFromStorage();
-    attachInputsHandlers();
-    recalcAllBuildings();
-    recalcAllResearch();
-    computeFleet();
-    syncTabButtonToContent();
-
-    positionTabs();
-  }
-  document.getElementById('langRU').addEventListener('click', ()=> applyLang('ru'));
-  document.getElementById('langTR').addEventListener('click', ()=> applyLang('tr'));
-
-  // Drag wrapper (таблица) — вкладки двигаются вместе, т.к. абсолютны внутри wrapper
-  (function(){
-    const dragHandle = document.getElementById('dragHandle'); const wrapper = document.getElementById('tableWrapper'); if(!dragHandle || !wrapper) return;
-    let dragging=false, startX=0, startY=0, startPosX=0, startPosY=0; dragHandle.style.touchAction='none';
-    dragHandle.addEventListener('pointerdown', ev=>{ ev.preventDefault(); dragging=true; startX=ev.clientX; startY=ev.clientY; startPosX = window.posX || 0; startPosY = window.posY || 0; try{ dragHandle.setPointerCapture(ev.pointerId); }catch{} dragHandle.style.cursor='grabbing'; });
-    document.addEventListener('pointermove', ev=>{
-      if(!dragging) return; ev.preventDefault();
-      const dx = (ev.clientX - startX) / (window.scale || 1);
-      const dy = (ev.clientY - startY) / (window.scale || 1);
-      window.posX = startPosX + dx; window.posY = startPosY + dy;
-      wrapper.style.transform = `translate(${window.posX}px, ${window.posY}px) scale(${window.scale||1})`;
-    });
-    function stopDrag(ev){
-      if(!dragging) return; dragging=false;
-      try{ dragHandle.releasePointerCapture && dragHandle.releasePointerCapture(ev && ev.pointerId); }catch{}
-      dragHandle.style.cursor='grab';
-      localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale||1, posX: window.posX||0, posY: window.posY||0 }));
-      positionTabs();
-    }
-    document.addEventListener('pointerup', stopDrag); document.addEventListener('pointercancel', stopDrag);
-    dragHandle.addEventListener('keydown', e=>{
-      const step=10;
-      if(e.key==='ArrowLeft'){ window.posX = (window.posX||0) - step; }
-      if(e.key==='ArrowRight'){ window.posX = (window.posX||0) + step; }
-      if(e.key==='ArrowUp'){ window.posY = (window.posY||0) - step; }
-      if(e.key==='ArrowDown'){ window.posY = (window.posY||0) + step; }
-      wrapper.style.transform = `translate(${window.posX}px, ${window.posY}px) scale(${window.scale||1})`;
-      localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale||1, posX: window.posX||0, posY: window.posY||0 }));
-      positionTabs();
-    });
-    dragHandle.style.cursor='grab';
-  })();
-
-  // Tabs click
-  document.querySelectorAll('.tab-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.tab-btn').forEach(b=>{
-        b.classList.remove('active'); b.setAttribute('aria-selected','false'); b.setAttribute('tabindex','-1');
-      });
-      btn.classList.add('active'); btn.setAttribute('aria-selected','true'); btn.setAttribute('tabindex','0');
-
-      document.querySelectorAll('.tab-content').forEach(p=> p.classList.remove('active'));
-      if(btn.dataset.tab === 'buildings'){ document.getElementById('tabBuildings').classList.add('active'); setActiveTab('buildings'); }
-      if(btn.dataset.tab === 'research'){ document.getElementById('tabResearch').classList.add('active'); setActiveTab('research'); }
-      if(btn.dataset.tab === 'fleet'){ document.getElementById('tabFleet').classList.add('active'); setActiveTab('fleet'); }
-
-      positionTabs();
-    });
-  });
-
-  function setActiveTab(tab){
-    document.querySelectorAll('.tab-btn').forEach(b=>{
-      const isActive = (b.dataset.tab===tab);
-      b.classList.toggle('active', isActive);
-      b.setAttribute('aria-selected', isActive ? 'true' : 'false');
-      b.setAttribute('tabindex', isActive ? '0' : '-1');
-    });
-
-    document.getElementById('tabBuildings').classList.toggle('active', tab==='buildings');
-    document.getElementById('tabResearch').classList.toggle('active', tab==='research');
-    document.getElementById('tabFleet').classList.toggle('active', tab==='fleet');
-
-    if(tab==='fleet'){
-      document.getElementById('fleetDelivery').style.display = 'flex';
-      renderTable(); computeFleet();
-    } else {
-      document.getElementById('fleetDelivery').style.display = 'none';
-      if(tab==='buildings') recalcAllBuildings(); else if(tab==='research') recalcAllResearch();
-    }
-    updateBoxesNeeded();
-    try{ localStorage.setItem(KEYS.ACTIVE_TAB, tab); }catch(e){}
-  }
-
-  function restoreFromStorage(){
-    try{
-      const inputsBuild = JSON.parse(localStorage.getItem(KEYS.INPUTS_BUILD) || 'null');
-      if(inputsBuild && tbodyB){
-        tbodyB.querySelectorAll('tr').forEach((tr,i)=>{
-          if(inputsBuild[i]){
-            tr.querySelector('input[data-type="from"]').value = inputsBuild[i].from ? formatWithDotsRaw(inputsBuild[i].from) : '';
-            tr.querySelector('input[data-type="to"]').value = inputsBuild[i].to ? formatWithDotsRaw(inputsBuild[i].to) : '';
-            tr.querySelector('input[data-type="planets"]').value = inputsBuild[i].planets ? formatWithDotsRaw(inputsBuild[i].planets) : '1';
-          }
-        });
-      }
-      const inputsResearch = JSON.parse(localStorage.getItem(KEYS.INPUTS_RESEARCH) || 'null');
-      if(inputsResearch && tbodyR){
-        tbodyR.querySelectorAll('tr').forEach((tr,i)=>{
-          if(inputsResearch[i]){
-            tr.querySelector('input[data-type="from"]').value = inputsResearch[i].from ? formatWithDotsRaw(inputsResearch[i].from) : '';
-            tr.querySelector('input[data-type="to"]').value = inputsResearch[i].to ? formatWithDotsRaw(inputsResearch[i].to) : '';
-          }
-        });
-      }
-      const boxes = JSON.parse(localStorage.getItem(KEYS.BOXES) || '{}');
-      if(boxes){
-        if(boxes.boxesCount) boxesCountInput.value = formatWithDotsRaw(boxes.boxesCount);
-        if(boxes.boxValue) boxValueInput.value = formatWithDotsRaw(boxes.boxValue);
-        if(boxes.planetMetal) document.getElementById('planetMetal').value = formatWithDotsRaw(boxes.planetMetal);
-        if(boxes.planetCrystal) document.getElementById('planetCrystal').value = formatWithDotsRaw(boxes.planetCrystal);
-        if(boxes.planetDeut) document.getElementById('planetDeut').value = formatWithDotsRaw(boxes.planetDeut);
-      }
-      const tmSaved = localStorage.getItem(KEYS.TM);
-      if(tmSaved) tmInput.value = tmSaved;
-      const shipQty = JSON.parse(localStorage.getItem(KEYS.SHIP_QTY) || '{}');
-      if(shipQty){
-        document.querySelectorAll('input[data-id]').forEach(inp=>{
-          const v = shipQty[inp.dataset.id]; if(v) inp.value = formatWithDotsRaw(v);
-        });
-      }
-      const trf = JSON.parse(localStorage.getItem(KEYS.TRANSFORM) || 'null');
-      if(trf){
-        window.scale = trf.scale || 1; window.posX = trf.posX || 0; window.posY = trf.posY || 0;
-        wrapperEl.style.transform = `translate(${window.posX}px, ${window.posY}px) scale(${window.scale})`;
-      }
-      const lang = localStorage.getItem(KEYS.LANG) || 'ru';
-      document.getElementById('langRU').classList.toggle('active', lang==='ru');
-      document.getElementById('langTR').classList.toggle('active', lang==='tr');
-    }catch(e){}
-  }
-
-  function centerWrapper(){
-    const scale = 1; window.scale = scale;
-    const rect = wrapperEl.getBoundingClientRect();
-    const pageLeft = parseFloat(getComputedStyle(wrapperEl).left) || 0;
-    const pageTop = parseFloat(getComputedStyle(wrapperEl).top) || 0;
-    const targetX = (window.innerWidth - rect.width) / 2 - pageLeft;
-    const targetY = (window.innerHeight - rect.height) / 2 - pageTop;
-    window.posX = targetX; window.posY = targetY;
-    wrapperEl.style.transform = `translate(${window.posX}px, ${window.posY}px) scale(${window.scale})`;
-    localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale, posX: window.posX, posY: window.posY }));
-    positionTabs();
-  }
-
-  function fullResetToZero(){
-    try{
-      localStorage.removeItem(KEYS.INPUTS_BUILD);
-      localStorage.removeItem(KEYS.INPUTS_RESEARCH);
-      localStorage.removeItem(KEYS.TM);
-      localStorage.removeItem(KEYS.BOXES);
-      localStorage.removeItem(KEYS.SHIP_QTY);
-
-      document.querySelectorAll('#tbodyBuildings input').forEach(i=>{ i.value=''; });
-      document.querySelectorAll('#tbodyResearch input').forEach(i=>{ i.value=''; });
-      document.querySelectorAll('input[data-id]').forEach(i=>{ i.value=''; });
-
-      boxesCountInput && (boxesCountInput.value='');
-      boxValueInput && (boxValueInput.value='');
-
-      const planetMetalEl = document.getElementById('planetMetal');
-      const planetCrystalEl = document.getElementById('planetCrystal');
-      const planetDeutEl = document.getElementById('planetDeut');
-      if(planetMetalEl) planetMetalEl.value='';
-      if(planetCrystalEl) planetCrystalEl.value='';
-      if(planetDeutEl) planetDeutEl.value='';
-
-      if(tmInput) tmInput.value='';
-
-      recalcAllBuildings();
-      recalcAllResearch();
-      renderTable();
-      computeFleet();
-
-      document.getElementById('sumPointsB').textContent = '0';
-      document.getElementById('sumPointsR').textContent = '0';
-      document.getElementById('totalMetalEq').textContent = '0';
-      document.getElementById('grandTotal').textContent = '0';
-      document.getElementById('totalRes').textContent = '0 Металл, 0 Кристалл, 0 Дейтерий';
-      boxesNeededEl && (boxesNeededEl.textContent='0');
-      boxesCostTLEl && (boxesCostTLEl.innerHTML='TRY: —');
-      leftoverTmValueEl && (leftoverTmValueEl.textContent='—');
-    }catch(e){}
-  }
-
-  // Позиционируем вкладки на уровень блока «Коробка с металлом»
-  function positionTabs(){
-    try{
-      if(!tabsLeftEl || !headerBarEl || !wrapperEl) return;
-      const boxRow = document.getElementById('globalBoxRow') || headerBarEl;
-      const wrapperRect = wrapperEl.getBoundingClientRect();
-      const targetRect = boxRow.getBoundingClientRect();
-      const offsetWithinWrapper = targetRect.top - wrapperRect.top;
-      const extra = -2; // тонкая подгонка
-      tabsLeftEl.style.top = `${Math.max(0, Math.round(offsetWithinWrapper + extra))}px`;
-    }catch(e){}
-  }
-
-  function init(){
-    try{
-      buildRowsBuildings();
-      buildRowsResearch();
-      attachLiveThousandsFormatting('#boxesCount, #boxValue, #planetMetal, #planetCrystal, #planetDeut, input[data-id], #tbodyBuildings input, #tbodyResearch input');
-      attachInputsHandlers();
-      renderTable();
-      restoreFromStorage();
-
-      const lang = localStorage.getItem(KEYS.LANG) || 'ru';
-      applyLang(lang);
-
-      syncTabButtonToContent();
-
-      const ZOOM_STEP = 1.08;
-      document.getElementById('globalZoomIn')?.addEventListener('click', ()=>{
-        window.scale = Math.min(3.5, (window.scale||1)*ZOOM_STEP);
-        wrapperEl.style.transform = `translate(${window.posX||0}px, ${window.posY||0}px) scale(${window.scale||1})`;
-        localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale||1, posX: window.posX||0, posY: window.posY||0 }));
-        positionTabs();
-      });
-      document.getElementById('globalZoomOut')?.addEventListener('click', ()=>{
-        window.scale = Math.max(0.4, (window.scale||1)/ZOOM_STEP);
-        wrapperEl.style.transform = `translate(${window.posX||0}px, ${window.posY||0}px) scale(${window.scale||1})`;
-        localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale||1, posX: window.posX||0, posY: window.posY||0 }));
-        positionTabs();
-      });
-
-      document.getElementById('globalZoomReset')?.addEventListener('click', ()=>{
-        fullResetToZero();
-        centerWrapper();
-        setActiveTab('buildings');
-        positionTabs();
-      });
-
-      window.addEventListener('resize', positionTabs);
-      positionTabs();
-    }catch(e){}
-  }
-
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
-
-})();
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
