@@ -34,7 +34,7 @@
     1109: [320000, 240000, 100000, 0, 6500, 1.5, 1.5, 1.5, 0, 1.4],
     1110: [320000, 240000, 100000, 0, 7000, 1.5, 1.5, 1.5, 0, 1.4],
     1111: [120000, 30000, 25000, 0, 7500, 1.5, 1.5, 1.5, 0, 1.3],
-    1112: [100000, 40000, 30000, 0, 10000, 1.3, 1.3, 1.3, 0, 1.3],
+    1112: [100000, 40000, 30000, 0, 10000, 1.5, 1.5, 1.5, 0, 1.3],
     1113: [200000, 100000, 100000, 0, 8500, 1.3, 1.3, 1.3, 0, 1.3],
     1114: [160000, 120000, 50000, 0, 9000, 1.5, 1.5, 1.5, 0, 1.4],
     1115: [160000, 120000, 50000, 0, 9500, 1.5, 1.5, 1.5, 0, 1.4],
@@ -757,15 +757,20 @@
         to = Math.max(from, to);
       }
       if (to - from > CONFIG.MAX_LEVEL_SPAN) to = from + CONFIG.MAX_LEVEL_SPAN;
+      const planets = Math.max(1, parseNumberInput(tr.querySelector('input[data-type="planets"]').value) || 1); // НОВОЕ
       const cost = getTotalCostLf(techId, from, to);
-      tr.querySelector('td.m').innerHTML = formatSpanMetal(cost.m);
-      tr.querySelector('td.c').innerHTML = formatSpanCrystal(cost.c);
-      tr.querySelector('td.d').innerHTML = formatSpanDeut(cost.d);
-      tr.querySelector('td.p').textContent = formatNumber(cost.points);
-      tm += cost.m;
-      tc += cost.c;
-      td += cost.d;
-      tp += cost.points;
+      let m = Math.round(cost.m * planets); // НОВОЕ
+      let c = Math.round(cost.c * planets); // НОВОЕ
+      let d = Math.round(cost.d * planets); // НОВОЕ
+      let p = Math.round(cost.points * planets); // НОВОЕ
+      tr.querySelector('td.m').innerHTML = formatSpanMetal(m);
+      tr.querySelector('td.c').innerHTML = formatSpanCrystal(c);
+      tr.querySelector('td.d').innerHTML = formatSpanDeut(d);
+      tr.querySelector('td.p').textContent = formatNumber(p);
+      tm += m;
+      tc += c;
+      td += d;
+      tp += p;
     });
     document.getElementById('sumMetalLfB').innerHTML = formatSpanMetal(tm);
     document.getElementById('sumCrystalLfB').innerHTML = formatSpanCrystal(tc);
@@ -965,6 +970,8 @@
       tdFrom.innerHTML = `<input type="text" class="lvl-input" data-type="from" data-index="${i - 1}">`;
       const tdTo = document.createElement('td');
       tdTo.innerHTML = `<input type="text" class="lvl-input" data-type="to" data-index="${i - 1}">`;
+      const tdPlanets = document.createElement('td'); // НОВОЕ
+      tdPlanets.innerHTML = `<img src="images/planet.png" class="icon" alt=""><input type="text" class="planet-input" data-type="planets" data-index="${i - 1}" inputmode="numeric" value="1">`;
       const tdM = document.createElement('td');
       tdM.className = 'm';
       tdM.innerHTML = '<span class="val-metal">0</span>';
@@ -980,7 +987,7 @@
       const tdP = document.createElement('td');
       tdP.className = 'p';
       tdP.textContent = '0';
-      tr.append(tdFrom, tdTo, tdM, tdC, tdD, tdE, tdP);
+      tr.append(tdFrom, tdTo, tdPlanets, tdM, tdC, tdD, tdE, tdP); // НОВОЕ
       frag.appendChild(tr);
     }
     tbody.appendChild(frag);
@@ -1248,7 +1255,7 @@
     if(tbodyLfB){
       tbodyLfB.addEventListener('input', e=>{
         const t=e.target;
-        if(!t.matches('.lvl-input')) return;
+        if(!t.matches('.lvl-input') && !t.matches('.planet-input')) return; // НОВОЕ
         debouncedRecalcLfBuildings();
         persistLfInputs();
       });
@@ -1350,7 +1357,8 @@
       buildRows.forEach((tr,i)=>{
         const from = parseNumberInput(tr.querySelector('input[data-type="from"]')?.value);
         const to = parseNumberInput(tr.querySelector('input[data-type="to"]')?.value);
-        b[i] = { from, to };
+        const planets = parseNumberInput(tr.querySelector('input[data-type="planets"]')?.value) || 1; // НОВОЕ
+        b[i] = { from, to, planets }; // НОВОЕ
       });
       const r = [];
       researchRows.forEach((tr,i)=>{
@@ -1427,6 +1435,7 @@
           if(lfInputsBuild[i]){
             tr.querySelector('input[data-type="from"]').value = lfInputsBuild[i].from ? String(Math.min(99, lfInputsBuild[i].from)) : '';
             tr.querySelector('input[data-type="to"]').value = lfInputsBuild[i].to ? String(Math.min(99, lfInputsBuild[i].to)) : '';
+            tr.querySelector('input[data-type="planets"]').value = lfInputsBuild[i].planets ? formatWithDotsRaw(lfInputsBuild[i].planets) : '1'; // НОВОЕ
           }
         });
       }
