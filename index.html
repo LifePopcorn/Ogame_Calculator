@@ -124,42 +124,57 @@
       </div>
     </div>
     <div id="tabFleet" class="tab-content" role="tabpanel" aria-hidden="true">
-      <div class="table-frame" id="fleetFrame">
-        <table class="cost-table" id="shipsTable" aria-describedby="fleetDesc">
-          <caption id="fleetDesc" style="position:absolute;left:-9999px;">Таблица расчета ресурсов для флота</caption>
-          <thead>
-            <tr>
-              <th id="thShip" data-i18n="ship">Корабль</th>
-              <th id="thMetal"><img src="images/metal.png" class="icon" alt=""> <span data-i18n="metal">Металл</span></th>
-              <th id="thCrystal"><img src="images/crystal.png" class="icon" alt=""> <span data-i18n="crystal">Кристалл</span></th>
-              <th id="thDeut"><img src="images/deuterium.png" class="icon" alt=""> <span data-i18n="deut">Дейтерий</span></th>
-              <th id="thQty" data-i18n="qty">Количество</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-        <div class="planet-single-row" style="margin-top:10px;">
-          <div id="planetLabel" style="display:flex;align-items:center;gap:8px;"><img src="images/planet.png" class="icon" alt=""> <span data-i18n="planetResources">Ресурсы на планете</span></div>
-          <div class="planet-field"><img src="images/metal.png" class="icon" alt=""><input id="planetMetal" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="planetMetalPh" placeholder="Металл" style="width:120px"></div>
-          <div class="planet-field"><img src="images/crystal.png" class="icon" alt=""><input id="planetCrystal" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="planetCrystalPh" placeholder="Кристалл" style="width:120px"></div>
-          <div class="planet-field"><img src="images/deuterium.png" class="icon" alt=""><input id="planetDeut" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="planetDeutPh" placeholder="Дейтерий" style="width:120px"></div>
-        </div>
-        <div class="delivery" aria-live="polite" id="fleetDelivery" style="display:none;">
-          <div class="blk" id="deliveryTotalsBlock" style="display:flex;" aria-live="polite">
-            <div style="font-weight:700" data-i18n="deliveryTotals">Итого по ресурсам:</div>
-            <div style="margin-left:8px;"><span id="totalRes">0 Металл, 0 Кристалл, 0 Дейтерий</span></div>
-          </div>
-          <div class="blk" id="deliveryMetalEqBlock" style="display:flex;" aria-live="polite">
-            <div style="font-weight:700" data-i18n="metalEq">Эквивалент в металле:</div>
-            <div style="margin-left:8px;"><span id="totalMetalEq">0</span></div>
-          </div>
-          <div class="blk" id="deliveryGrandBlock" style="display:flex;" aria-live="polite">
-            <div style="font-weight:700" data-i18n="grandAfter">Остаток после вычета:</div>
-            <div style="margin-left:8px;"><span id="grandTotal">0</span></div>
-          </div>
-        </div>
+  <div class="table-frame" id="fleetFrame">
+    <table class="cost-table" id="shipsTable" aria-describedby="fleetDesc">
+      <caption id="fleetDesc" style="position:absolute;left:-9999px;">Таблица расчета ресурсов для флота</caption>
+      <thead>
+        <tr>
+          <th id="thShip" data-i18n="ship">Корабль</th>
+          <th id="thQty" data-i18n="qty">Количество</th>
+          <th id="thMetal"><img src="images/metal.png" class="icon" alt=""> <span data-i18n="metal">Металл</span></th>
+          <th id="thCrystal"><img src="images/crystal.png" class="icon" alt=""> <span data-i18n="crystal">Кристалл</span></th>
+          <th id="thDeut"><img src="images/deuterium.png" class="icon" alt=""> <span data-i18n="deut">Дейтерий</span></th>
+          <th id="thPoints" data-i18n="points">Очки</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot>
+        <tr>
+          <td><span class="data-key-label" data-i18n="total">Итого</span></td>
+          <td id="sumQtyFleet"></td>
+          <td id="sumMetalFleet"><span class="val-metal">0</span></td>
+          <td id="sumCrystalFleet"><span class="val-crystal">0</span></td>
+          <td id="sumDeutFleet"><span class="val-deut">0</span></td>
+          <td id="sumPointsFleet">0</td>
+        </tr>
+        <tr>
+          <td colspan="2" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td>
+          <td colspan="4" id="sumTotalMetalFleet">0</td>
+        </tr>
+      </tfoot>
+    </table>
+    <div class="planet-single-row" style="margin-top:10px;">
+      <div id="planetLabel" style="display:flex;align-items:center;gap:8px;"><img src="images/planet.png" class="icon" alt=""> <span data-i18n="planetResources">Ресурсы на планете</span></div>
+      <div class="planet-field"><img src="images/metal.png" class="icon" alt=""><input id="planetMetal" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="planetMetalPh" placeholder="Металл" style="width:120px"></div>
+      <div class="planet-field"><img src="images/crystal.png" class="icon" alt=""><input id="planetCrystal" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="planetCrystalPh" placeholder="Кристалл" style="width:120px"></div>
+      <div class="planet-field"><img src="images/deuterium.png" class="icon" alt=""><input id="planetDeut" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="planetDeutPh" placeholder="Дейтерий" style="width:120px"></div>
+    </div>
+    <div class="delivery" aria-live="polite" id="fleetDelivery" style="display:none;">
+      <div class="blk" id="deliveryTotalsBlock" style="display:flex;" aria-live="polite">
+        <div style="font-weight:700" data-i18n="deliveryTotals">Итого по ресурсам:</div>
+        <div style="margin-left:8px;"><span id="totalRes">0 Металл, 0 Кристалл, 0 Дейтерий</span></div>
+      </div>
+      <div class="blk" id="deliveryMetalEqBlock" style="display:flex;" aria-live="polite">
+        <div style="font-weight:700" data-i18n="metalEq">Эквивалент в металле:</div>
+        <div style="margin-left:8px;"><span id="totalMetalEq">0</span></div>
+      </div>
+      <div class="blk" id="deliveryGrandBlock" style="display:flex;" aria-live="polite">
+        <div style="font-weight:700" data-i18n="grandAfter">Остаток после вычета:</div>
+        <div style="margin-left:8px;"><span id="grandTotal">0</span></div>
       </div>
     </div>
+  </div>
+</div>
     <div id="tabLifeforms" class="tab-content" role="tabpanel" aria-hidden="true">
       <div class="table-frame">
         <div class="lf-subtabs" role="tablist" aria-label="LifeformTabs">
