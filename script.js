@@ -1,5 +1,7 @@
 (function(){
   'use strict';
+
+  // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ / КОНФИГУРАЦИЯ ===
   const CONFIG = {
     TM_PER_BOX: 42000,
     TM_PACKS: [{ tm: 12500000, priceTRY: 900 }],
@@ -10,6 +12,14 @@
     MEGALITH_DISCOUNT_PER_LEVEL: 0.05,
     MINERAL_CENTER_DISCOUNT_PER_LEVEL: 0.05
   };
+
+  // --- НОВОЕ: Константы для путей к изображениям ---
+  const IMAGES_ROOT_PATH = 'images/'; // Корень папки с изображениями
+  const IMAGES_BUILDINGS_PATH = 'images/buildings/'; // Путь к папке с изображениями построек
+  const IMAGES_RESEARCH_PATH = 'images/research/';   // Путь к папке с изображениями исследований
+  const IMAGES_SHIPS_PATH = 'images/ships/';         // Путь к папке с изображениями кораблей
+  // ----------------------------------------------
+
   const TECH_COSTS = {
     1001: [7, 2, 0, 0, 40, 1.2, 1.2, 0, 0, 1.21],
     1002: [5, 2, 0, 8, 40, 1.23, 1.23, 0, 1.02, 1.25],
@@ -132,6 +142,7 @@
     4117: [500000, 300000, 200000, 0, 13000, 1.5, 1.5, 1.5, 0, 1.3],
     4118: [300000, 180000, 120000, 0, 11000, 1.7, 1.7, 1.7, 0, 1.4]
   };
+
   const LANG = {
     ru: {
       tmLabel: "Тёмная материя",
@@ -224,6 +235,7 @@
       kaelesh: "Kaelesh"
     }
   };
+
   const BUILDINGS_DATA = [
     { base: { m: 60, c: 15, d: 0 }, factor: 1.5 },
     { base: { m: 48, c: 24, d: 0 }, factor: 1.6 },
@@ -242,6 +254,7 @@
     { base: { m: 200, c: 0, d: 50 }, factor: 2.0 },
     { base: { m: 20000, c: 20000, d: 0 }, factor: 2.0 }
   ];
+
   const BUILDING_NAMES = {
     ru: [
       "Рудник по добыче металла", "Рудник по добыче кристалла", "Синтезатор дейтерия", "Солнечная электростанция",
@@ -256,12 +269,16 @@
       "Terraformer", "İttifak Deposu", "Uzay İskelesi", "Roket Silosu"
     ]
   };
+
+  // --- ИСПРАВЛЕНО: Теперь содержит только имена файлов ---
   const ICONS_BUILDINGS = [
     "metal_mine.png", "crystal_mine.png", "deuterium_synth.png", "solar_plant.png",
     "fusion_plant.png", "robot_factory.png", "nanite_factory.png", "shipyard.png",
     "metal_storage.png", "crystal_storage.png", "deuterium_tank.png", "research_lab.png",
     "terraformer.png", "alliance_depot.png", "dock.png", "missile_silo.png"
   ];
+  // ----------------------------------------------------
+
   const RESEARCH_DATA = [
     { base: { m: 200, c: 1000, d: 200 }, factor: 2.0 },
     { base: { m: 0, c: 400, d: 600 }, factor: 2.0 },
@@ -280,6 +297,7 @@
     { base: { m: 4000, c: 8000, d: 4000 }, factor: 1.75 },
     { base: { m: 0, c: 0, d: 0 }, factor: 3.0 }
   ];
+
   const RESEARCH_NAMES = {
     ru: [
       "Шпионаж", "Компьютерная технология", "Оружейная технология", "Щитовая технология",
@@ -294,12 +312,17 @@
       "Plazma Tekniği", "Galaksiler Arası Araştırma Ağı", "Astrofizik", "Gravitasyon Araştırması"
     ]
   };
+
+  // --- ИСПРАВЛЕНО: Теперь содержит только имена файлов ---
   const ICONS_RESEARCH = [
     "spy.png", "computer.png", "weapons.png", "shield.png",
     "armor.png", "energy.png", "hyperspace.png", "combustion.png",
     "impulse.png", "hyperdrive.png", "laser.png", "ion.png",
     "plasma.png", "irn.png", "astro.png", "graviton.png"
   ];
+  // ----------------------------------------------------
+
+  // --- ИСПРАВЛЕНО: Теперь содержит только имена файлов ---
   const shipList = [
     { id: "small_cargo", ru: "Малый транспорт", tr: "Küçük Nakliye", metal: 2000, crystal: 2000, deut: 0, img: "maly_transport.png" },
     { id: "large_cargo", ru: "Большой транспорт", tr: "Büyük Nakliye", metal: 6000, crystal: 6000, deut: 0, img: "bolshoy_transport.png" },
@@ -315,8 +338,11 @@
     { id: "pathfinder", ru: "Перво-проходец", tr: "Rehber", metal: 8000, crystal: 15000, deut: 8000, img: "pathfinder.png" },
     { id: "reaper", ru: "Жнец", tr: "Azrail", metal: 85000, crystal: 55000, deut: 20000, img: "reaper.png" }
   ];
+  // ----------------------------------------------------
+
   const LIFEFORM_RACES = ['humans', 'rocktal', 'mechas', 'kaelesh'];
   let currentLifeformRace = localStorage.getItem('og_calc_lf_race_v1') || 'humans';
+
   const KEYS = {
     LANG: 'og_calc_lang_v2',
     TRANSFORM: 'og_calc_transform_v2',
@@ -332,6 +358,7 @@
     ROCKTAL_MEGALITH_LEVEL: 'og_calc_rocktal_megalith_level',
     ROCKTAL_MRC_LEVEL: 'og_calc_rocktal_mrc_level'
   };
+
   const LF_BUILDING_NAMES = {
     ru: {
       1001: "Жилые кварталы", 1002: "Биосферическая ферма", 1003: "Центр Исследований", 1004: "Академия наук",
@@ -368,6 +395,7 @@
       4011: "Gemi Üretim Salonu", 4012: "Supra Kırıcı"
     }
   };
+
   const LF_RESEARCH_NAMES = {
     ru: {
       1101: "Межгалактические послы", 1102: "Высокопроизводительные экстракторы", 1103: "Термоядерные двигатели",
@@ -378,7 +406,7 @@
       1116: "Линейный крейсер Mk II", 1117: "Роботы-ассистенты", 1118: "Суперкомпьютер",
       2101: "Вулканические аккумуляторы", 2102: "Акустическое сканирование", 2103: "Высокоэнергетические системы подкачки",
       2104: "Увеличение грузового отсека (гражданские корабли)", 2105: "Производство с магмовым источником энергии",
-      2106: "Геотермические электростанции", 2107: "Эхолотный промер", 2108: "Улучшение ионных кристаллов (Тяжёлый истребитель)",
+      2106: "Геотермальные электростанции", 2107: "Эхолотный промер", 2108: "Улучшение ионных кристаллов (Тяжёлый истребитель)",
       2109: "Улучшенный стелларатор", 2110: "Укрепленные алмазные сверла", 2111: "Сейсмическая технология выработки",
       2112: "Системы подкачки с магмовым источником энергии", 2113: "Модули ионизированных кристаллов",
       2114: "Оптимизированный метод постройки шахт", 2115: "Алмазный передатчик энергии",
@@ -424,14 +452,17 @@
       4116: "Hız Artışı (Komuta Gemisi)", 4117: "Psionik Kalkan Matrisi", 4118: "Kâşif için Kaelesh Geliştirme"
     }
   };
+
   function getLfBuildingName(techId) {
     const lang = localStorage.getItem(KEYS.LANG) || 'ru';
     return LF_BUILDING_NAMES[lang]?.[techId] || LF_BUILDING_NAMES.ru?.[techId] || `ID ${techId}`;
   }
+
   function getLfResearchName(techId) {
     const lang = localStorage.getItem(KEYS.LANG) || 'ru';
     return LF_RESEARCH_NAMES[lang]?.[techId] || LF_RESEARCH_NAMES.ru?.[techId] || `ID ${techId}`;
   }
+
   // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ===
   function formatWithDotsRaw(inputStr) {
     if (inputStr === null || inputStr === undefined) return '';
@@ -446,10 +477,12 @@
     }
     return sign + out;
   }
+
   function formatNumberWithDots(n) {
     if (n === null || n === undefined || isNaN(n)) return '0';
     return formatWithDotsRaw(Math.round(Number(n) || 0));
   }
+
   function parseNumberInput(s) {
     if (s === null || s === undefined) return 0;
     const str = String(s).trim();
@@ -461,6 +494,7 @@
     const safe = Math.min(num, Number.MAX_SAFE_INTEGER);
     return negative ? -safe : safe;
   }
+
   function getNumberFormatter(lang) {
     try {
       return new Intl.NumberFormat(LANG[lang]?.locale || 'ru-RU');
@@ -468,23 +502,29 @@
       return new Intl.NumberFormat('ru-RU');
     }
   }
+
   function formatNumber(n, lang = localStorage.getItem(KEYS.LANG) || 'ru') {
     if (n === null || n === undefined || isNaN(n)) return '0';
     const nf = getNumberFormatter(lang);
     return nf.format(Math.round(Number(n) || 0));
   }
+
   function formatSpanMetal(n) {
     return `<span class="val-metal">${formatNumber(n)}</span>`;
   }
+
   function formatSpanCrystal(n) {
     return `<span class="val-crystal">${formatNumber(n)}</span>`;
   }
+
   function formatSpanDeut(n) {
     return `<span class="val-deut">${formatNumber(n)}</span>`;
   }
+
   function convertToMetal(m, c, d) {
     return (m || 0) + (c || 0) * CONFIG.METAL_EQ_CRYSTAL + (d || 0) * CONFIG.METAL_EQ_DEUT;
   }
+
   function debounce(fn, wait) {
     let t = null;
     return function (...a) {
@@ -492,6 +532,7 @@
       t = setTimeout(() => fn.apply(this, a), wait);
     };
   }
+
   function createImageFallbackEl(label) {
     const span = document.createElement('span');
     span.className = 'icon-fallback';
@@ -499,6 +540,7 @@
     span.textContent = label ? label[0] : '—';
     return span;
   }
+
   function getLevelCost(techId, level) {
     const data = TECH_COSTS[techId];
     if (!data) return { m: 0, c: 0, d: 0, points: 0 };
@@ -510,24 +552,26 @@
     const points = Math.round((m + c + d) / 1000);
     return { m, c, d, points };
   }
+
+  // Заменить старую getTotalCostLf на эту реализацию
   function getTotalCostLf(techId, from, to) {
+    // Диапазон пустой
     if (from >= to) return { m: 0, c: 0, d: 0, points: 0 };
-    const data = TECH_COSTS[techId];
-    if (!data) return { m: 0, c: 0, d: 0, points: 0 };
-    const [baseM, baseC, baseD] = data;
-    const fM = data[5], fC = data[6], fD = data[7];
+    // Защита: нет данных
+    if (!TECH_COSTS[techId]) return { m: 0, c: 0, d: 0, points: 0 };
     let totalM = 0, totalC = 0, totalD = 0;
-    for (let i = from; i < to; i++) {
-      const m = Math.ceil(baseM * Math.pow(fM, i));
-      const c = Math.ceil(baseC * Math.pow(fC, i));
-      const d = Math.ceil(baseD * Math.pow(fD, i));
-      totalM += m;
-      totalC += c;
-      totalD += d;
+    // Суммируем уровни level = from .. to-1.
+    // (UI уже приводит пустое "До" в from=1,to=level+1 при одном поле)
+    for (let level = from; level < to; level++) {
+      const lvlCost = getLevelCost(techId, level);
+      totalM += Number(lvlCost.m || 0);
+      totalC += Number(lvlCost.c || 0);
+      totalD += Number(lvlCost.d || 0);
     }
     const points = Math.round((totalM + totalC + totalD) / 1000);
     return { m: totalM, c: totalC, d: totalD, points };
   }
+
   function geomSum(base, factor, from, to) {
     const len = Math.max(0, to - from);
     if (len <= 0) return { m: 0, c: 0, d: 0, e: 0, points: 0, levels: 0 };
@@ -545,9 +589,11 @@
     const points = Math.round((m + c + d) / 1000);
     return { m, c, d, e, points, levels: count };
   }
+
   function getActiveTab() {
     return document.querySelector('.tab-btn.active')?.dataset.tab || 'buildings';
   }
+
   // === ⭐ СПЕЦИАЛЬНЫЙ ОБРАБОТЧИК ВВОДА ДЛЯ .lvl-input (0–99) ===
   function attachLvlInputHandlers() {
     document.querySelectorAll('.lvl-input').forEach(inp => {
@@ -577,6 +623,7 @@
       });
     });
   }
+
   // === ОСНОВНЫЕ РАСЧЁТНЫЕ ФУНКЦИИ ===
   function recalcAllBuildings() {
     const tbodyB = document.getElementById('tbodyBuildings');
@@ -630,6 +677,7 @@
     document.getElementById('sumTotalMetalB').textContent = formatNumber(Math.round(convertToMetal(tm, tc, td)));
     updateBoxesNeeded();
   }
+
   function recalcAllResearch() {
     const tbodyR = document.getElementById('tbodyResearch');
     if (!tbodyR) return;
@@ -664,6 +712,7 @@
     document.getElementById('tmTotal').textContent = (LANG[localStorage.getItem(KEYS.LANG) || 'ru'].totalTMLabel || 'Итого: ') + formatNumber(totalTM);
     updateBoxesNeeded();
   }
+
   function computeFleet() {
     try {
       const factorC = CONFIG.METAL_EQ_CRYSTAL;
@@ -727,6 +776,7 @@
       updateBoxesNeeded();
     } catch (e) {}
   }
+
   // ✅ ИСПРАВЛЕНА ОБРАБОТКА ВВОДА ДЛЯ ФОРМ ЖИЗНИ ===
   function recalcAllLfBuildings() {
     const tbody = document.getElementById('tbodyLfBuildings');
@@ -779,6 +829,7 @@
     document.getElementById('sumTotalMetalLfB').textContent = formatNumber(Math.round(convertToMetal(tm, tc, td)));
     updateBoxesNeeded();
   }
+
   function recalcAllLfResearch() {
     const tbody = document.getElementById('tbodyLfResearch');
     if (!tbody) return;
@@ -825,6 +876,7 @@
     document.getElementById('sumTotalMetalLfR').textContent = formatNumber(Math.round(convertToMetal(tm, tc, td)));
     updateBoxesNeeded();
   }
+
   // === ФУНКЦИИ РЕНДЕРА ===
   function buildRowsBuildings() {
     const tbodyB = document.getElementById('tbodyBuildings');
@@ -837,10 +889,12 @@
       tr.dataset.index = i;
       const tdName = document.createElement('td');
       tdName.className = 'name-cell';
-      const icon = ICONS_BUILDINGS[i];
-      if (icon) {
+      const iconFileName = ICONS_BUILDINGS[i]; // Получаем имя файла
+      if (iconFileName) {
         const img = document.createElement('img');
-        img.src = `images/${icon}`;
+        // --- ИСПРАВЛЕНО: Используем новую константу для пути ---
+        img.src = `${IMAGES_BUILDINGS_PATH}${iconFileName}`;
+        // ------------------------------------------------------
         img.className = 'icon';
         img.alt = '';
         img.addEventListener('error', () => {
@@ -862,7 +916,9 @@
       const tdTo = document.createElement('td');
       tdTo.innerHTML = `<input type="text" class="lvl-input" data-type="to" data-index="${i}" inputmode="numeric">`;
       const tdPlanets = document.createElement('td');
-      tdPlanets.innerHTML = `<img src="images/planet.png" class="icon" alt=""><input type="text" class="planet-input" data-type="planets" data-index="${i}" inputmode="numeric" value="1">`;
+      // --- ИСПРАВЛЕНО: Используем путь из корня для изображений, не относящихся к подпапкам ---
+      tdPlanets.innerHTML = `<img src="${IMAGES_ROOT_PATH}planet.png" class="icon" alt=""><input type="text" class="planet-input" data-type="planets" data-index="${i}" inputmode="numeric" value="1">`;
+      // ----------------------------------------------------
       const tdM = document.createElement('td');
       tdM.className = 'm';
       tdM.innerHTML = `<span class="val-metal">0</span>`;
@@ -887,6 +943,7 @@
     tbodyB.appendChild(frag);
     attachLvlInputHandlers(); // Применяем обработку 0–99 после генерации
   }
+
   function buildRowsResearch() {
     const tbodyR = document.getElementById('tbodyResearch');
     if (!tbodyR) return;
@@ -898,10 +955,12 @@
       tr.dataset.index = i;
       const tdName = document.createElement('td');
       tdName.className = 'name-cell';
-      const icon = ICONS_RESEARCH[i];
-      if (icon) {
+      const iconFileName = ICONS_RESEARCH[i]; // Получаем имя файла
+      if (iconFileName) {
         const img = document.createElement('img');
-        img.src = `images/${icon}`;
+        // --- ИСПРАВЛЕНО: Используем новую константу для пути ---
+        img.src = `${IMAGES_RESEARCH_PATH}${iconFileName}`;
+        // ------------------------------------------------------
         img.className = 'icon';
         img.alt = '';
         img.addEventListener('error', () => {
@@ -945,6 +1004,7 @@
     tbodyR.appendChild(frag);
     attachLvlInputHandlers(); // Применяем обработку 0–99 после генерации
   }
+
   function buildRowsLfBuildings() {
     const tbody = document.getElementById('tbodyLfBuildings');
     if (!tbody) return;
@@ -971,7 +1031,9 @@
       const tdTo = document.createElement('td');
       tdTo.innerHTML = `<input type="text" class="lvl-input" data-type="to" data-index="${i - 1}">`;
       const tdPlanets = document.createElement('td'); // НОВОЕ
-      tdPlanets.innerHTML = `<img src="images/planet.png" class="icon" alt=""><input type="text" class="planet-input" data-type="planets" data-index="${i - 1}" inputmode="numeric" value="1">`;
+      // --- ИСПРАВЛЕНО: Используем путь из корня для изображений, не относящихся к подпапкам ---
+      tdPlanets.innerHTML = `<img src="${IMAGES_ROOT_PATH}planet.png" class="icon" alt=""><input type="text" class="planet-input" data-type="planets" data-index="${i - 1}" inputmode="numeric" value="1">`;
+      // ----------------------------------------------------
       const tdM = document.createElement('td');
       tdM.className = 'm';
       tdM.innerHTML = '<span class="val-metal">0</span>';
@@ -993,6 +1055,7 @@
     tbody.appendChild(frag);
     attachLvlInputHandlers(); // Применяем обработку 0–99 после генерации
   }
+
   function buildRowsLfResearch() {
     const tbody = document.getElementById('tbodyLfResearch');
     if (!tbody) return;
@@ -1039,6 +1102,7 @@
     tbody.appendChild(frag);
     attachLvlInputHandlers(); // Применяем обработку 0–99 после генерации
   }
+
   function renderTable() {
     const tableBody = document.querySelector("#shipsTable tbody");
     if (!tableBody) return;
@@ -1053,7 +1117,9 @@
       const tdName = document.createElement('td');
       tdName.style.textAlign = 'left';
       const img = document.createElement('img');
-      img.src = `images/ships/${ship.img}`;
+      // --- ИСПРАВЛЕНО: Используем новую константу для пути к кораблям ---
+      img.src = `${IMAGES_SHIPS_PATH}${ship.img}`;
+      // ----------------------------------------------------
       img.alt = shipName;
       img.width = 28;
       img.height = 28;
@@ -1107,6 +1173,7 @@
       }
     });
   }
+
   // === ОБРАБОТКА ВВОДА ===
   function attachLiveThousandsFormatting(selector) {
     const inputs = document.querySelectorAll(selector);
@@ -1173,6 +1240,7 @@
       });
     });
   }
+
   function saveShipQuantities() {
     try {
       const qtyMap = {};
@@ -1182,6 +1250,7 @@
       localStorage.setItem(KEYS.SHIP_QTY, JSON.stringify(qtyMap));
     } catch (e) {}
   }
+
   // === ОБРАБОТЧИКИ ===
   let __inputsHandlersAttached = false;
   function attachInputsHandlers() {
@@ -1202,6 +1271,7 @@
     const debouncedRecalcLfResearch = debounce(() => {
       if (getActiveTab() === 'lifeforms') recalcAllLfResearch();
     }, 120);
+
     const tbodyB = document.getElementById('tbodyBuildings');
     if (tbodyB) {
       tbodyB.addEventListener('input', e => {
@@ -1221,6 +1291,7 @@
       });
       tbodyB.addEventListener('change', () => debouncedRecalcBuildings());
     }
+
     const tbodyR = document.getElementById('tbodyResearch');
     if (tbodyR) {
       tbodyR.addEventListener('input', e => {
@@ -1230,6 +1301,7 @@
       });
       tbodyR.addEventListener('change', () => debouncedRecalcResearch());
     }
+
     const tmEl = document.getElementById('tmInput');
     if (tmEl) {
       tmEl.addEventListener('input', () => debouncedRecalcResearch());
@@ -1240,6 +1312,7 @@
         } catch (e) {}
       });
     }
+
     ['boxesCount', 'boxValue'].forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
@@ -1251,6 +1324,7 @@
         debouncedComputeFleet();
       });
     });
+
     const tbodyLfB = document.getElementById('tbodyLfBuildings');
     if(tbodyLfB){
       tbodyLfB.addEventListener('input', e=>{
@@ -1261,6 +1335,7 @@
       });
       tbodyLfB.addEventListener('change', ()=>{ debouncedRecalcLfBuildings(); persistLfInputs(); });
     }
+
     const tbodyLfR = document.getElementById('tbodyLfResearch');
     if(tbodyLfR){
       tbodyLfR.addEventListener('input', e=>{
@@ -1271,6 +1346,7 @@
       });
       tbodyLfR.addEventListener('change', ()=>{ debouncedRecalcLfResearch(); persistLfInputs(); });
     }
+
     const sel = document.getElementById('lifeformSelect');
     if(sel){
       sel.addEventListener('change', (e)=>{
@@ -1284,6 +1360,7 @@
         updateBoxesNeeded();
       });
     }
+
     const megInput = document.getElementById('megalithLevel');
     const mrcInput = document.getElementById('mrcLevel');
     if(megInput){
@@ -1298,6 +1375,7 @@
       mrcInput.addEventListener('change', applyMrc);
       mrcInput.addEventListener('blur', applyMrc);
     }
+
     document.getElementById('langRU')?.addEventListener('click', (ev) => {
       ev.stopPropagation();
       applyLang('ru');
@@ -1306,6 +1384,7 @@
       ev.stopPropagation();
       applyLang('tr');
     });
+
     document.querySelectorAll('.tab-btn').forEach(btn=>{
       btn.addEventListener('click', (ev)=>{
         ev.stopPropagation();
@@ -1319,6 +1398,7 @@
         positionTabs();
       });
     });
+
     document.querySelectorAll('.lf-subtab-btn').forEach(btn => {
       btn.addEventListener('click', (ev) => {
         ev.stopPropagation();
@@ -1335,6 +1415,7 @@
         }catch(e){}
       });
     });
+
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
       const savedTheme = localStorage.getItem('og_calc_theme') || 'dark';
@@ -1348,6 +1429,7 @@
       });
     }
   }
+
   // === ОСТАЛЬНЫЕ ФУНКЦИИ ===
   function persistLfInputs(){
     try{
@@ -1370,6 +1452,7 @@
       localStorage.setItem(KEYS.LF_INPUTS_RESEARCH, JSON.stringify(r));
     }catch(e){}
   }
+
   function applyLang(lang){
     if(!lang) return;
     try { localStorage.setItem(KEYS.LANG, lang); } catch(e){}
@@ -1398,6 +1481,7 @@
     document.getElementById('langRU')?.classList.toggle('active', lang==='ru');
     document.getElementById('langTR')?.classList.toggle('active', lang==='tr');
   }
+
   function restoreFromStorage(){
     try{
       buildRowsBuildings();
@@ -1487,6 +1571,7 @@
       document.body.classList.toggle('theme-dark', savedTheme === 'dark');
     }catch(e){}
   }
+
   function centerWrapper(){
     const wrapperEl = document.getElementById('tableWrapper');
     if(!wrapperEl) return;
@@ -1501,6 +1586,7 @@
     try{ localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale, posX: window.posX, posY: window.posY })); }catch(e){}
     positionTabs();
   }
+
   function fullResetToZero(){
     try{
       localStorage.removeItem(KEYS.INPUTS_BUILD);
@@ -1543,6 +1629,7 @@
       centerWrapper();
     }catch(e){}
   }
+
   function positionTabs(){
     try{
       const tabsLeftEl = document.getElementById('tabsLeft');
@@ -1557,6 +1644,7 @@
       tabsLeftEl.style.top = `${Math.max(0, Math.round(offsetWithinWrapper + extra))}px`;
     }catch(e){}
   }
+
   function updateBoxesNeeded() {
     try {
       const boxesNeededEl = document.getElementById('boxesNeeded');
@@ -1575,6 +1663,7 @@
       }
     } catch (e) {}
   }
+
   function updateBoxesCostTL() {
     try {
       const boxesCostTLEl = document.getElementById('boxesCostTL');
@@ -1616,6 +1705,7 @@
       leftoverTmValueEl && (leftoverTmValueEl.textContent = leftoverTM > 0 ? formatWithDotsRaw(leftoverTM) : '0');
     } catch (e) {}
   }
+
   function getCurrentTotalMetalValue() {
     try {
       const active = document.querySelector('.tab-btn.active')?.dataset.tab;
@@ -1638,6 +1728,7 @@
       return 0;
     }
   }
+
   function setActiveTab(tab){
     document.querySelectorAll('.tab-btn').forEach(b=>{
       const isActive = (b.dataset.tab===tab);
@@ -1677,6 +1768,7 @@
       localStorage.setItem(KEYS.ACTIVE_TAB, tab);
     }catch(e){}
   }
+
   // === ИНИЦИАЛИЗАЦИЯ ===
   (function(){
     const dragHandle = document.getElementById('dragHandle');
@@ -1734,6 +1826,7 @@
       positionTabs();
     });
   })();
+
   function init(){
     try{
       buildRowsBuildings();
@@ -1777,6 +1870,7 @@
       setActiveTab(savedTab);
     }catch(e){}
   }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
