@@ -10,7 +10,7 @@
 body{
   margin:0; font-family:Arial,Helvetica,sans-serif; font-size:12px; color:#e6edf3;
   background-image:
-    url("./images/wallpaper.jpg"),
+    url("./images/wallpaper.png"),
     linear-gradient(180deg,#071021,#0b1220);
   background-size: cover, cover, auto;
   background-position: center center, center center, center;
@@ -160,11 +160,10 @@ body{
 #fleetFrame { width:auto; max-width:100%; }
 #shipsTable { table-layout: fixed; border-collapse: collapse; }
 #shipsTable th:nth-child(1), #shipsTable td:nth-child(1) { width:200px; text-align:left; }
-#shipsTable th:nth-child(2), #shipsTable td:nth-child(2) { width:110px; text-align:right; }
+#shipsTable th:nth-child(2), #shipsTable td:nth-child(2),
 #shipsTable th:nth-child(3), #shipsTable td:nth-child(3),
-#shipsTable th:nth-child(4), #shipsTable td:nth-child(4),
-#shipsTable th:nth-child(5), #shipsTable td:nth-child(5) { width:90px; text-align:right; }
-#shipsTable th:nth-child(6), #shipsTable td:nth-child(6) { width:80px; text-align:right; }
+#shipsTable th:nth-child(4), #shipsTable td:nth-child(4) { width:90px; text-align:right; }
+#shipsTable th:nth-child(5), #shipsTable td:nth-child(5) { width:110px; text-align:right; }
 #shipsTable input[type="text"] { width:100%; box-sizing:border-box; text-align:right; padding-right:4px; }
 #tabFleet #shipsTable { width:800px; margin:0 auto; }
 .lf-subtabs { display:flex; gap:6px; align-items:center; margin-bottom:8px; }
@@ -254,6 +253,7 @@ body{
   display: inline-block !important;
   text-align: left !important;
 }
+
 /* --- ПОДСТРОЙКА ШИРИНЫ СТОЛБЦА НАЗВАНИЙ ДЛЯ ФОРМ ЖИЗНИ --- */
 #lfBuildingsTable th[data-key="lfBuilding"],
 #lfBuildingsTable td.name-cell,
@@ -264,11 +264,13 @@ body{
   white-space: nowrap; /* Запрещаем перенос слов */
   overflow: visible; /* Позволяем содержимому выходить за пределы ячейки, если необходимо */
 }
+
 /* Обеспечиваем, что другие элементы внутри ячейки также не переносятся */
 #lfBuildingsTable td.name-cell span,
 #lfResearchTable td.name-cell span {
   white-space: nowrap;
 }
+
 @media (max-width:640px){
   .table-wrapper{ left:12px; top:12px; right:12px; position:relative; transform:none; max-width:unset; }
   .top-controls { flex-wrap:wrap; gap:6px; }
