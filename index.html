@@ -223,6 +223,7 @@
                 <th data-key="lfResearch"><span class="data-key-label" data-i18n="lfResearch">Исследование</span></th>
                 <th data-key="from"><span class="data-key-label" data-i18n="from">От</span></th>
                 <th data-key="to"><span class="data-key-label" data-i18n="to">До</span></th>
+                <th data-key="planets"><img src="images/planet.png" class="icon" alt=""><span class="data-key-label" data-i18n="planets">Планеты</span></th> <!-- НОВОЕ -->
                 <th data-key="metal"><img src="images/metal.png" class="icon" alt=""><span class="data-key-label" data-i18n="metal">Металл</span></th>
                 <th data-key="crystal"><img src="images/crystal.png" class="icon" alt=""><span class="data-key-label" data-i18n="crystal">Кристалл</span></th>
                 <th data-key="deut"><img src="images/deuterium.png" class="icon" alt=""><span class="data-key-label" data-i18n="deut">Дейтерий</span></th>
@@ -233,7 +234,7 @@
             <tbody id="tbodyLfResearch"></tbody>
             <tfoot>
               <tr>
-                <td><span class="data-key-label" data-i18n="total">Итого</span></td><td></td><td></td>
+                <td><span class="data-key-label" data-i18n="total">Итого</span></td><td></td><td></td><td></td> <!-- НОВОЕ: добавлена ячейка -->
                 <td id="sumMetalLfR"><span class="val-metal">0</span></td>
                 <td id="sumCrystalLfR"><span class="val-crystal">0</span></td>
                 <td id="sumDeutLfR"><span class="val-deut">0</span></td>
@@ -241,7 +242,7 @@
                 <td id="sumPointsLfR">0</td>
               </tr>
               <tr>
-                <td colspan="3" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td>
+                <td colspan="4" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td> <!-- НОВОЕ: colspan увеличен -->
                 <td colspan="5" id="sumTotalMetalLfR">0</td>
               </tr>
             </tfoot>

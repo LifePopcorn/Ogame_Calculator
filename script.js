@@ -1,6 +1,5 @@
 (function(){
   'use strict';
-
   // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ / КОНФИГУРАЦИЯ ===
   const CONFIG = {
     TM_PER_BOX: 42000,
@@ -12,14 +11,12 @@
     MEGALITH_DISCOUNT_PER_LEVEL: 0.05,
     MINERAL_CENTER_DISCOUNT_PER_LEVEL: 0.05
   };
-
   // --- НОВОЕ: Константы для путей к изображениям ---
   const IMAGES_ROOT_PATH = 'images/'; // Корень папки с изображениями
   const IMAGES_BUILDINGS_PATH = 'images/buildings/'; // Путь к папке с изображениями построек
   const IMAGES_RESEARCH_PATH = 'images/research/';   // Путь к папке с изображениями исследований
   const IMAGES_SHIPS_PATH = 'images/ships/';         // Путь к папке с изображениями кораблей
   // ----------------------------------------------
-
   const TECH_COSTS = {
     1001: [7, 2, 0, 0, 40, 1.2, 1.2, 0, 0, 1.21],
     1002: [5, 2, 0, 8, 40, 1.23, 1.23, 0, 1.02, 1.25],
@@ -142,7 +139,6 @@
     4117: [500000, 300000, 200000, 0, 13000, 1.5, 1.5, 1.5, 0, 1.3],
     4118: [300000, 180000, 120000, 0, 11000, 1.7, 1.7, 1.7, 0, 1.4]
   };
-
   const LANG = {
     ru: {
       tmLabel: "Тёмная материя",
@@ -235,7 +231,6 @@
       kaelesh: "Kaelesh"
     }
   };
-
   const BUILDINGS_DATA = [
     { base: { m: 60, c: 15, d: 0 }, factor: 1.5 },
     { base: { m: 48, c: 24, d: 0 }, factor: 1.6 },
@@ -254,7 +249,6 @@
     { base: { m: 200, c: 0, d: 50 }, factor: 2.0 },
     { base: { m: 20000, c: 20000, d: 0 }, factor: 2.0 }
   ];
-
   const BUILDING_NAMES = {
     ru: [
       "Рудник по добыче металла", "Рудник по добыче кристалла", "Синтезатор дейтерия", "Солнечная электростанция",
@@ -269,7 +263,6 @@
       "Terraformer", "İttifak Deposu", "Uzay İskelesi", "Roket Silosu"
     ]
   };
-
   // --- ИСПРАВЛЕНО: Теперь содержит только имена файлов ---
   const ICONS_BUILDINGS = [
     "metal_mine.png", "crystal_mine.png", "deuterium_synth.png", "solar_plant.png",
@@ -278,7 +271,6 @@
     "terraformer.png", "alliance_depot.png", "dock.png", "missile_silo.png"
   ];
   // ----------------------------------------------------
-
   const RESEARCH_DATA = [
     { base: { m: 200, c: 1000, d: 200 }, factor: 2.0 },
     { base: { m: 0, c: 400, d: 600 }, factor: 2.0 },
@@ -297,7 +289,6 @@
     { base: { m: 4000, c: 8000, d: 4000 }, factor: 1.75 },
     { base: { m: 0, c: 0, d: 0 }, factor: 3.0 }
   ];
-
   const RESEARCH_NAMES = {
     ru: [
       "Шпионаж", "Компьютерная технология", "Оружейная технология", "Щитовая технология",
@@ -312,7 +303,6 @@
       "Plazma Tekniği", "Galaksiler Arası Araştırma Ağı", "Astrofizik", "Gravitasyon Araştırması"
     ]
   };
-
   // --- ИСПРАВЛЕНО: Теперь содержит только имена файлов ---
   const ICONS_RESEARCH = [
     "spy.png", "computer.png", "weapons.png", "shield.png",
@@ -321,7 +311,6 @@
     "plasma.png", "irn.png", "astro.png", "graviton.png"
   ];
   // ----------------------------------------------------
-
   // --- ИСПРАВЛЕНО: Теперь содержит только имена файлов ---
   const shipList = [
     { id: "small_cargo", ru: "Малый транспорт", tr: "Küçük Nakliye", metal: 2000, crystal: 2000, deut: 0, img: "maly_transport.png" },
@@ -339,10 +328,8 @@
     { id: "pathfinder", ru: "Первопроходец", tr: "Rehber", metal: 8000, crystal: 15000, deut: 8000, img: "pathfinder.png" }
   ];
   // ----------------------------------------------------
-
   const LIFEFORM_RACES = ['humans', 'rocktal', 'mechas', 'kaelesh'];
   let currentLifeformRace = localStorage.getItem('og_calc_lf_race_v1') || 'humans';
-
   const KEYS = {
     LANG: 'og_calc_lang_v2',
     TRANSFORM: 'og_calc_transform_v2',
@@ -358,7 +345,6 @@
     ROCKTAL_MEGALITH_LEVEL: 'og_calc_rocktal_megalith_level',
     ROCKTAL_MRC_LEVEL: 'og_calc_rocktal_mrc_level'
   };
-
   const LF_BUILDING_NAMES = {
     ru: {
       1001: "Жилые кварталы", 1002: "Биосферическая ферма", 1003: "Центр Исследований", 1004: "Академия наук",
@@ -395,7 +381,6 @@
       4011: "Gemi Üretim Salonu", 4012: "Supra Kırıcı"
     }
   };
-
   const LF_RESEARCH_NAMES = {
     ru: {
       1101: "Межгалактические послы", 1102: "Высокопроизводительные экстракторы", 1103: "Термоядерные двигатели",
@@ -452,17 +437,14 @@
       4116: "Hız Artışı (Komuta Gemisi)", 4117: "Psionik Kalkan Matrisi", 4118: "Kâşif için Kaelesh Geliştirme"
     }
   };
-
   function getLfBuildingName(techId) {
     const lang = localStorage.getItem(KEYS.LANG) || 'ru';
     return LF_BUILDING_NAMES[lang]?.[techId] || LF_BUILDING_NAMES.ru?.[techId] || `ID ${techId}`;
   }
-
   function getLfResearchName(techId) {
     const lang = localStorage.getItem(KEYS.LANG) || 'ru';
     return LF_RESEARCH_NAMES[lang]?.[techId] || LF_RESEARCH_NAMES.ru?.[techId] || `ID ${techId}`;
   }
-
   // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ===
   function formatWithDotsRaw(inputStr) {
     if (inputStr === null || inputStr === undefined) return '';
@@ -477,12 +459,10 @@
     }
     return sign + out;
   }
-
   function formatNumberWithDots(n) {
     if (n === null || n === undefined || isNaN(n)) return '0';
     return formatWithDotsRaw(Math.round(Number(n) || 0));
   }
-
   function parseNumberInput(s) {
     if (s === null || s === undefined) return 0;
     const str = String(s).trim();
@@ -494,7 +474,6 @@
     const safe = Math.min(num, Number.MAX_SAFE_INTEGER);
     return negative ? -safe : safe;
   }
-
   function getNumberFormatter(lang) {
     try {
       return new Intl.NumberFormat(LANG[lang]?.locale || 'ru-RU');
@@ -502,29 +481,23 @@
       return new Intl.NumberFormat('ru-RU');
     }
   }
-
   function formatNumber(n, lang = localStorage.getItem(KEYS.LANG) || 'ru') {
     if (n === null || n === undefined || isNaN(n)) return '0';
     const nf = getNumberFormatter(lang);
     return nf.format(Math.round(Number(n) || 0));
   }
-
   function formatSpanMetal(n) {
     return `<span class="val-metal">${formatNumber(n)}</span>`;
   }
-
   function formatSpanCrystal(n) {
     return `<span class="val-crystal">${formatNumber(n)}</span>`;
   }
-
   function formatSpanDeut(n) {
     return `<span class="val-deut">${formatNumber(n)}</span>`;
   }
-
   function convertToMetal(m, c, d) {
     return (m || 0) + (c || 0) * CONFIG.METAL_EQ_CRYSTAL + (d || 0) * CONFIG.METAL_EQ_DEUT;
   }
-
   function debounce(fn, wait) {
     let t = null;
     return function (...a) {
@@ -532,7 +505,6 @@
       t = setTimeout(() => fn.apply(this, a), wait);
     };
   }
-
   function createImageFallbackEl(label) {
     const span = document.createElement('span');
     span.className = 'icon-fallback';
@@ -540,7 +512,6 @@
     span.textContent = label ? label[0] : '—';
     return span;
   }
-
   function getLevelCost(techId, level) {
     const data = TECH_COSTS[techId];
     if (!data) return { m: 0, c: 0, d: 0, points: 0 };
@@ -552,7 +523,6 @@
     const points = Math.round((m + c + d) / 1000);
     return { m, c, d, points };
   }
-
   // Заменить старую getTotalCostLf на эту реализацию
   function getTotalCostLf(techId, from, to) {
     // Диапазон пустой
@@ -571,7 +541,6 @@
     const points = Math.round((totalM + totalC + totalD) / 1000);
     return { m: totalM, c: totalC, d: totalD, points };
   }
-
   function geomSum(base, factor, from, to) {
     const len = Math.max(0, to - from);
     if (len <= 0) return { m: 0, c: 0, d: 0, e: 0, points: 0, levels: 0 };
@@ -589,11 +558,9 @@
     const points = Math.round((m + c + d) / 1000);
     return { m, c, d, e, points, levels: count };
   }
-
   function getActiveTab() {
     return document.querySelector('.tab-btn.active')?.dataset.tab || 'buildings';
   }
-
   // === ⭐ СПЕЦИАЛЬНЫЙ ОБРАБОТЧИК ВВОДА ДЛЯ .lvl-input (0–99) ===
   function attachLvlInputHandlers() {
     document.querySelectorAll('.lvl-input').forEach(inp => {
@@ -623,7 +590,6 @@
       });
     });
   }
-
   // === ОСНОВНЫЕ РАСЧЁТНЫЕ ФУНКЦИИ ===
   function recalcAllBuildings() {
     const tbodyB = document.getElementById('tbodyBuildings');
@@ -677,7 +643,6 @@
     document.getElementById('sumTotalMetalB').textContent = formatNumber(Math.round(convertToMetal(tm, tc, td)));
     updateBoxesNeeded();
   }
-
   function recalcAllResearch() {
     const tbodyR = document.getElementById('tbodyResearch');
     if (!tbodyR) return;
@@ -712,7 +677,6 @@
     document.getElementById('tmTotal').textContent = (LANG[localStorage.getItem(KEYS.LANG) || 'ru'].totalTMLabel || 'Итого: ') + formatNumber(totalTM);
     updateBoxesNeeded();
   }
-
   function computeFleet() {
     try {
       const factorC = CONFIG.METAL_EQ_CRYSTAL;
@@ -776,7 +740,6 @@
       updateBoxesNeeded();
     } catch (e) {}
   }
-
   // ✅ ИСПРАВЛЕНА ОБРАБОТКА ВВОДА ДЛЯ ФОРМ ЖИЗНИ ===
   function recalcAllLfBuildings() {
     const tbody = document.getElementById('tbodyLfBuildings');
@@ -829,7 +792,6 @@
     document.getElementById('sumTotalMetalLfB').textContent = formatNumber(Math.round(convertToMetal(tm, tc, td)));
     updateBoxesNeeded();
   }
-
   function recalcAllLfResearch() {
     const tbody = document.getElementById('tbodyLfResearch');
     if (!tbody) return;
@@ -859,15 +821,20 @@
         to = Math.max(from, to);
       }
       if (to - from > CONFIG.MAX_LEVEL_SPAN) to = from + CONFIG.MAX_LEVEL_SPAN;
+      const planets = Math.max(1, parseNumberInput(tr.querySelector('input[data-type="planets"]').value) || 1); // НОВОЕ
       const cost = getTotalCostLf(techId, from, to);
-      tr.querySelector('td.m').innerHTML = formatSpanMetal(cost.m);
-      tr.querySelector('td.c').innerHTML = formatSpanCrystal(cost.c);
-      tr.querySelector('td.d').innerHTML = formatSpanDeut(cost.d);
-      tr.querySelector('td.p').textContent = formatNumber(cost.points);
-      tm += cost.m;
-      tc += cost.c;
-      td += cost.d;
-      tp += cost.points;
+      let m = Math.round(cost.m * planets); // НОВОЕ
+      let c = Math.round(cost.c * planets); // НОВОЕ
+      let d = Math.round(cost.d * planets); // НОВОЕ
+      let p = Math.round(cost.points * planets); // НОВОЕ
+      tr.querySelector('td.m').innerHTML = formatSpanMetal(m);
+      tr.querySelector('td.c').innerHTML = formatSpanCrystal(c);
+      tr.querySelector('td.d').innerHTML = formatSpanDeut(d);
+      tr.querySelector('td.p').textContent = formatNumber(p);
+      tm += m;
+      tc += c;
+      td += d;
+      tp += p;
     });
     document.getElementById('sumMetalLfR').innerHTML = formatSpanMetal(tm);
     document.getElementById('sumCrystalLfR').innerHTML = formatSpanCrystal(tc);
@@ -876,7 +843,6 @@
     document.getElementById('sumTotalMetalLfR').textContent = formatNumber(Math.round(convertToMetal(tm, tc, td)));
     updateBoxesNeeded();
   }
-
   // === ФУНКЦИИ РЕНДЕРА ===
   function buildRowsBuildings() {
     const tbodyB = document.getElementById('tbodyBuildings');
@@ -943,7 +909,6 @@
     tbodyB.appendChild(frag);
     attachLvlInputHandlers(); // Применяем обработку 0–99 после генерации
   }
-
   function buildRowsResearch() {
     const tbodyR = document.getElementById('tbodyResearch');
     if (!tbodyR) return;
@@ -1004,7 +969,6 @@
     tbodyR.appendChild(frag);
     attachLvlInputHandlers(); // Применяем обработку 0–99 после генерации
   }
-
   function buildRowsLfBuildings() {
     const tbody = document.getElementById('tbodyLfBuildings');
     if (!tbody) return;
@@ -1055,7 +1019,6 @@
     tbody.appendChild(frag);
     attachLvlInputHandlers(); // Применяем обработку 0–99 после генерации
   }
-
   function buildRowsLfResearch() {
     const tbody = document.getElementById('tbodyLfResearch');
     if (!tbody) return;
@@ -1081,6 +1044,10 @@
       tdFrom.innerHTML = `<input type="text" class="lvl-input" data-type="from" data-index="${i - 1}">`;
       const tdTo = document.createElement('td');
       tdTo.innerHTML = `<input type="text" class="lvl-input" data-type="to" data-index="${i - 1}">`;
+      const tdPlanets = document.createElement('td'); // НОВОЕ
+      // --- ИСПРАВЛЕНО: Используем путь из корня для изображений, не относящихся к подпапкам ---
+      tdPlanets.innerHTML = `<img src="${IMAGES_ROOT_PATH}planet.png" class="icon" alt=""><input type="text" class="planet-input" data-type="planets" data-index="${i - 1}" inputmode="numeric" value="1">`;
+      // ----------------------------------------------------
       const tdM = document.createElement('td');
       tdM.className = 'm';
       tdM.innerHTML = '<span class="val-metal">0</span>';
@@ -1096,13 +1063,12 @@
       const tdP = document.createElement('td');
       tdP.className = 'p';
       tdP.textContent = '0';
-      tr.append(tdFrom, tdTo, tdM, tdC, tdD, tdE, tdP);
+      tr.append(tdFrom, tdTo, tdPlanets, tdM, tdC, tdD, tdE, tdP); // НОВОЕ
       frag.appendChild(tr);
     };
     tbody.appendChild(frag);
     attachLvlInputHandlers(); // Применяем обработку 0–99 после генерации
   }
-
   function renderTable() {
     const tableBody = document.querySelector("#shipsTable tbody");
     if (!tableBody) return;
@@ -1160,20 +1126,18 @@
     tableBody.appendChild(frag);
     attachLiveThousandsFormatting('input[data-id]');
     document.querySelectorAll("input[data-id]").forEach(inp => {
-      if (!inp._qtyBound) {
-        inp.addEventListener('input', () => {
-          saveShipQuantities();
-          computeFleet();
-        });
-        inp.addEventListener('change', () => {
-          saveShipQuantities();
-          computeFleet();
-        });
-        inp._qtyBound = true;
-      }
+      if (!inp || inp._qtyBound) return;
+      inp.addEventListener('input', () => {
+        saveShipQuantities();
+        computeFleet();
+      });
+      inp.addEventListener('change', () => {
+        saveShipQuantities();
+        computeFleet();
+      });
+      inp._qtyBound = true;
     });
   }
-
   // === ОБРАБОТКА ВВОДА ===
   function attachLiveThousandsFormatting(selector) {
     const inputs = document.querySelectorAll(selector);
@@ -1240,7 +1204,6 @@
       });
     });
   }
-
   function saveShipQuantities() {
     try {
       const qtyMap = {};
@@ -1250,7 +1213,6 @@
       localStorage.setItem(KEYS.SHIP_QTY, JSON.stringify(qtyMap));
     } catch (e) {}
   }
-
   // === ОБРАБОТЧИКИ ===
   let __inputsHandlersAttached = false;
   function attachInputsHandlers() {
@@ -1271,7 +1233,6 @@
     const debouncedRecalcLfResearch = debounce(() => {
       if (getActiveTab() === 'lifeforms') recalcAllLfResearch();
     }, 120);
-
     const tbodyB = document.getElementById('tbodyBuildings');
     if (tbodyB) {
       tbodyB.addEventListener('input', e => {
@@ -1291,7 +1252,6 @@
       });
       tbodyB.addEventListener('change', () => debouncedRecalcBuildings());
     }
-
     const tbodyR = document.getElementById('tbodyResearch');
     if (tbodyR) {
       tbodyR.addEventListener('input', e => {
@@ -1301,7 +1261,6 @@
       });
       tbodyR.addEventListener('change', () => debouncedRecalcResearch());
     }
-
     const tmEl = document.getElementById('tmInput');
     if (tmEl) {
       tmEl.addEventListener('input', () => debouncedRecalcResearch());
@@ -1312,7 +1271,6 @@
         } catch (e) {}
       });
     }
-
     ['boxesCount', 'boxValue'].forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
@@ -1324,7 +1282,6 @@
         debouncedComputeFleet();
       });
     });
-
     const tbodyLfB = document.getElementById('tbodyLfBuildings');
     if(tbodyLfB){
       tbodyLfB.addEventListener('input', e=>{
@@ -1335,18 +1292,16 @@
       });
       tbodyLfB.addEventListener('change', ()=>{ debouncedRecalcLfBuildings(); persistLfInputs(); });
     }
-
     const tbodyLfR = document.getElementById('tbodyLfResearch');
     if(tbodyLfR){
       tbodyLfR.addEventListener('input', e=>{
         const t=e.target;
-        if(!t.matches('.lvl-input')) return;
+        if(!t.matches('.lvl-input') && !t.matches('.planet-input')) return; // НОВОЕ
         debouncedRecalcLfResearch();
         persistLfInputs();
       });
       tbodyLfR.addEventListener('change', ()=>{ debouncedRecalcLfResearch(); persistLfInputs(); });
     }
-
     const sel = document.getElementById('lifeformSelect');
     if(sel){
       sel.addEventListener('change', (e)=>{
@@ -1360,7 +1315,6 @@
         updateBoxesNeeded();
       });
     }
-
     const megInput = document.getElementById('megalithLevel');
     const mrcInput = document.getElementById('mrcLevel');
     if(megInput){
@@ -1375,7 +1329,6 @@
       mrcInput.addEventListener('change', applyMrc);
       mrcInput.addEventListener('blur', applyMrc);
     }
-
     document.getElementById('langRU')?.addEventListener('click', (ev) => {
       ev.stopPropagation();
       applyLang('ru');
@@ -1384,7 +1337,6 @@
       ev.stopPropagation();
       applyLang('tr');
     });
-
     document.querySelectorAll('.tab-btn').forEach(btn=>{
       btn.addEventListener('click', (ev)=>{
         ev.stopPropagation();
@@ -1398,7 +1350,6 @@
         positionTabs();
       });
     });
-
     document.querySelectorAll('.lf-subtab-btn').forEach(btn => {
       btn.addEventListener('click', (ev) => {
         ev.stopPropagation();
@@ -1415,7 +1366,6 @@
         }catch(e){}
       });
     });
-
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
       const savedTheme = localStorage.getItem('og_calc_theme') || 'dark';
@@ -1429,7 +1379,6 @@
       });
     }
   }
-
   // === ОСТАЛЬНЫЕ ФУНКЦИИ ===
   function persistLfInputs(){
     try{
@@ -1446,13 +1395,13 @@
       researchRows.forEach((tr,i)=>{
         const from = parseNumberInput(tr.querySelector('input[data-type="from"]')?.value);
         const to = parseNumberInput(tr.querySelector('input[data-type="to"]')?.value);
-        r[i] = { from, to };
+        const planets = parseNumberInput(tr.querySelector('input[data-type="planets"]')?.value) || 1; // НОВОЕ
+        r[i] = { from, to, planets }; // НОВОЕ
       });
       localStorage.setItem(KEYS.LF_INPUTS_BUILD, JSON.stringify(b));
       localStorage.setItem(KEYS.LF_INPUTS_RESEARCH, JSON.stringify(r));
     }catch(e){}
   }
-
   function applyLang(lang){
     if(!lang) return;
     try { localStorage.setItem(KEYS.LANG, lang); } catch(e){}
@@ -1481,7 +1430,6 @@
     document.getElementById('langRU')?.classList.toggle('active', lang==='ru');
     document.getElementById('langTR')?.classList.toggle('active', lang==='tr');
   }
-
   function restoreFromStorage(){
     try{
       buildRowsBuildings();
@@ -1529,6 +1477,7 @@
           if(lfInputsResearch[i]){
             tr.querySelector('input[data-type="from"]').value = lfInputsResearch[i].from ? String(Math.min(99, lfInputsResearch[i].from)) : '';
             tr.querySelector('input[data-type="to"]').value = lfInputsResearch[i].to ? String(Math.min(99, lfInputsResearch[i].to)) : '';
+            tr.querySelector('input[data-type="planets"]').value = lfInputsResearch[i].planets ? formatWithDotsRaw(lfInputsResearch[i].planets) : '1'; // НОВОЕ
           }
         });
       }
@@ -1571,7 +1520,6 @@
       document.body.classList.toggle('theme-dark', savedTheme === 'dark');
     }catch(e){}
   }
-
   function centerWrapper(){
     const wrapperEl = document.getElementById('tableWrapper');
     if(!wrapperEl) return;
@@ -1586,7 +1534,6 @@
     try{ localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale, posX: window.posX, posY: window.posY })); }catch(e){}
     positionTabs();
   }
-
   function fullResetToZero(){
     try{
       localStorage.removeItem(KEYS.INPUTS_BUILD);
@@ -1629,7 +1576,6 @@
       centerWrapper();
     }catch(e){}
   }
-
   function positionTabs(){
     try{
       const tabsLeftEl = document.getElementById('tabsLeft');
@@ -1644,7 +1590,6 @@
       tabsLeftEl.style.top = `${Math.max(0, Math.round(offsetWithinWrapper + extra))}px`;
     }catch(e){}
   }
-
   function updateBoxesNeeded() {
     try {
       const boxesNeededEl = document.getElementById('boxesNeeded');
@@ -1663,7 +1608,6 @@
       }
     } catch (e) {}
   }
-
   function updateBoxesCostTL() {
     try {
       const boxesCostTLEl = document.getElementById('boxesCostTL');
@@ -1705,7 +1649,6 @@
       leftoverTmValueEl && (leftoverTmValueEl.textContent = leftoverTM > 0 ? formatWithDotsRaw(leftoverTM) : '0');
     } catch (e) {}
   }
-
   function getCurrentTotalMetalValue() {
     try {
       const active = document.querySelector('.tab-btn.active')?.dataset.tab;
@@ -1728,7 +1671,6 @@
       return 0;
     }
   }
-
   function setActiveTab(tab){
     document.querySelectorAll('.tab-btn').forEach(b=>{
       const isActive = (b.dataset.tab===tab);
@@ -1768,7 +1710,6 @@
       localStorage.setItem(KEYS.ACTIVE_TAB, tab);
     }catch(e){}
   }
-
   // === ИНИЦИАЛИЗАЦИЯ ===
   (function(){
     const dragHandle = document.getElementById('dragHandle');
@@ -1826,7 +1767,6 @@
       positionTabs();
     });
   })();
-
   function init(){
     try{
       buildRowsBuildings();
@@ -1870,7 +1810,6 @@
       setActiveTab(savedTab);
     }catch(e){}
   }
-
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {

@@ -126,7 +126,7 @@ body{
 .lvl-input, .planet-input, input[type="text"]{
   padding:3px 6px; border-radius:4px; background:#0f1217; border:1px solid #4a5562; color:#e6edf3; height:22px; font-size:12px;
 }
-.planet-input{ width:80px; } .lvl-input{ width:70px; }
+.planet-input{ width:60px; } .lvl-input{ width:50px; } /* ИЗМЕНЕНО */
 .icon{ width:20px; height:20px; vertical-align:middle; margin-right:6px; image-rendering:auto; }
 .icon-dm{ width:26px; height:26px; margin:0 6px 0 0; display:inline-block; vertical-align:middle; }
 .try-value { color: var(--try-color); font-weight:800; }
@@ -253,6 +253,24 @@ body{
   display: inline-block !important;
   text-align: left !important;
 }
+
+/* --- ПОДСТРОЙКА ШИРИНЫ СТОЛБЦА НАЗВАНИЙ ДЛЯ ФОРМ ЖИЗНИ --- */
+#lfBuildingsTable th[data-key="lfBuilding"],
+#lfBuildingsTable td.name-cell,
+#lfResearchTable th[data-key="lfResearch"],
+#lfResearchTable td.name-cell {
+  width: 320px !important; /* Достаточная ширина для длинных названий */
+  min-width: 320px;
+  white-space: nowrap; /* Запрещаем перенос слов */
+  overflow: visible; /* Позволяем содержимому выходить за пределы ячейки, если необходимо */
+}
+
+/* Обеспечиваем, что другие элементы внутри ячейки также не переносятся */
+#lfBuildingsTable td.name-cell span,
+#lfResearchTable td.name-cell span {
+  white-space: nowrap;
+}
+
 @media (max-width:640px){
   .table-wrapper{ left:12px; top:12px; right:12px; position:relative; transform:none; max-width:unset; }
   .top-controls { flex-wrap:wrap; gap:6px; }
