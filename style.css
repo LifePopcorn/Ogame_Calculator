@@ -22,9 +22,6 @@ body{
   position:absolute; left:180px; top:50px; padding:8px;
   max-width:calc(100vw - 220px);
   transform-origin:center top; user-select:none; touch-action:none; z-index:1000; background: transparent;
-  /* Убираем will-change из основного стиля, добавим при необходимости в JS */
-  /* will-change: transform; */
-  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
 }
 .top-controls {
   display:flex; align-items:center; justify-content:flex-start; gap:8px;
@@ -35,10 +32,6 @@ body{
 .drag-handle{
   padding:6px 8px; border-radius:6px; border:1px solid var(--accent);
   background:rgba(58,123,213,0.12); cursor:grab; color:#cfe0ff; user-select:none;
-  /* Убираем трансформации для чёткости */
-  /* transform: translateZ(0); */
-  /* backface-visibility: hidden; */
-  /* will-change: transform; */
 }
 .lang-switch{ display:flex; gap:6px; align-items:center; }
 .lang-btn{ padding:6px 8px; background:#444; color:#fff; border-radius:6px; border:1px solid #999; cursor:pointer; }
@@ -75,10 +68,6 @@ body{
     inset 0 -1px 1.5px rgba(0,0,0,0.25),
     0 3px 8px rgba(0,0,0,0.35);
   -webkit-font-smoothing:antialiased;
-  /* Убираем трансформации для чёткости */
-  /* transform: translateZ(0); */
-  /* backface-visibility: hidden; */
-  /* will-change: transform; */
 }
 .tab-btn:hover{ filter:brightness(1.12) saturate(1.08); transform:translateY(-0.5px); }
 .tab-btn:active{ transform:translateY(0.5px); filter:brightness(0.98); }
@@ -110,10 +99,6 @@ body{
   display:flex; flex-direction:column;
   border:2px solid #253041; border-top:none;
   overflow: visible; width:100%;
-  /* Убираем трансформации для чёткости */
-  /* transform: translateZ(0); */
-  /* backface-visibility: hidden; */
-  /* will-change: transform; */
 }
 .cost-table{
   width:100%; border-collapse:collapse; margin-top:6px;
@@ -126,14 +111,14 @@ body{
 .lvl-input, .planet-input, input[type="text"]{
   padding:3px 6px; border-radius:4px; background:#0f1217; border:1px solid #4a5562; color:#e6edf3; height:22px; font-size:12px;
 }
-.planet-input{ width:60px; } .lvl-input{ width:50px; } /* ИЗМЕНЕНО */
+.planet-input{ width:60px; } .lvl-input{ width:50px; }
 .icon{ width:20px; height:20px; vertical-align:middle; margin-right:6px; image-rendering:auto; }
 .icon-dm{ width:26px; height:26px; margin:0 6px 0 0; display:inline-block; vertical-align:middle; }
 .try-value { color: var(--try-color); font-weight:800; }
 .tm-left {
   font-weight: 800;
   color: black;
-  background: gold; /* Золотой фон */
+  background: gold;
   padding: 2px 8px;
   border-radius: 4px;
   display: inline-block;
@@ -158,14 +143,42 @@ body{
 .val-crystal { color: var(--crystal); font-weight:700; }
 .val-deut { color: var(--deut); font-weight:700; }
 #fleetFrame { width:auto; max-width:100%; }
-#shipsTable { table-layout: fixed; border-collapse: collapse; }
-#shipsTable th:nth-child(1), #shipsTable td:nth-child(1) { width:200px; text-align:left; }
-#shipsTable th:nth-child(2), #shipsTable td:nth-child(2),
-#shipsTable th:nth-child(3), #shipsTable td:nth-child(3),
-#shipsTable th:nth-child(4), #shipsTable td:nth-child(4) { width:90px; text-align:right; }
-#shipsTable th:nth-child(5), #shipsTable td:nth-child(5) { width:110px; text-align:right; }
-#shipsTable input[type="text"] { width:100%; box-sizing:border-box; text-align:right; padding-right:4px; }
-#tabFleet #shipsTable { width:800px; margin:0 auto; }
+
+/* === 🔧 ФЛОТ: правильная фиксированная ширина с расширенным столбцом "Очки" === */
+#shipsTable {
+  table-layout: fixed;
+  border-collapse: collapse;
+  width: 840px; /* увеличено с 800px */
+  margin: 0 auto;
+}
+#shipsTable th,
+#shipsTable td {
+  padding: 4px 6px;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#shipsTable th:nth-child(1),
+#shipsTable td:nth-child(1) { width: 200px; text-align: left; }
+#shipsTable th:nth-child(2),
+#shipsTable td:nth-child(2) { width: 140px; text-align: right; }
+#shipsTable th:nth-child(3),
+#shipsTable td:nth-child(3),
+#shipsTable th:nth-child(4),
+#shipsTable td:nth-child(4) { width: 90px; text-align: right; }
+#shipsTable th:nth-child(5),
+#shipsTable td:nth-child(5) { width: 90px; text-align: right; }
+#shipsTable th:nth-child(6),
+#shipsTable td:nth-child(6) { width: 110px; text-align: right; } /* увеличено с 70px */
+#shipsTable input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  text-align: right;
+  padding-right: 4px;
+}
+/* ============================================== */
+
 .lf-subtabs { display:flex; gap:6px; align-items:center; margin-bottom:8px; }
 .lf-subtab-btn{
   padding:6px 10px; border-radius:6px; border:1px solid var(--lf);
@@ -174,10 +187,6 @@ body{
   box-shadow: inset 0 1px 1.5px rgba(255,255,255,0.25), inset 0 -1px 1.5px rgba(0,0,0,0.25), 0 3px 8px rgba(0,0,0,0.35);
   transition: all 0.2s ease;
   -webkit-font-smoothing:antialiased;
-  /* Убираем трансформации для чёткости */
-  /* transform: translateZ(0); */
-  /* backface-visibility: hidden; */
-  /* will-change: transform; */
 }
 .lf-subtab-btn:hover{ filter:brightness(1.12) saturate(1.08); transform:translateY(-0.5px); }
 .lf-subtab-btn.active{ background: var(--lf); }
@@ -186,53 +195,45 @@ body{
   background:#1d1f27; color:#fff; font-weight:700; min-width:140px; height:22px; font-size:11px;
   box-shadow: inset 0 1px 1px rgba(255,255,255,0.12);
 }
-/* Блок бонусов Rock'Tal */
+/* === БОНУСЫ: поля 50px === */
 .lf-bonuses {
-  display:flex; gap:8px; align-items:center; margin:8px 0 4px 0;
-  padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);
-  background:rgba(29,31,39,0.75);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 8px 0 4px 0;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: rgba(18,22,30,0.95);
+  border: 1px solid #29323d;
+  font-size: 12px;
 }
-.lf-bonuses .field { display:flex; align-items:center; gap:6px; }
-.lf-bonuses label { font-weight:800; color:#dfeefe; }
-.lf-bonuses input { width:80px; }
+.lf-bonuses .field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.lf-bonuses label {
+  font-weight: 700;
+  color: #cfe0ff;
+  white-space: nowrap;
+  font-size: 12px;
+}
+.lf-bonuses input {
+  width: 50px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: #0f1217;
+  border: 1px solid #4a5562;
+  color: #e6edf3;
+  height: 22px;
+  font-size: 12px;
+  text-align: right;
+  -moz-appearance: textfield;
+  -webkit-appearance: none;
+  appearance: none;
+}
+/* ============================================== */
 .subtab-content{ display:none; } .subtab-content.active{ display:block; }
-/* --- ИСПРАВЛЕНИЕ РАЗМЫТИЯ ПРИ МАСШТАБИРОВАНИИ --- */
-/* Применяем трансформации и свойства GPU-рендеринга ТОЛЬКО к самому масштабируемому элементу (.table-wrapper) через JS */
-/* Убираем эти правила из CSS, чтобы они не влияли на дочерние элементы */
-/* .table-wrapper, .table-frame, .tab-btn, .lf-subtab-btn, .drag-handle, .global-zoom button { */
-/*   transform: translateZ(0); */
-/*   backface-visibility: hidden; */
-/*   -webkit-transform: translateZ(0); */
-/*   -webkit-backface-visibility: hidden; */
-/*   will-change: transform, opacity; */
-/* } */
-/* .tab-btn, .lf-subtab-btn, .drag-handle { */
-/*   -webkit-font-smoothing: antialiased; */
-/*   text-rendering: geometricPrecision; */
-/* } */
-/* .table-wrapper img, .icon, #shipsTable img { */
-/*   image-rendering: crisp-edges; */
-/*   -ms-interpolation-mode: nearest-neighbor; */
-/* } */
-/* .tab-btn, .lf-subtab-btn { */
-/*   background-image: none !important; */
-/* } */
-/* .table-wrapper, .tab-btn, .box-row, .tab-content, .table-frame { */
-/*   -webkit-font-smoothing: antialiased; */
-/*   text-rendering: optimizeLegibility; */
-/* } */
-/* .table-wrapper img, .icon, #shipsTable img { */
-/*   backface-visibility: hidden; */
-/*   transform-origin: center center; */
-/*   will-change: transform; */
-/*   image-rendering: -webkit-optimize-contrast; */
-/*   image-rendering: crisp-edges; */
-/* } */
-/* .table-wrapper * { */
-/*   filter: none !important; */
-/*   -webkit-backdrop-filter: none !important; */
-/* } */
-/* === ИСПРАВЛЕНИЕ: выравнивание иконки и текста по левому краю во вкладке "Исследования" === */
 #tabResearch td.name-cell {
   display: flex !important;
   align-items: center !important;
@@ -253,24 +254,61 @@ body{
   display: inline-block !important;
   text-align: left !important;
 }
-
-/* --- ПОДСТРОЙКА ШИРИНЫ СТОЛБЦА НАЗВАНИЙ ДЛЯ ФОРМ ЖИЗНИ --- */
-#lfBuildingsTable th[data-key="lfBuilding"],
-#lfBuildingsTable td.name-cell,
+/* === ✅ ФОРМЫ ЖИЗНИ: только исследования — 320px, постройки — 220px === */
 #lfResearchTable th[data-key="lfResearch"],
 #lfResearchTable td.name-cell {
-  width: 320px !important; /* Достаточная ширина для длинных названий */
+  width: 320px !important;
   min-width: 320px;
-  white-space: nowrap; /* Запрещаем перенос слов */
-  overflow: visible; /* Позволяем содержимому выходить за пределы ячейки, если необходимо */
+  white-space: nowrap;
+  overflow: visible;
 }
-
-/* Обеспечиваем, что другие элементы внутри ячейки также не переносятся */
+#lfBuildingsTable th[data-key="lfBuilding"],
+#lfBuildingsTable td.name-cell {
+  width: 220px !important;
+  min-width: 220px;
+  white-space: nowrap;
+  overflow: visible;
+}
+/* ========================================================================== */
 #lfBuildingsTable td.name-cell span,
 #lfResearchTable td.name-cell span {
   white-space: nowrap;
 }
-
+/* === УБРАТЬ СТРЕЛОЧКИ У ЧИСЛОВЫХ ПОЛЕЙ === */
+#megalithLevel,
+#mrcLevel,
+#megalithLevel[type="number"],
+#mrcLevel[type="number"],
+#lfBuildingsTable input[type="number"],
+#lfResearchTable input[type="number"],
+#lfBuildingsTable input[type="text"],
+#lfResearchTable input[type="text"],
+.lf-bonuses input[type="number"],
+.lf-bonuses input[type="text"] {
+  -webkit-appearance: none !important;
+  -moz-appearance: textfield !important;
+  appearance: none !important;
+  margin: 0 !important;
+  padding: 3px 6px !important;
+  box-sizing: border-box !important;
+  width: 50px !important;
+}
+#megalithLevel[type="number"]::-webkit-outer-spin-button,
+#megalithLevel[type="number"]::-webkit-inner-spin-button,
+#mrcLevel[type="number"]::-webkit-outer-spin-button,
+#mrcLevel[type="number"]::-webkit-inner-spin-button,
+#lfBuildingsTable input[type="number"]::-webkit-outer-spin-button,
+#lfBuildingsTable input[type="number"]::-webkit-inner-spin-button,
+#lfResearchTable input[type="number"]::-webkit-outer-spin-button,
+#lfResearchTable input[type="number"]::-webkit-inner-spin-button,
+.lf-bonuses input[type="number"]::-webkit-outer-spin-button,
+.lf-bonuses input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+}
 @media (max-width:640px){
   .table-wrapper{ left:12px; top:12px; right:12px; position:relative; transform:none; max-width:unset; }
   .top-controls { flex-wrap:wrap; gap:6px; }

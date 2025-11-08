@@ -1,5 +1,6 @@
 (function(){
   'use strict';
+
   // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ / КОНФИГУРАЦИЯ ===
   const CONFIG = {
     TM_PER_BOX: 42000,
@@ -437,6 +438,8 @@
     const lang = localStorage.getItem(KEYS.LANG) || 'ru';
     return LF_RESEARCH_NAMES[lang]?.[techId] || LF_RESEARCH_NAMES.ru?.[techId] || `ID ${techId}`;
   }
+
+  // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ===
   function formatWithDotsRaw(inputStr) {
     if (inputStr === null || inputStr === undefined) return '';
     const s = String(inputStr);
@@ -547,6 +550,8 @@
   function getActiveTab() {
     return document.querySelector('.tab-btn.active')?.dataset.tab || 'buildings';
   }
+
+  // === ⭐ СПЕЦИАЛЬНЫЙ ОБРАБОТЧИК ВВОДА ДЛЯ .lvl-input (0–99) ===
   function attachLvlInputHandlers() {
     document.querySelectorAll('.lvl-input').forEach(inp => {
       if (inp._lvlBound) return;
@@ -575,6 +580,8 @@
       });
     });
   }
+
+  // === ОСНОВНЫЕ РАСЧЁТНЫЕ ФУНКЦИИ ===
   function recalcAllBuildings() {
     const tbodyB = document.getElementById('tbodyBuildings');
     if (!tbodyB) return;
@@ -661,104 +668,89 @@
     document.getElementById('tmTotal').textContent = (LANG[localStorage.getItem(KEYS.LANG) || 'ru'].totalTMLabel || 'Итого: ') + formatNumber(totalTM);
     updateBoxesNeeded();
   }
+
+  // ✅ ОСНОВНОЕ ИЗМЕНЕНИЕ: computeFleet с очками
   function computeFleet() {
-  try {
-    const factorC = CONFIG.METAL_EQ_CRYSTAL;
-    const factorD = CONFIG.METAL_EQ_DEUT;
-    let totalM = 0, totalC = 0, totalD = 0, totalPoints = 0;
+    try {
+      const factorC = CONFIG.METAL_EQ_CRYSTAL;
+      const factorD = CONFIG.METAL_EQ_DEUT;
+      let totalM = 0, totalC = 0, totalD = 0;
+      document.querySelectorAll("input[data-id]").forEach(inp => {
+        const qty = parseNumberInput(inp.value);
+        const row = inp.closest('tr');
+        const pointsCell = row.querySelector('.p'); // Ячейка очков
 
-    document.querySelectorAll("input[data-id]").forEach(inp => {
-      const qty = parseNumberInput(inp.value);
-      const ship = shipList.find(s => s.id === inp.dataset.id);
-      if (!ship) return;
+        if (qty <= 0) {
+          inp.value = '';
+          pointsCell.textContent = '0';
+          return;
+        }
 
-      // Обновляем значение в инпуте (с форматированием)
-      if (qty <= 0) {
-        inp.value = '';
-      } else {
+        const ship = shipList.find(s => s.id === inp.dataset.id);
+        if (!ship) return;
+
+        totalM += qty * ship.metal;
+        totalC += qty * ship.crystal;
+        totalD += qty * ship.deut;
         inp.value = formatWithDotsRaw(qty);
+
+        // Рассчитываем и выводим очки
+        const shipPoints = Math.round((ship.metal + ship.crystal + ship.deut) / 1000) * qty;
+        pointsCell.textContent = formatNumber(shipPoints);
+      });
+
+      const totalResEl = document.getElementById('totalRes');
+      const totalMetalEqEl = document.getElementById('totalMetalEq');
+      const grandTotalEl = document.getElementById('grandTotal');
+      const lang = localStorage.getItem(KEYS.LANG) || 'ru';
+
+      if (totalResEl) totalResEl.innerHTML = `${formatSpanMetal(totalM)} ${LANG[lang].metal}, ${formatSpanCrystal(totalC)} ${LANG[lang].crystal}, ${formatSpanDeut(totalD)} ${LANG[lang].deut}`;
+      const metalEq = Math.round(totalM + totalC * factorC + totalD * factorD);
+      if (totalMetalEqEl) totalMetalEqEl.textContent = formatNumber(metalEq);
+
+      const boxesCount = parseNumberInput(document.getElementById('boxesCount')?.value);
+      const boxValue = parseNumberInput(document.getElementById('boxValue')?.value);
+      const boxesMetal = boxesCount * boxValue;
+
+      const planetM = parseNumberInput(document.getElementById('planetMetal')?.value);
+      const planetC = parseNumberInput(document.getElementById('planetCrystal')?.value);
+      const planetD = parseNumberInput(document.getElementById('planetDeut')?.value);
+      const planetMetalEq = planetM + planetC * factorC + planetD * factorD;
+
+      const grand = boxesMetal + planetMetalEq - metalEq;
+      if (grandTotalEl) {
+        grandTotalEl.textContent = formatNumber(Math.round(grand));
+        grandTotalEl.style.color = grand >= 0 ? "#41c879" : "#ff4d4d";
       }
 
-      // Находим ячейку с очками в той же строке
-      const row = inp.closest('tr');
-      const pointsCell = row.querySelector('td:nth-child(6)'); // 6-й столбец — Очки
+      const availableMetalPool = boxesMetal + planetMetalEq;
+      let cumulativeEq = 0;
+      document.querySelectorAll("#shipsTable tbody tr[data-row-id]").forEach(row => {
+        const id = row.getAttribute('data-row-id');
+        const inp = row.querySelector('input[data-id]');
+        const qty = parseNumberInput(inp?.value);
+        const ship = shipList.find(s => s.id === id);
+        let rowEq = 0;
+        if (ship && qty > 0) {
+          const m = ship.metal * qty, c = ship.crystal * qty, d = ship.deut * qty;
+          rowEq = m + c * factorC + d * factorD;
+        }
+        cumulativeEq += rowEq;
+        if (availableMetalPool > 0 && rowEq > 0 && cumulativeEq > availableMetalPool) row.classList.add('row-deficit');
+        else row.classList.remove('row-deficit');
+      });
 
-      if (qty > 0) {
-        const m = qty * ship.metal;
-        const c = qty * ship.crystal;
-        const d = qty * ship.deut;
-        const p = qty * Math.round((ship.metal + ship.crystal + ship.deut) / 1000);
+      localStorage.setItem(KEYS.BOXES, JSON.stringify({
+        boxesCount,
+        boxValue,
+        planetMetal: planetM,
+        planetCrystal: planetC,
+        planetDeut: planetD
+      }));
+      updateBoxesNeeded();
+    } catch (e) {}
+  }
 
-        totalM += m;
-        totalC += c;
-        totalD += d;
-        totalPoints += p;
-
-        // Показываем очки
-        pointsCell.textContent = formatNumber(p);
-      } else {
-        // Очищаем ячейку очков
-        pointsCell.textContent = '';
-      }
-    });
-
-    const totalResEl = document.getElementById('totalRes');
-    const totalMetalEqEl = document.getElementById('totalMetalEq');
-    const grandTotalEl = document.getElementById('grandTotal');
-    const lang = localStorage.getItem(KEYS.LANG) || 'ru';
-
-    if (totalResEl) totalResEl.innerHTML = `${formatSpanMetal(totalM)} ${LANG[lang].metal}, ${formatSpanCrystal(totalC)} ${LANG[lang].crystal}, ${formatSpanDeut(totalD)} ${LANG[lang].deut}`;
-    const metalEq = Math.round(totalM + totalC * factorC + totalD * factorD);
-    if (totalMetalEqEl) totalMetalEqEl.textContent = formatNumber(metalEq);
-
-    const boxesCount = parseNumberInput(document.getElementById('boxesCount')?.value);
-    const boxValue = parseNumberInput(document.getElementById('boxValue')?.value);
-    const boxesMetal = boxesCount * boxValue;
-    const planetM = parseNumberInput(document.getElementById('planetMetal')?.value);
-    const planetC = parseNumberInput(document.getElementById('planetCrystal')?.value);
-    const planetD = parseNumberInput(document.getElementById('planetDeut')?.value);
-    const planetMetalEq = planetM + planetC * factorC + planetD * factorD;
-    const grand = boxesMetal + planetMetalEq - metalEq;
-
-    if (grandTotalEl) {
-      grandTotalEl.textContent = formatNumber(Math.round(grand));
-      grandTotalEl.style.color = grand >= 0 ? "#41c879" : "#ff4d4d";
-    }
-
-    const availableMetalPool = boxesMetal + planetMetalEq;
-    let cumulativeEq = 0;
-    document.querySelectorAll("#shipsTable tbody tr[data-row-id]").forEach(row => {
-      const id = row.getAttribute('data-row-id');
-      const inp = row.querySelector('input[data-id]');
-      const qty = parseNumberInput(inp?.value);
-      const ship = shipList.find(s => s.id === id);
-      let rowEq = 0;
-      if (ship && qty > 0) {
-        const m = ship.metal * qty, c = ship.crystal * qty, d = ship.deut * qty;
-        rowEq = m + c * factorC + d * factorD;
-      }
-      cumulativeEq += rowEq;
-      if (availableMetalPool > 0 && rowEq > 0 && cumulativeEq > availableMetalPool) row.classList.add('row-deficit');
-      else row.classList.remove('row-deficit');
-    });
-
-    // Обновление ИТОГОВ (в футере)
-    document.getElementById('sumMetalFleet').innerHTML = formatSpanMetal(totalM);
-    document.getElementById('sumCrystalFleet').innerHTML = formatSpanCrystal(totalC);
-    document.getElementById('sumDeutFleet').innerHTML = formatSpanDeut(totalD);
-    document.getElementById('sumPointsFleet').textContent = formatNumber(totalPoints);
-    document.getElementById('sumTotalMetalFleet').textContent = formatNumber(metalEq);
-
-    localStorage.setItem(KEYS.BOXES, JSON.stringify({
-      boxesCount,
-      boxValue,
-      planetMetal: planetM,
-      planetCrystal: planetC,
-      planetDeut: planetD
-    }));
-    updateBoxesNeeded();
-  } catch (e) {}
-}
   function recalcAllLfBuildings() {
     const tbody = document.getElementById('tbodyLfBuildings');
     if (!tbody) return;
@@ -859,6 +851,88 @@
     document.getElementById('sumTotalMetalLfR').textContent = formatNumber(Math.round(convertToMetal(tm, tc, td)));
     updateBoxesNeeded();
   }
+
+  // === ФУНКЦИИ РЕНДЕРА ===
+
+  // ⭐ ОСНОВНОЕ ИЗМЕНЕНИЕ: renderTable с правильным порядком и очками
+  function renderTable() {
+    const tableBody = document.querySelector("#shipsTable tbody");
+    if (!tableBody) return;
+    const qtyMap = JSON.parse(localStorage.getItem(KEYS.SHIP_QTY) || '{}');
+    tableBody.innerHTML = '';
+    const frag = document.createDocumentFragment();
+    shipList.forEach(ship => {
+      const v = qtyMap[ship.id] || '';
+      const row = document.createElement('tr');
+      row.setAttribute('data-row-id', ship.id);
+      const shipName = (localStorage.getItem(KEYS.LANG) === 'tr') ? (ship.tr || ship.ru) : (ship.ru || ship.tr);
+      const tdName = document.createElement('td');
+      tdName.style.textAlign = 'left';
+      const img = document.createElement('img');
+      img.src = `${IMAGES_SHIPS_PATH}${ship.img}`;
+      img.alt = shipName;
+      img.width = 28;
+      img.height = 28;
+      img.loading = 'lazy';
+      img.style.width = '28px';
+      img.style.height = '28px';
+      img.style.verticalAlign = 'middle';
+      img.style.marginRight = '8px';
+      img.style.borderRadius = '4px';
+      img.addEventListener('error', () => {
+        if (!img._fallback) {
+          const fb = createImageFallbackEl(shipName);
+          img.style.display = 'none';
+          img.parentNode && img.parentNode.insertBefore(fb, img.nextSibling);
+          img._fallback = true;
+        }
+      });
+      tdName.appendChild(img);
+      const span = document.createElement('span');
+      span.className = 'ship-name';
+      span.textContent = shipName;
+      tdName.appendChild(span);
+
+      // === ПОЛНОСТЬЮ ОБНОВЛЁННЫЙ ПОРЯДОК СТОЛБЦОВ ===
+      const tdQty = document.createElement('td');
+      tdQty.innerHTML = `<input type="text" inputmode="numeric" pattern="[0-9\\.]*" value="${v ? formatWithDotsRaw(v) : ''}" data-id="${ship.id}">`;
+
+      const tdM = document.createElement('td');
+      tdM.innerHTML = formatSpanMetal(ship.metal);
+      const tdC = document.createElement('td');
+      tdC.innerHTML = formatSpanCrystal(ship.crystal);
+      const tdD = document.createElement('td');
+      tdD.innerHTML = formatSpanDeut(ship.deut);
+
+      const points = Math.round((ship.metal + ship.crystal + ship.deut) / 1000);
+      const tdP = document.createElement('td');
+      tdP.className = 'p';
+      tdP.textContent = '0';
+
+      row.appendChild(tdName);
+      row.appendChild(tdQty);
+      row.appendChild(tdM);
+      row.appendChild(tdC);
+      row.appendChild(tdD);
+      row.appendChild(tdP);
+      frag.appendChild(row);
+    });
+    tableBody.appendChild(frag);
+    attachLiveThousandsFormatting('input[data-id]');
+    document.querySelectorAll("input[data-id]").forEach(inp => {
+      if (!inp || inp._qtyBound) return;
+      inp.addEventListener('input', () => {
+        saveShipQuantities();
+        computeFleet();
+      });
+      inp.addEventListener('change', () => {
+        saveShipQuantities();
+        computeFleet();
+      });
+      inp._qtyBound = true;
+    });
+  }
+
   function buildRowsBuildings() {
     const tbodyB = document.getElementById('tbodyBuildings');
     if (!tbodyB) return;
@@ -1074,80 +1148,8 @@
     tbody.appendChild(frag);
     attachLvlInputHandlers();
   }
-  function renderTable() {
-  const tableBody = document.querySelector("#shipsTable tbody");
-  if (!tableBody) return;
-  const qtyMap = JSON.parse(localStorage.getItem(KEYS.SHIP_QTY) || '{}');
-  tableBody.innerHTML = '';
-  const frag = document.createDocumentFragment();
-  shipList.forEach(ship => {
-    const v = qtyMap[ship.id] || '';
-    const row = document.createElement('tr');
-    row.setAttribute('data-row-id', ship.id);
-    const shipName = (localStorage.getItem(KEYS.LANG) === 'tr') ? (ship.tr || ship.ru) : (ship.ru || ship.tr);
-    const tdName = document.createElement('td');
-    tdName.style.textAlign = 'left';
-    const img = document.createElement('img');
-    img.src = `${IMAGES_SHIPS_PATH}${ship.img}`;
-    img.alt = shipName;
-    img.width = 28;
-    img.height = 28;
-    img.loading = 'lazy';
-    img.style.width = '28px';
-    img.style.height = '28px';
-    img.style.verticalAlign = 'middle';
-    img.style.marginRight = '8px';
-    img.style.borderRadius = '4px';
-    img.addEventListener('error', () => {
-      if (!img._fallback) {
-        const fb = createImageFallbackEl(shipName);
-        img.style.display = 'none';
-        img.parentNode && img.parentNode.insertBefore(fb, img.nextSibling);
-        img._fallback = true;
-      }
-    });
-    tdName.appendChild(img);
-    const span = document.createElement('span');
-    span.className = 'ship-name';
-    span.textContent = shipName;
-    tdName.appendChild(span);
 
-    // ❗️Очки НЕ отображаем сразу — пусто по умолчанию
-    const tdPoints = document.createElement('td');
-    tdPoints.textContent = '';
-
-    const tdM = document.createElement('td');
-    tdM.innerHTML = formatSpanMetal(ship.metal);
-    const tdC = document.createElement('td');
-    tdC.innerHTML = formatSpanCrystal(ship.crystal);
-    const tdD = document.createElement('td');
-    tdD.innerHTML = formatSpanDeut(ship.deut);
-    const tdQty = document.createElement('td');
-    tdQty.innerHTML = `<input type="text" inputmode="numeric" pattern="[0-9\\.]*" value="${v ? formatWithDotsRaw(v) : ''}" data-id="${ship.id}">`;
-
-    row.appendChild(tdName);
-    row.appendChild(tdQty);
-    row.appendChild(tdM);
-    row.appendChild(tdC);
-    row.appendChild(tdD);
-    row.appendChild(tdPoints); // очки — пусто
-    frag.appendChild(row);
-  });
-  tableBody.appendChild(frag);
-  attachLiveThousandsFormatting('input[data-id]');
-  document.querySelectorAll("input[data-id]").forEach(inp => {
-    if (!inp || inp._qtyBound) return;
-    inp.addEventListener('input', () => {
-      saveShipQuantities();
-      computeFleet();
-    });
-    inp.addEventListener('change', () => {
-      saveShipQuantities();
-      computeFleet();
-    });
-    inp._qtyBound = true;
-  });
-}
+  // === ОБРАБОТКА ВВОДА ===
   function attachLiveThousandsFormatting(selector) {
     const inputs = document.querySelectorAll(selector);
     inputs.forEach(inp => {
@@ -1222,6 +1224,8 @@
       localStorage.setItem(KEYS.SHIP_QTY, JSON.stringify(qtyMap));
     } catch (e) {}
   }
+
+  // === ОБРАБОТЧИКИ ===
   let __inputsHandlersAttached = false;
   function attachInputsHandlers() {
     if (__inputsHandlersAttached) return;
@@ -1310,11 +1314,16 @@
       });
       tbodyLfR.addEventListener('change', ()=>{ debouncedRecalcLfResearch(); persistLfInputs(); });
     }
+
     const sel = document.getElementById('lifeformSelect');
-    if(sel){
-      sel.addEventListener('change', (e)=>{
+    if (sel) {
+      sel.addEventListener('change', (e) => {
         currentLifeformRace = e.target.value;
-        try{ localStorage.setItem(KEYS.LF_RACE, currentLifeformRace); }catch(e){}
+        try { localStorage.setItem(KEYS.LF_RACE, currentLifeformRace); } catch (e) { }
+        const bonusesEl = document.getElementById('lfBonuses');
+        if (bonusesEl) {
+          bonusesEl.style.display = (currentLifeformRace === 'rocktal') ? 'flex' : 'none';
+        }
         buildRowsLfBuildings();
         buildRowsLfResearch();
         attachLiveThousandsFormatting('#tbodyLfBuildings input, #tbodyLfResearch input');
@@ -1323,6 +1332,7 @@
         updateBoxesNeeded();
       });
     }
+
     const megInput = document.getElementById('megalithLevel');
     const mrcInput = document.getElementById('mrcLevel');
     if(megInput){
@@ -1337,6 +1347,7 @@
       mrcInput.addEventListener('change', applyMrc);
       mrcInput.addEventListener('blur', applyMrc);
     }
+
     document.getElementById('langRU')?.addEventListener('click', (ev) => {
       ev.stopPropagation();
       applyLang('ru');
@@ -1345,6 +1356,7 @@
       ev.stopPropagation();
       applyLang('tr');
     });
+
     document.querySelectorAll('.tab-btn').forEach(btn=>{
       btn.addEventListener('click', (ev)=>{
         ev.stopPropagation();
@@ -1358,6 +1370,7 @@
         positionTabs();
       });
     });
+
     document.querySelectorAll('.lf-subtab-btn').forEach(btn => {
       btn.addEventListener('click', (ev) => {
         ev.stopPropagation();
@@ -1374,6 +1387,7 @@
         }catch(e){}
       });
     });
+
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
       const savedTheme = localStorage.getItem('og_calc_theme') || 'dark';
@@ -1387,6 +1401,8 @@
       });
     }
   }
+
+  // === ОСТАЛЬНЫЕ ФУНКЦИИ ===
   function persistLfInputs(){
     try{
       const buildRows = document.querySelectorAll('#tbodyLfBuildings tr');
@@ -1466,6 +1482,10 @@
       const savedRace = localStorage.getItem(KEYS.LF_RACE) || 'humans';
       currentLifeformRace = savedRace;
       const lfSel = document.getElementById('lifeformSelect'); if(lfSel) lfSel.value = savedRace;
+      const bonusesEl = document.getElementById('lfBonuses');
+      if (bonusesEl) {
+        bonusesEl.style.display = (savedRace === 'rocktal') ? 'flex' : 'none';
+      }
       buildRowsLfBuildings();
       buildRowsLfResearch();
       const lfInputsBuild = JSON.parse(localStorage.getItem(KEYS.LF_INPUTS_BUILD) || 'null');
@@ -1572,7 +1592,7 @@
       recalcAllLfResearch();
       renderTable();
       computeFleet();
-      ['sumPointsB','sumPointsR','sumPointsLfB','sumPointsLfR','totalMetalEq','grandTotal','sumPointsFleet'].forEach(id=>{
+      ['sumPointsB','sumPointsR','sumPointsLfB','sumPointsLfR','totalMetalEq','grandTotal'].forEach(id=>{
         const el = document.getElementById(id); if(el) el.textContent = '0';
       });
       const totalResEl = document.getElementById('totalRes');
@@ -1717,6 +1737,8 @@
       localStorage.setItem(KEYS.ACTIVE_TAB, tab);
     }catch(e){}
   }
+
+  // === ИНИЦИАЛИЗАЦИЯ ===
   (function(){
     const dragHandle = document.getElementById('dragHandle');
     const wrapper = document.getElementById('tableWrapper');
@@ -1773,6 +1795,7 @@
       positionTabs();
     });
   })();
+
   function init(){
     try{
       buildRowsBuildings();
