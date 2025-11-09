@@ -1,6 +1,5 @@
 (function () {
   'use strict';
-
   // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ / КОНФИГУРАЦИЯ ===
   const CONFIG = {
     TM_PER_BOX: 42000,
@@ -12,12 +11,10 @@
     MEGALITH_DISCOUNT_PER_LEVEL: 0.05,
     MINERAL_CENTER_DISCOUNT_PER_LEVEL: 0.05
   };
-
   const IMAGES_ROOT_PATH = 'images/';
   const IMAGES_BUILDINGS_PATH = 'images/buildings/';
   const IMAGES_RESEARCH_PATH = 'images/research/';
   const IMAGES_SHIPS_PATH = 'images/ships/';
-
   const TECH_COSTS = {
     1001: [7, 2, 0, 0, 40, 1.2, 1.2, 0, 0, 1.21],
     1002: [5, 2, 0, 8, 40, 1.23, 1.23, 0, 1.02, 1.25],
@@ -140,7 +137,6 @@
     4117: [500000, 300000, 200000, 0, 13000, 1.5, 1.5, 1.5, 0, 1.3],
     4118: [300000, 180000, 120000, 0, 11000, 1.7, 1.7, 1.7, 0, 1.4]
   };
-
   const LANG = {
     ru: {
       tmLabel: "Тёмная материя",
@@ -233,7 +229,6 @@
       kaelesh: "Kaelesh"
     }
   };
-
   const BUILDINGS_DATA = [
     { base: { m: 60, c: 15, d: 0 }, factor: 1.5 },
     { base: { m: 48, c: 24, d: 0 }, factor: 1.6 },
@@ -252,7 +247,6 @@
     { base: { m: 200, c: 0, d: 50 }, factor: 2.0 },
     { base: { m: 20000, c: 20000, d: 0 }, factor: 2.0 }
   ];
-
   const BUILDING_NAMES = {
     ru: [
       "Рудник по добыче металла", "Рудник по добыче кристалла", "Синтезатор дейтерия", "Солнечная электростанция",
@@ -267,14 +261,12 @@
       "Terraformer", "İttifak Deposu", "Uzay İskelesi", "Roket Silosu"
     ]
   };
-
   const ICONS_BUILDINGS = [
     "metal_mine.png", "crystal_mine.png", "deuterium_synth.png", "solar_plant.png",
     "fusion_plant.png", "robot_factory.png", "nanite_factory.png", "shipyard.png",
     "metal_storage.png", "crystal_storage.png", "deuterium_tank.png", "research_lab.png",
     "terraformer.png", "alliance_depot.png", "dock.png", "missile_silo.png"
   ];
-
   const RESEARCH_DATA = [
     { base: { m: 200, c: 1000, d: 200 }, factor: 2.0 },
     { base: { m: 0, c: 400, d: 600 }, factor: 2.0 },
@@ -293,7 +285,6 @@
     { base: { m: 4000, c: 8000, d: 4000 }, factor: 1.75 },
     { base: { m: 0, c: 0, d: 0 }, factor: 3.0 }
   ];
-
   const RESEARCH_NAMES = {
     ru: [
       "Шпионаж", "Компьютерная технология", "Оружейная технология", "Щитовая технология",
@@ -308,14 +299,12 @@
       "Plazma Tekniği", "Galaksiler Arası Araştırma Ağı", "Astrofizik", "Gravitasyon Araştırması"
     ]
   };
-
   const ICONS_RESEARCH = [
     "spy.png", "computer.png", "weapons.png", "shield.png",
     "armor.png", "energy.png", "hyperspace.png", "combustion.png",
     "impulse.png", "hyperdrive.png", "laser.png", "ion.png",
     "plasma.png", "irn.png", "astro.png", "graviton.png"
   ];
-
   const shipList = [
     { id: "small_cargo", ru: "Малый транспорт", tr: "Küçük Nakliye", metal: 2000, crystal: 2000, deut: 0, img: "maly_transport.png" },
     { id: "large_cargo", ru: "Большой транспорт", tr: "Büyük Nakliye", metal: 6000, crystal: 6000, deut: 0, img: "bolshoy_transport.png" },
@@ -331,10 +320,8 @@
     { id: "reaper", ru: "Жнец", tr: "Azrail", metal: 85000, crystal: 55000, deut: 20000, img: "reaper.png" },
     { id: "pathfinder", ru: "Первопроходец", tr: "Rehber", metal: 8000, crystal: 15000, deut: 8000, img: "pathfinder.png" }
   ];
-
   const LIFEFORM_RACES = ['humans', 'rocktal', 'mechas', 'kaelesh'];
   let currentLifeformRace = localStorage.getItem('og_calc_lf_race_v1') || 'humans';
-
   const KEYS = {
     LANG: 'og_calc_lang_v2',
     TRANSFORM: 'og_calc_transform_v2',
@@ -350,7 +337,6 @@
     ROCKTAL_MEGALITH_LEVEL: 'og_calc_rocktal_megalith_level',
     ROCKTAL_MRC_LEVEL: 'og_calc_rocktal_mrc_level'
   };
-
   const LF_BUILDING_NAMES = {
     ru: {
       1001: "Жилые кварталы", 1002: "Биосферическая ферма", 1003: "Центр Исследований", 1004: "Академия наук",
@@ -387,7 +373,6 @@
       4011: "Gemi Üretim Salonu", 4012: "Supra Kırıcı"
     }
   };
-
   const LF_RESEARCH_NAMES = {
     ru: {
       1101: "Межгалактические послы", 1102: "Высокопроизводительные экстракторы", 1103: "Термоядерные двигатели",
@@ -444,16 +429,141 @@
       4116: "Hız Artışı (Komuta Gemisi)", 4117: "Psionik Kalkan Matrisi", 4118: "Kâşif için Kaelesh Geliştirme"
     }
   };
-
   function getLfBuildingName(techId) {
     const lang = localStorage.getItem(KEYS.LANG) || 'ru';
     return LF_BUILDING_NAMES[lang]?.[techId] || LF_BUILDING_NAMES.ru?.[techId] || `ID ${techId}`;
   }
-
   function getLfResearchName(techId) {
     const lang = localStorage.getItem(KEYS.LANG) || 'ru';
     return LF_RESEARCH_NAMES[lang]?.[techId] || LF_RESEARCH_NAMES.ru?.[techId] || `ID ${techId}`;
   }
+
+  // === 🗃️ КАРТА СООТВЕТСТВИЯ ID -> ИМЯ ФАЙЛА (для форм жизни) ===
+  const LF_BUILDING_FILENAMES = {
+    1001: "residential_sector.png",
+    1002: "biosphere_farm.png",
+    1003: "research_center.png",
+    1004: "science_academy.png",
+    1005: "nerve_calibration_center.png",
+    1006: "high_energy_melting.png",
+    1007: "food_storage.png",
+    1008: "fusion_powered_production.png",
+    1009: "skyscraper.png",
+    1010: "biotech_lab.png",
+    1011: "metropolis.png",
+    1012: "planetary_shield.png",
+    2001: "meditation_enclave.png",
+    2002: "crystal_farm.png",
+    2003: "rune_technologium.png",
+    2004: "rune_forge.png",
+    2005: "orictorium.png",
+    2006: "magma_forge.png",
+    2007: "chamber_of_rupture.png",
+    2008: "megalith.png",
+    2009: "crystal_purification.png",
+    2010: "deuterium_synthesizer.png",
+    2011: "mineral_research_center.png",
+    2012: "advanced_recycling_unit.png",
+    3001: "assembly_line.png",
+    3002: "fusion_cell_factory.png",
+    3003: "robotics_research_center.png",
+    3004: "upgrade_network.png",
+    3005: "quantum_computer_center.png",
+    3006: "automated_assembly_center.png",
+    3007: "high_performance_transformer.png",
+    3008: "microchip_line.png",
+    3009: "production_assembly_workshop.png",
+    3010: "high_performance_synthesizer.png",
+    3011: "mass_chip_production.png",
+    3012: "repair_nanobots.png",
+    4001: "sanctuary.png",
+    4002: "antimatter_condenser.png",
+    4003: "cyclone_chamber.png",
+    4004: "hall_of_realization.png",
+    4005: "transcendental_forum.png",
+    4006: "antimatter_converter.png",
+    4007: "cloning_lab.png",
+    4008: "chrysalis_accelerator.png",
+    4009: "biomodifier.png",
+    4010: "psionic_modulator.png",
+    4011: "ship_production_hall.png",
+    4012: "supra_refractor.png"
+  };
+
+  const LF_RESEARCH_FILENAMES = {
+    1101: "intergalactic_envoys.png",
+    1102: "high_efficiency_extractors.png",
+    1103: "fusion_drives.png",
+    1104: "stealth_field_generator.png",
+    1105: "orbital_dock.png",
+    1106: "research_ai.png",
+    1107: "high_performance_terraformer.png",
+    1108: "enhanced_extraction_tech.png",
+    1109: "light_fighter_mk2.png",
+    1110: "cruiser_mk2.png",
+    1111: "enhanced_lab_tech.png",
+    1112: "plasma_terraformer.png",
+    1113: "low_temp_drives.png",
+    1114: "bomber_mk2.png",
+    1115: "destroyer_mk2.png",
+    1116: "battlecruiser_mk2.png",
+    1117: "assistant_robots.png",
+    1118: "supercomputer.png",
+    2101: "volcanic_batteries.png",
+    2102: "acoustic_scanning.png",
+    2103: "high_energy_supply.png",
+    2104: "cargo_hold_expansion.png",
+    2105: "magma_powered_production.png",
+    2106: "geothermal_plants.png",
+    2107: "echo_sounding.png",
+    2108: "ion_crystal_enhancement.png",
+    2109: "enhanced_stellarator.png",
+    2110: "reinforced_diamond_drills.png",
+    2111: "seismic_extraction_tech.png",
+    2112: "magma_powered_supply.png",
+    2113: "ionized_crystal_modules.png",
+    2114: "optimized_mine_construction.png",
+    2115: "diamond_energy_transmitter.png",
+    2116: "obsidian_shield_plating.png",
+    2117: "rune_shields.png",
+    2118: "rocktal_collector_enhancement.png",
+    3101: "catalyst_tech.png",
+    3102: "plasma_drive.png",
+    3103: "efficiency_module.png",
+    3104: "warehouse_ai.png",
+    3105: "general_repair_light_fighter.png",
+    3106: "automated_transport_lines.png",
+    3107: "enhanced_drone_ai.png",
+    3108: "experimental_recycling_tech.png",
+    3109: "general_repair_cruiser.png",
+    3110: "gravitational_maneuver_autopilot.png",
+    3111: "high_temp_superconductors.png",
+    3112: "general_repair_battleship.png",
+    3113: "swarm_ai.png",
+    3114: "general_repair_battlecruiser.png",
+    3115: "general_repair_bomber.png",
+    3116: "general_repair_destroyer.png",
+    3117: "experimental_weapon_tech.png",
+    3118: "mechas_overall_enhancement.png",
+    4101: "waste_heat_recovery.png",
+    4102: "sulfide_process.png",
+    4103: "psionic_network.png",
+    4104: "telekinetic_grab_beam.png",
+    4105: "enhanced_sensor_tech.png",
+    4106: "neuromodal_compressor.png",
+    4107: "neuro_interface.png",
+    4108: "interplanetary_analytical_network.png",
+    4109: "speed_boost_heavy_fighter.png",
+    4110: "telekinetic_drive.png",
+    4111: "sixth_sense.png",
+    4112: "psycho_harmonizer.png",
+    4113: "efficient_swarm_intelligence.png",
+    4114: "speed_boost_large_cargo.png",
+    4115: "gravitational_sensors.png",
+    4116: "speed_boost_battleship.png",
+    4117: "psionic_shield_matrix.png",
+    4118: "kaelesh_explorer_enhancement.png"
+  };
 
   // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ===
   function formatWithDotsRaw(inputStr) {
@@ -469,12 +579,10 @@
     }
     return sign + out;
   }
-
   function formatNumberWithDots(n) {
     if (n === null || n === undefined || isNaN(n)) return '0';
     return formatWithDotsRaw(Math.round(Number(n) || 0));
   }
-
   function parseNumberInput(s) {
     if (s === null || s === undefined) return 0;
     const str = String(s).trim();
@@ -486,7 +594,6 @@
     const safe = Math.min(num, Number.MAX_SAFE_INTEGER);
     return negative ? -safe : safe;
   }
-
   function getNumberFormatter(lang) {
     try {
       return new Intl.NumberFormat(LANG[lang]?.locale || 'ru-RU');
@@ -494,29 +601,23 @@
       return new Intl.NumberFormat('ru-RU');
     }
   }
-
   function formatNumber(n, lang = localStorage.getItem(KEYS.LANG) || 'ru') {
     if (n === null || n === undefined || isNaN(n)) return '0';
     const nf = getNumberFormatter(lang);
     return nf.format(Math.round(Number(n) || 0));
   }
-
   function formatSpanMetal(n) {
     return `<span class="val-metal">${formatNumber(n)}</span>`;
   }
-
   function formatSpanCrystal(n) {
     return `<span class="val-crystal">${formatNumber(n)}</span>`;
   }
-
   function formatSpanDeut(n) {
     return `<span class="val-deut">${formatNumber(n)}</span>`;
   }
-
   function convertToMetal(m, c, d) {
     return (m || 0) + (c || 0) * CONFIG.METAL_EQ_CRYSTAL + (d || 0) * CONFIG.METAL_EQ_DEUT;
   }
-
   function debounce(fn, wait) {
     let t = null;
     return function (...a) {
@@ -524,7 +625,6 @@
       t = setTimeout(() => fn.apply(this, a), wait);
     };
   }
-
   function createImageFallbackEl(label) {
     const span = document.createElement('span');
     span.className = 'icon-fallback';
@@ -532,7 +632,6 @@
     span.textContent = label ? label[0] : '—';
     return span;
   }
-
   function getLevelCost(techId, level) {
     const data = TECH_COSTS[techId];
     if (!data) return { m: 0, c: 0, d: 0, points: 0 };
@@ -544,21 +643,39 @@
     const points = Math.round((m + c + d) / 1000);
     return { m, c, d, points };
   }
-
-  function getTotalCostLf(techId, from, to) {
-    if (from >= to) return { m: 0, c: 0, d: 0, points: 0 };
-    if (!TECH_COSTS[techId]) return { m: 0, c: 0, d: 0, points: 0 };
-    let totalM = 0, totalC = 0, totalD = 0;
-    for (let level = from; level < to; level++) {
-      const lvlCost = getLevelCost(techId, level);
-      totalM += Number(lvlCost.m || 0);
-      totalC += Number(lvlCost.c || 0);
-      totalD += Number(lvlCost.d || 0);
+  function getTotalCostUpToLevel(techId, levelTo) {
+    if (!TECH_COSTS[techId] || levelTo <= 0) return { m: 0, c: 0, d: 0, points: 0 };
+    const [baseM, baseC, baseD, , , fM, fC, fD] = TECH_COSTS[techId];
+    let metal = 0;
+    if (baseM > 0 && fM !== 1) {
+      metal = baseM * (Math.pow(fM, levelTo) - 1) / (fM - 1);
     }
-    const points = Math.round((totalM + totalC + totalD) / 1000);
-    return { m: totalM, c: totalC, d: totalD, points };
+    let crystal = 0;
+    if (baseC > 0 && fC !== 1) {
+      crystal = baseC * (Math.pow(fC, levelTo) - 1) / (fC - 1);
+    }
+    let deut = 0;
+    if (baseD > 0 && fD > 0 && fD !== 1) {
+      deut = baseD * (Math.pow(fD, levelTo) - 1) / (fD - 1);
+    }
+    const m = Math.round(metal);
+    const c = Math.round(crystal);
+    const d = Math.round(deut);
+    const points = Math.round((m + c + d) / 1000);
+    return { m, c, d, points };
   }
-
+  function getTotalCostLf(techId, from, to) {
+    if (from >= to || !TECH_COSTS[techId]) {
+      return { m: 0, c: 0, d: 0, points: 0 };
+    }
+    const costTo = getTotalCostUpToLevel(techId, to);
+    const costFrom = getTotalCostUpToLevel(techId, from);
+    const m = costTo.m - costFrom.m;
+    const c = costTo.c - costFrom.c;
+    const d = costTo.d - costFrom.d;
+    const points = costTo.points - costFrom.points;
+    return { m, c, d, points };
+  }
   function geomSum(base, factor, from, to) {
     const len = Math.max(0, to - from);
     if (len <= 0) return { m: 0, c: 0, d: 0, e: 0, points: 0, levels: 0 };
@@ -576,11 +693,9 @@
     const points = Math.round((m + c + d) / 1000);
     return { m, c, d, e, points, levels: count };
   }
-
   function getActiveTab() {
     return document.querySelector('.tab-btn.active')?.dataset.tab || 'buildings';
   }
-
   // === ⭐ СПЕЦИАЛЬНЫЙ ОБРАБОТЧИК ВВОДА ДЛЯ .lvl-input (0–99) ===
   function attachLvlInputHandlers() {
     document.querySelectorAll('.lvl-input').forEach(inp => {
@@ -610,7 +725,6 @@
       });
     });
   }
-
   // === ОСНОВНЫЕ РАСЧЁТНЫЕ ФУНКЦИИ ===
   function recalcAllBuildings() {
     const tbodyB = document.getElementById('tbodyBuildings');
@@ -664,7 +778,6 @@
     document.getElementById('sumTotalMetalB').textContent = formatNumber(Math.round(convertToMetal(tm, tc, td)));
     updateBoxesNeeded();
   }
-
   function recalcAllResearch() {
     const tbodyR = document.getElementById('tbodyResearch');
     if (!tbodyR) return;
@@ -699,7 +812,6 @@
     document.getElementById('tmTotal').textContent = (LANG[localStorage.getItem(KEYS.LANG) || 'ru'].totalTMLabel || 'Итого: ') + formatNumber(totalTM);
     updateBoxesNeeded();
   }
-
   function computeFleet() {
     try {
       const factorC = CONFIG.METAL_EQ_CRYSTAL;
@@ -768,7 +880,6 @@
       updateBoxesNeeded();
     } catch (e) { }
   }
-
   function recalcAllLfBuildings() {
     const tbody = document.getElementById('tbodyLfBuildings');
     if (!tbody) return;
@@ -819,7 +930,6 @@
     document.getElementById('sumTotalMetalLfB').textContent = formatNumber(Math.round(convertToMetal(tm, tc, td)));
     updateBoxesNeeded();
   }
-
   function recalcAllLfResearch() {
     const tbody = document.getElementById('tbodyLfResearch');
     if (!tbody) return;
@@ -870,7 +980,6 @@
     document.getElementById('sumTotalMetalLfR').textContent = formatNumber(Math.round(convertToMetal(tm, tc, td)));
     updateBoxesNeeded();
   }
-
   // === ФУНКЦИИ РЕНДЕРА ===
   function renderTable() {
     const tableBody = document.querySelector("#shipsTable tbody");
@@ -944,7 +1053,6 @@
       inp._qtyBound = true;
     });
   }
-
   function buildRowsBuildings() {
     const tbodyB = document.getElementById('tbodyBuildings');
     if (!tbodyB) return;
@@ -1006,7 +1114,6 @@
     tbodyB.appendChild(frag);
     attachLvlInputHandlers();
   }
-
   function buildRowsResearch() {
     const tbodyR = document.getElementById('tbodyResearch');
     if (!tbodyR) return;
@@ -1065,7 +1172,6 @@
     tbodyR.appendChild(frag);
     attachLvlInputHandlers();
   }
-
   function buildRowsLfBuildings() {
     const tbody = document.getElementById('tbodyLfBuildings');
     if (!tbody) return;
@@ -1085,7 +1191,25 @@
       const name = getLfBuildingName(techId);
       const tdName = document.createElement('td');
       tdName.className = 'name-cell';
-      tdName.textContent = name;
+      // === НОВАЯ ЛОГИКА: добавление иконки по расе и имени файла ===
+      const img = document.createElement('img');
+      const imagePath = `images/lifeforms/buildings/${currentLifeformRace}/`; // Путь к папке
+      const fileName = LF_BUILDING_FILENAMES[techId] || `${techId}.png`; // Имя файла из карты
+      img.src = `${imagePath}${fileName}`;
+      img.className = 'icon';
+      img.alt = name;
+      img.addEventListener('error', () => {
+        if (!img._fallback) {
+          const fb = createImageFallbackEl(name);
+          img.style.display = 'none';
+          img.parentNode && img.parentNode.insertBefore(fb, img.nextSibling);
+          img._fallback = true;
+        }
+      });
+      tdName.appendChild(img);
+      const span = document.createElement('span');
+      span.textContent = name;
+      tdName.appendChild(span);
       tr.appendChild(tdName);
       const tdFrom = document.createElement('td');
       tdFrom.innerHTML = `<input type="text" class="lvl-input" data-type="from" data-index="${i - 1}">`;
@@ -1114,7 +1238,6 @@
     tbody.appendChild(frag);
     attachLvlInputHandlers();
   }
-
   function buildRowsLfResearch() {
     const tbody = document.getElementById('tbodyLfResearch');
     if (!tbody) return;
@@ -1134,7 +1257,25 @@
       const name = getLfResearchName(techId);
       const tdName = document.createElement('td');
       tdName.className = 'name-cell';
-      tdName.textContent = name;
+      // === НОВАЯ ЛОГИКА: добавление иконки по расе и имени файла ===
+      const img = document.createElement('img');
+      const imagePath = `images/lifeforms/research/${currentLifeformRace}/`; // Путь к папке
+      const fileName = LF_RESEARCH_FILENAMES[techId] || `${techId}.png`; // Имя файла из карты
+      img.src = `${imagePath}${fileName}`;
+      img.className = 'icon';
+      img.alt = name;
+      img.addEventListener('error', () => {
+        if (!img._fallback) {
+          const fb = createImageFallbackEl(name);
+          img.style.display = 'none';
+          img.parentNode && img.parentNode.insertBefore(fb, img.nextSibling);
+          img._fallback = true;
+        }
+      });
+      tdName.appendChild(img);
+      const span = document.createElement('span');
+      span.textContent = name;
+      tdName.appendChild(span);
       tr.appendChild(tdName);
       const tdFrom = document.createElement('td');
       tdFrom.innerHTML = `<input type="text" class="lvl-input" data-type="from" data-index="${i - 1}">`;
@@ -1159,11 +1300,10 @@
       tdP.textContent = '0';
       tr.append(tdFrom, tdTo, tdPlanets, tdM, tdC, tdD, tdE, tdP);
       frag.appendChild(tr);
-    };
+    }
     tbody.appendChild(frag);
     attachLvlInputHandlers();
   }
-
   // === ОБРАБОТКА ВВОДА ===
   function attachLiveThousandsFormatting(selector) {
     const inputs = document.querySelectorAll(selector);
@@ -1230,7 +1370,6 @@
       });
     });
   }
-
   function saveShipQuantities() {
     try {
       const qtyMap = {};
@@ -1240,8 +1379,7 @@
       localStorage.setItem(KEYS.SHIP_QTY, JSON.stringify(qtyMap));
     } catch (e) { }
   }
-
-  // === ОБРАБОТЧИКИ ===
+  // === ОБРАБОТЧИКИ И ОСТАЛЬНОЕ (БЕЗ ИЗМЕНЕНИЙ) ===
   let __inputsHandlersAttached = false;
   function attachInputsHandlers() {
     if (__inputsHandlersAttached) return;
@@ -1405,7 +1543,6 @@
       });
     });
   }
-
   // === ОСТАЛЬНЫЕ ФУНКЦИИ ===
   function persistLfInputs() {
     try {
@@ -1429,7 +1566,6 @@
       localStorage.setItem(KEYS.LF_INPUTS_RESEARCH, JSON.stringify(r));
     } catch (e) { }
   }
-
   function applyLang(lang) {
     if (!lang) return;
     try { localStorage.setItem(KEYS.LANG, lang); } catch (e) { }
@@ -1441,6 +1577,18 @@
       const key = el.getAttribute('data-i18n-ph');
       if (key && LANG[lang] && LANG[lang][key] !== undefined) { el.setAttribute('placeholder', LANG[lang][key]); }
     });
+    // Перевод select lifeform
+    const lfSelect = document.getElementById('lifeformSelect');
+    if (lfSelect && LANG[lang]) {
+      const options = lfSelect.querySelectorAll('option');
+      options.forEach(opt => {
+        const key = opt.value;
+        if (key && LANG[lang][key] !== undefined) {
+          opt.textContent = LANG[lang][key];
+        }
+      });
+      lfSelect.setAttribute('aria-label', LANG[lang].lfSelectLabel || 'Lifeform');
+    }
     buildRowsBuildings();
     buildRowsResearch();
     renderTable();
@@ -1458,17 +1606,13 @@
     document.getElementById('langRU')?.classList.toggle('active', lang === 'ru');
     document.getElementById('langTR')?.classList.toggle('active', lang === 'tr');
   }
-
   function restoreFromStorage() {
     try {
-      // ✅ ГАРАНТИРОВАННО СОЗДАЁМ СТРОКИ ТАБЛИЦ ПЕРЕД ВОССТАНОВЛЕНИЕМ ДАННЫХ
       buildRowsBuildings();
       buildRowsResearch();
       buildRowsLfBuildings();
       buildRowsLfResearch();
       renderTable();
-
-      // Загружаем сохранённые значения
       const inputsBuild = JSON.parse(localStorage.getItem(KEYS.INPUTS_BUILD) || 'null');
       if (inputsBuild) {
         const trs = document.getElementById('tbodyBuildings')?.querySelectorAll('tr') || [];
@@ -1480,7 +1624,6 @@
           }
         });
       }
-
       const inputsResearch = JSON.parse(localStorage.getItem(KEYS.INPUTS_RESEARCH) || 'null');
       if (inputsResearch) {
         const trs = document.getElementById('tbodyResearch')?.querySelectorAll('tr') || [];
@@ -1491,7 +1634,6 @@
           }
         });
       }
-
       const savedRace = localStorage.getItem(KEYS.LF_RACE) || 'humans';
       currentLifeformRace = savedRace;
       const lfSel = document.getElementById('lifeformSelect');
@@ -1500,7 +1642,6 @@
       if (bonusesEl) {
         bonusesEl.style.display = (savedRace === 'rocktal') ? 'flex' : 'none';
       }
-
       const lfInputsBuild = JSON.parse(localStorage.getItem(KEYS.LF_INPUTS_BUILD) || 'null');
       if (lfInputsBuild) {
         document.querySelectorAll('#tbodyLfBuildings tr').forEach((tr, i) => {
@@ -1511,7 +1652,6 @@
           }
         });
       }
-
       const lfInputsResearch = JSON.parse(localStorage.getItem(KEYS.LF_INPUTS_RESEARCH) || 'null');
       if (lfInputsResearch) {
         document.querySelectorAll('#tbodyLfResearch tr').forEach((tr, i) => {
@@ -1522,7 +1662,6 @@
           }
         });
       }
-
       const boxes = JSON.parse(localStorage.getItem(KEYS.BOXES) || '{}');
       if (boxes) {
         if (boxes.boxesCount) document.getElementById('boxesCount').value = formatWithDotsRaw(boxes.boxesCount);
@@ -1531,10 +1670,8 @@
         if (boxes.planetCrystal) document.getElementById('planetCrystal').value = formatWithDotsRaw(boxes.planetCrystal);
         if (boxes.planetDeut) document.getElementById('planetDeut').value = formatWithDotsRaw(boxes.planetDeut);
       }
-
       const tmSaved = localStorage.getItem(KEYS.TM);
       if (tmSaved) document.getElementById('tmInput').value = tmSaved;
-
       const shipQty = JSON.parse(localStorage.getItem(KEYS.SHIP_QTY) || '{}');
       if (shipQty) {
         document.querySelectorAll('input[data-id]').forEach(inp => {
@@ -1542,12 +1679,10 @@
           if (v) inp.value = formatWithDotsRaw(v);
         });
       }
-
       const megSaved = localStorage.getItem(KEYS.ROCKTAL_MEGALITH_LEVEL);
       const mrcSaved = localStorage.getItem(KEYS.ROCKTAL_MRC_LEVEL);
       if (megSaved !== null && document.getElementById('megalithLevel')) document.getElementById('megalithLevel').value = String(parseNumberInput(megSaved));
       if (mrcSaved !== null && document.getElementById('mrcLevel')) document.getElementById('mrcLevel').value = String(parseNumberInput(mrcSaved));
-
       const trf = JSON.parse(localStorage.getItem(KEYS.TRANSFORM) || 'null');
       if (trf) {
         window.scale = trf.scale || 1;
@@ -1563,17 +1698,14 @@
         window.posX = 0;
         window.posY = 0;
       }
-
       const lang = localStorage.getItem(KEYS.LANG) || 'ru';
       document.getElementById('langRU')?.classList.toggle('active', lang === 'ru');
       document.getElementById('langTR')?.classList.toggle('active', lang === 'tr');
-
       const savedTheme = localStorage.getItem('og_calc_theme') || 'dark';
       document.body.classList.toggle('theme-light', savedTheme === 'light');
       document.body.classList.toggle('theme-dark', savedTheme === 'dark');
     } catch (e) { }
   }
-
   function centerWrapper() {
     const wrapperEl = document.getElementById('tableWrapper');
     if (!wrapperEl) return;
@@ -1588,7 +1720,6 @@
     try { localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale, posX: window.posX, posY: window.posY })); } catch (e) { }
     positionTabs();
   }
-
   function fullResetToZero() {
     try {
       localStorage.removeItem(KEYS.INPUTS_BUILD);
@@ -1600,7 +1731,7 @@
       localStorage.removeItem(KEYS.LF_INPUTS_RESEARCH);
       localStorage.removeItem(KEYS.ROCKTAL_MEGALITH_LEVEL);
       localStorage.removeItem(KEYS.ROCKTAL_MRC_LEVEL);
-      document.querySelectorAll('#tbodyBuildings input,#tbodyResearch input,#tbodyLfBuildings input,#tbodyLfResearch input,input[data-id]').forEach(i => { i.value = ''; });
+      document.querySelectorAll("#tbodyBuildings input,#tbodyResearch input,#tbodyLfBuildings input,#tbodyLfResearch input,input[data-id]").forEach(i => { i.value = ''; });
       ['boxesCount', 'boxValue', 'planetMetal', 'planetCrystal', 'planetDeut', 'tmInput', 'megalithLevel', 'mrcLevel'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
@@ -1635,7 +1766,6 @@
       centerWrapper();
     } catch (e) { }
   }
-
   function positionTabs() {
     try {
       const tabsLeftEl = document.getElementById('tabsLeft');
@@ -1650,7 +1780,6 @@
       tabsLeftEl.style.top = `${Math.max(0, Math.round(offsetWithinWrapper + extra))}px`;
     } catch (e) { }
   }
-
   function updateBoxesNeeded() {
     try {
       const boxesNeededEl = document.getElementById('boxesNeeded');
@@ -1669,7 +1798,6 @@
       }
     } catch (e) { }
   }
-
   function updateBoxesCostTL() {
     try {
       const boxesCostTLEl = document.getElementById('boxesCostTL');
@@ -1711,7 +1839,6 @@
       leftoverTmValueEl && (leftoverTmValueEl.textContent = leftoverTM > 0 ? formatWithDotsRaw(leftoverTM) : '0');
     } catch (e) { }
   }
-
   function getCurrentTotalMetalValue() {
     try {
       const active = document.querySelector('.tab-btn.active')?.dataset.tab;
@@ -1734,7 +1861,6 @@
       return 0;
     }
   }
-
   function setActiveTab(tab) {
     document.querySelectorAll('.tab-btn').forEach(b => {
       const isActive = (b.dataset.tab === tab);
@@ -1774,8 +1900,6 @@
       localStorage.setItem(KEYS.ACTIVE_TAB, tab);
     } catch (e) { }
   }
-
-  // === ИНИЦИАЛИЗАЦИЯ ===
   (function () {
     const dragHandle = document.getElementById('dragHandle');
     const wrapper = document.getElementById('tableWrapper');
@@ -1832,15 +1956,12 @@
       positionTabs();
     });
   })();
-
   function init() {
     try {
-      // ✅ НЕ вызываем buildRows... здесь — это делает restoreFromStorage()
       attachLiveThousandsFormatting('#boxesCount, #boxValue, #planetMetal, #planetCrystal, #planetDeut, input[data-id]');
       attachLvlInputHandlers();
       attachInputsHandlers();
-      restoreFromStorage(); // ← внутри создаются все таблицы
-
+      restoreFromStorage();
       const ZOOM_STEP = 1.08;
       document.getElementById('globalZoomIn')?.addEventListener('click', () => {
         window.scale = Math.min(3.5, (window.scale || 1) * ZOOM_STEP);
@@ -1872,7 +1993,6 @@
       setActiveTab(savedTab);
     } catch (e) { }
   }
-
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
