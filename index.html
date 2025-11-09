@@ -163,19 +163,19 @@
           <button class="lf-subtab-btn" data-subtab="lf-research" aria-selected="false" tabindex="-1" data-i18n="lfTabResearch">Исследования</button>
           <div class="lf-bonuses" id="lfBonuses" aria-live="polite">
             <div class="field">
-              <label for="megalithLevel">Мегалит (ур.)</label>
+              <label for="megalithLevel" data-i18n="lfMegalith">Мегалит (ур.)</label>
               <input id="megalithLevel" type="text" inputmode="numeric" min="0" max="100" placeholder="0">
             </div>
             <div class="field">
-              <label for="mrcLevel">Центр минералов (ур.)</label>
+              <label for="mrcLevel" data-i18n="lfMineralCenter">Центр минералов (ур.)</label>
               <input id="mrcLevel" type="text" inputmode="numeric" min="0" max="100" placeholder="0">
             </div>
           </div>
-          <select id="lifeformSelect" class="lifeform-select" aria-label="Lifeform">
-            <option value="humans" selected>Люди</option>
-            <option value="rocktal">Рок'тал</option>
-            <option value="mechas">Мехи</option>
-            <option value="kaelesh">Кэлиш</option>
+          <select id="lifeformSelect" class="lifeform-select" aria-label="Lifeform" data-i18n-label="lfSelectLabel">
+            <option value="humans" data-i18n="humans">Люди</option>
+            <option value="rocktal" data-i18n="rocktal">Рок'тал</option>
+            <option value="mechas" data-i18n="mechas">Мехи</option>
+            <option value="kaelesh" data-i18n="kaelesh">Кэлиш</option>
           </select>
         </div>
         <div id="lf-buildings" class="subtab-content active" role="tabpanel" aria-hidden="false">
