@@ -8,15 +8,7 @@
 </head>
 <body class="theme-dark">
   <div class="table-wrapper" id="tableWrapper" role="region" aria-label="OGame калькулятор" tabindex="-1">
-    <div class="tabs-left" id="tabsLeft">
-      <div class="tab-switch" role="tablist" aria-label="Tabs">
-        <button class="tab-btn active" data-tab="buildings" aria-selected="true" data-i18n="tabBuildings" role="tab" tabindex="0">Постройки</button>
-        <button class="tab-btn" data-tab="research" aria-selected="false" data-i18n="tabResearch" role="tab" tabindex="-1">Исследования</button>
-        <button class="tab-btn" data-tab="fleet" aria-selected="false" data-i18n="tabFleet" role="tab" tabindex="-1">Флот</button>
-        <button class="tab-btn" data-tab="lifeforms" aria-selected="false" data-i18n="tabLifeforms" role="tab" tabindex="-1">Формы жизни</button>
-      </div>
-    </div>
-    <div class="top-controls">
+    <header class="top-controls">
       <div class="top-controls-left">
         <div class="drag-handle" id="dragHandle" tabindex="0" role="button" aria-label="Переместить таблицу">Переместить таблицу</div>
       </div>
@@ -26,7 +18,15 @@
           <button class="lang-btn" id="langTR" aria-pressed="false">TR</button>
         </div>
       </div>
-    </div>
+    </header>
+    <nav class="tabs-left" id="tabsLeft" aria-label="Навигация по разделам">
+      <div class="tab-switch" role="tablist" aria-label="Tabs">
+        <button class="tab-btn active" data-tab="buildings" aria-selected="true" data-i18n="tabBuildings" role="tab" tabindex="0">Постройки</button>
+        <button class="tab-btn" data-tab="research" aria-selected="false" data-i18n="tabResearch" role="tab" tabindex="-1">Исследования</button>
+        <button class="tab-btn" data-tab="fleet" aria-selected="false" data-i18n="tabFleet" role="tab" tabindex="-1">Флот</button>
+        <button class="tab-btn" data-tab="lifeforms" aria-selected="false" data-i18n="tabLifeforms" role="tab" tabindex="-1">Формы жизни</button>
+      </div>
+    </nav>
     <div class="header-bar" id="headerBar">
       <div class="header-left">
         <div class="box-row" id="globalBoxRow">
@@ -250,7 +250,7 @@
   <div class="global-zoom" id="globalZoom" aria-hidden="false">
     <button id="globalZoomIn" title="Приблизить">+</button>
     <button id="globalZoomOut" title="Отдалить">−</button>
-    <button id="globalZoomReset" title="Сброс и центр">⤦</button>
+    <button id="globalZoomReset" title="Сбросить масштаб и центрировать">⤦</button>
   </div>
   <script src="script.js"></script>
 </body>
