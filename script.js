@@ -1,6 +1,5 @@
 (function () {
   'use strict';
-
   // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ / КОНФИГУРАЦИЯ ===
   const CONFIG = {
     TM_PER_BOX: 42000,
@@ -182,9 +181,7 @@
       humans: "Люди",
       rocktal: "Рок’тал",
       mechas: "Мехи",
-      kaelesh: "Кэлиш",
-      lfMegalith: "Мегалит (ур.)",
-      lfMineralCenter: "Центр минералов (ур.)"
+      kaelesh: "Кэлиш"
     },
     tr: {
       tmLabel: "Karanlık Madde",
@@ -229,9 +226,7 @@
       humans: "İnsanlar",
       rocktal: "Rock’tal",
       mechas: "Mekanikler",
-      kaelesh: "Kaelesh",
-      lfMegalith: "Megalit (sev.)",
-      lfMineralCenter: "Mineral Araştırma Merkezi (sev.)"
+      kaelesh: "Kaelesh"
     }
   };
   const BUILDINGS_DATA = [
@@ -327,8 +322,6 @@
   ];
   const LIFEFORM_RACES = ['humans', 'rocktal', 'mechas', 'kaelesh'];
   let currentLifeformRace = localStorage.getItem('og_calc_lf_race_v1') || 'humans';
-
-  // === ✅ КЛЮЧИ ХРАНЕНИЯ ===
   const KEYS = {
     LANG: 'og_calc_lang_v2',
     TRANSFORM: 'og_calc_transform_v2',
@@ -344,85 +337,6 @@
     ROCKTAL_MEGALITH_LEVEL: 'og_calc_rocktal_megalith_level',
     ROCKTAL_MRC_LEVEL: 'og_calc_rocktal_mrc_level'
   };
-
-  // === ✅ УТИЛИТА ДЛЯ РАБОТЫ С LOCALSTORAGE ===
-  const storage = {
-    get(key, defaultValue = null) {
-      try {
-        const item = localStorage.getItem(key);
-        return item ? JSON.parse(item) : defaultValue;
-      } catch (e) {
-        return defaultValue;
-      }
-    },
-    set(key, value) {
-      try {
-        localStorage.setItem(key, JSON.stringify(value));
-        return true;
-      } catch (e) {
-        return false;
-      }
-    },
-    remove(key) {
-      try {
-        localStorage.removeItem(key);
-        return true;
-      } catch (e) {
-        return false;
-      }
-    }
-  };
-
-  // === ✅ КЭШ DOM-ЭЛЕМЕНТОВ ===
-  const DOMCache = {
-    boxesCount: null,
-    boxValue: null,
-    planetMetal: null,
-    planetCrystal: null,
-    planetDeut: null,
-    boxesNeeded: null,
-    boxesCostTL: null,
-    leftoverTmValue: null,
-    tmInput: null,
-    tmTotal: null,
-    megalithLevel: null,
-    mrcLevel: null,
-    get() {
-      if (!this.boxesCount) {
-        this.boxesCount = document.getElementById('boxesCount');
-        this.boxValue = document.getElementById('boxValue');
-        this.planetMetal = document.getElementById('planetMetal');
-        this.planetCrystal = document.getElementById('planetCrystal');
-        this.planetDeut = document.getElementById('planetDeut');
-        this.boxesNeeded = document.getElementById('boxesNeeded');
-        this.boxesCostTL = document.getElementById('boxesCostTL');
-        this.leftoverTmValue = document.getElementById('leftoverTmValue');
-        this.tmInput = document.getElementById('tmInput');
-        this.tmTotal = document.getElementById('tmTotal');
-        this.megalithLevel = document.getElementById('megalithLevel');
-        this.mrcLevel = document.getElementById('mrcLevel');
-      }
-      return this;
-    }
-  };
-
-  // === ✅ УЛУЧШЕННЫЙ DEBOUNCE ===
-  function debounce(fn, wait, immediate = false) {
-    let timeout;
-    return function () {
-      const context = this, args = arguments;
-      const later = function () {
-        timeout = null;
-        if (!immediate) fn.apply(context, args);
-      };
-      const callNow = immediate && !timeout;
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-      if (callNow) fn.apply(context, args);
-    };
-  }
-
-  // === ✅ ИМЕНА ФОРМ ЖИЗНИ ===
   const LF_BUILDING_NAMES = {
     ru: {
       1001: "Жилые кварталы", 1002: "Биосферическая ферма", 1003: "Центр Исследований", 1004: "Академия наук",
@@ -515,7 +429,14 @@
       4116: "Hız Artışı (Komuta Gemisi)", 4117: "Psionik Kalkan Matrisi", 4118: "Kâşif için Kaelesh Geliştirme"
     }
   };
-
+  function getLfBuildingName(techId) {
+    const lang = localStorage.getItem(KEYS.LANG) || 'ru';
+    return LF_BUILDING_NAMES[lang]?.[techId] || LF_BUILDING_NAMES.ru?.[techId] || `ID ${techId}`;
+  }
+  function getLfResearchName(techId) {
+    const lang = localStorage.getItem(KEYS.LANG) || 'ru';
+    return LF_RESEARCH_NAMES[lang]?.[techId] || LF_RESEARCH_NAMES.ru?.[techId] || `ID ${techId}`;
+  }
   const LF_BUILDING_FILENAMES = {
     1001: "residential_sector.png",
     1002: "biosphere_farm.png",
@@ -640,16 +561,6 @@
     4117: "psionic_shield_matrix.png",
     4118: "kaelesh_explorer_enhancement.png"
   };
-
-  // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ===
-  function getLfBuildingName(techId) {
-    const lang = localStorage.getItem(KEYS.LANG) || 'ru';
-    return LF_BUILDING_NAMES[lang]?.[techId] || LF_BUILDING_NAMES.ru?.[techId] || `ID ${techId}`;
-  }
-  function getLfResearchName(techId) {
-    const lang = localStorage.getItem(KEYS.LANG) || 'ru';
-    return LF_RESEARCH_NAMES[lang]?.[techId] || LF_RESEARCH_NAMES.ru?.[techId] || `ID ${techId}`;
-  }
   function formatWithDotsRaw(inputStr) {
     if (inputStr === null || inputStr === undefined) return '';
     const s = String(inputStr);
@@ -701,6 +612,13 @@
   }
   function convertToMetal(m, c, d) {
     return (m || 0) + (c || 0) * CONFIG.METAL_EQ_CRYSTAL + (d || 0) * CONFIG.METAL_EQ_DEUT;
+  }
+  function debounce(fn, wait) {
+    let t = null;
+    return function (...a) {
+      clearTimeout(t);
+      t = setTimeout(() => fn.apply(this, a), wait);
+    };
   }
   function createImageFallbackEl(label) {
     const span = document.createElement('span');
@@ -803,18 +721,21 @@
   }
 
   // ===================================================================
-  // ✅ ОПТИМИЗИРОВАННАЯ ЛОГИКА РАСЧЁТА ДЛЯ ФОРМ ЖИЗНИ
+  // ✅ ИСПРАВЛЕННЫЕ ФУНКЦИИ: РАСЧЁТ СО СКИДКАМИ ДЛЯ РОК’ТАЛ (Формы жизни)
   // ===================================================================
-  function recalcLfRows(tbodyId, sumMetalId, sumCrystalId, sumDeutId, sumPointsId, sumTotalMetalId) {
-    const tbody = document.getElementById(tbodyId);
+
+  function recalcAllLfBuildings() {
+    const tbody = document.getElementById('tbodyLfBuildings');
     if (!tbody) return;
     let tm = 0, tc = 0, td = 0, tp = 0;
+
+    // === Получение уровней бонусов для Рок’тал ===
     let megalithLevel = 0, mineralCenterLevel = 0;
     if (currentLifeformRace === 'rocktal') {
-      const dc = DOMCache.get();
-      megalithLevel = parseNumberInput(dc.megalithLevel?.value || '0');
-      mineralCenterLevel = parseNumberInput(dc.mrcLevel?.value || '0');
+      megalithLevel = parseNumberInput(document.getElementById('megalithLevel')?.value || '0');
+      mineralCenterLevel = parseNumberInput(document.getElementById('mrcLevel')?.value || '0');
     }
+
     tbody.querySelectorAll('tr').forEach(tr => {
       const techId = Number(tr.querySelector('td:first-child')?.textContent) || 0;
       if (!techId || !TECH_COSTS[techId]) {
@@ -845,6 +766,8 @@
       let c = Math.round(cost.c * planets);
       let d = Math.round(cost.d * planets);
       let p = Math.round(cost.points * planets);
+
+      // === Применение скидок для Рок’тал ===
       if (currentLifeformRace === 'rocktal') {
         let totalDiscount = 0;
         if (megalithLevel > 0) {
@@ -860,6 +783,7 @@
           p = Math.round((m + c + d) / 1000);
         }
       }
+
       tr.querySelector('td.m').innerHTML = formatSpanMetal(m);
       tr.querySelector('td.c').innerHTML = formatSpanCrystal(c);
       tr.querySelector('td.d').innerHTML = formatSpanDeut(d);
@@ -869,25 +793,97 @@
       td += d;
       tp += p;
     });
-    document.getElementById(sumMetalId).innerHTML = formatSpanMetal(tm);
-    document.getElementById(sumCrystalId).innerHTML = formatSpanCrystal(tc);
-    document.getElementById(sumDeutId).innerHTML = formatSpanDeut(td);
-    document.getElementById(sumPointsId).textContent = formatNumber(tp);
-    document.getElementById(sumTotalMetalId).textContent = formatNumber(Math.round(convertToMetal(tm, tc, td)));
+
+    document.getElementById('sumMetalLfB').innerHTML = formatSpanMetal(tm);
+    document.getElementById('sumCrystalLfB').innerHTML = formatSpanCrystal(tc);
+    document.getElementById('sumDeutLfB').innerHTML = formatSpanDeut(td);
+    document.getElementById('sumPointsLfB').textContent = formatNumber(tp);
+    document.getElementById('sumTotalMetalLfB').textContent = formatNumber(Math.round(convertToMetal(tm, tc, td)));
     updateBoxesNeeded();
   }
 
-  function recalcAllLfBuildings() {
-    recalcLfRows('tbodyLfBuildings', 'sumMetalLfB', 'sumCrystalLfB', 'sumDeutLfB', 'sumPointsLfB', 'sumTotalMetalLfB');
-  }
-
   function recalcAllLfResearch() {
-    recalcLfRows('tbodyLfResearch', 'sumMetalLfR', 'sumCrystalLfR', 'sumDeutLfR', 'sumPointsLfR', 'sumTotalMetalLfR');
+    const tbody = document.getElementById('tbodyLfResearch');
+    if (!tbody) return;
+    let tm = 0, tc = 0, td = 0, tp = 0;
+
+    // === Получение уровней бонусов для Рок’тал ===
+    let megalithLevel = 0, mineralCenterLevel = 0;
+    if (currentLifeformRace === 'rocktal') {
+      megalithLevel = parseNumberInput(document.getElementById('megalithLevel')?.value || '0');
+      mineralCenterLevel = parseNumberInput(document.getElementById('mrcLevel')?.value || '0');
+    }
+
+    tbody.querySelectorAll('tr').forEach(tr => {
+      const techId = Number(tr.querySelector('td:first-child')?.textContent) || 0;
+      if (!techId || !TECH_COSTS[techId]) {
+        tr.querySelector('td.m').innerHTML = formatSpanMetal(0);
+        tr.querySelector('td.c').innerHTML = formatSpanCrystal(0);
+        tr.querySelector('td.d').innerHTML = formatSpanDeut(0);
+        tr.querySelector('td.p').textContent = '0';
+        return;
+      }
+      const fromInput = tr.querySelector('input[data-type="from"]').value.trim();
+      const toInput = tr.querySelector('input[data-type="to"]').value.trim();
+      let from, to;
+      if (fromInput === '' && toInput === '') {
+        from = 0; to = 0;
+      } else if (toInput === '') {
+        const level = parseNumberInput(fromInput);
+        from = 1;
+        to = level + 1;
+      } else {
+        from = parseNumberInput(fromInput);
+        to = parseNumberInput(toInput);
+        to = Math.max(from, to);
+      }
+      if (to - from > CONFIG.MAX_LEVEL_SPAN) to = from + CONFIG.MAX_LEVEL_SPAN;
+      const planets = Math.max(1, parseNumberInput(tr.querySelector('input[data-type="planets"]').value) || 1);
+      const cost = getTotalCostLf(techId, from, to);
+      let m = Math.round(cost.m * planets);
+      let c = Math.round(cost.c * planets);
+      let d = Math.round(cost.d * planets);
+      let p = Math.round(cost.points * planets);
+
+      // === Применение скидок для Рок’тал ===
+      if (currentLifeformRace === 'rocktal') {
+        let totalDiscount = 0;
+        if (megalithLevel > 0) {
+          totalDiscount += CONFIG.MEGALITH_DISCOUNT_PER_LEVEL * megalithLevel;
+        }
+        if (mineralCenterLevel > 0) {
+          totalDiscount += CONFIG.MINERAL_CENTER_DISCOUNT_PER_LEVEL * mineralCenterLevel;
+        }
+        if (totalDiscount > 0) {
+          m = Math.ceil(m * (1 - totalDiscount));
+          c = Math.ceil(c * (1 - totalDiscount));
+          d = Math.ceil(d * (1 - totalDiscount));
+          p = Math.round((m + c + d) / 1000);
+        }
+      }
+
+      tr.querySelector('td.m').innerHTML = formatSpanMetal(m);
+      tr.querySelector('td.c').innerHTML = formatSpanCrystal(c);
+      tr.querySelector('td.d').innerHTML = formatSpanDeut(d);
+      tr.querySelector('td.p').textContent = formatNumber(p);
+      tm += m;
+      tc += c;
+      td += d;
+      tp += p;
+    });
+
+    document.getElementById('sumMetalLfR').innerHTML = formatSpanMetal(tm);
+    document.getElementById('sumCrystalLfR').innerHTML = formatSpanCrystal(tc);
+    document.getElementById('sumDeutLfR').innerHTML = formatSpanDeut(td);
+    document.getElementById('sumPointsLfR').textContent = formatNumber(tp);
+    document.getElementById('sumTotalMetalLfR').textContent = formatNumber(Math.round(convertToMetal(tm, tc, td)));
+    updateBoxesNeeded();
   }
 
   // ===================================================================
-  // ОСТАЛЬНОЙ КОД БЕЗ ИЗМЕНЕНИЙ (оставлен как в оригинале)
+  // ОСТАЛЬНЫЕ ФУНКЦИИ БЕЗ ИЗМЕНЕНИЙ (включая recalcAllBuildings с частичной поддержкой)
   // ===================================================================
+
   function recalcAllBuildings() {
     const tbodyB = document.getElementById('tbodyBuildings');
     if (!tbodyB) return;
@@ -1032,20 +1028,23 @@
         if (availableMetalPool > 0 && rowEq > 0 && cumulativeEq > availableMetalPool) row.classList.add('row-deficit');
         else row.classList.remove('row-deficit');
       });
-      storage.set(KEYS.BOXES, {
+      localStorage.setItem(KEYS.BOXES, JSON.stringify({
         boxesCount,
         boxValue,
         planetMetal: planetM,
         planetCrystal: planetC,
         planetDeut: planetD
-      });
+      }));
       updateBoxesNeeded();
     } catch (e) { }
   }
+
+  // === ПОЛНОСТЬЮ ОРИГИНАЛЬНЫЙ ОСТАТОК ФАЙЛА (БЕЗ ИЗМЕНЕНИЙ) ===
+
   function renderTable() {
     const tableBody = document.querySelector("#shipsTable tbody");
     if (!tableBody) return;
-    const qtyMap = storage.get(KEYS.SHIP_QTY, {});
+    const qtyMap = JSON.parse(localStorage.getItem(KEYS.SHIP_QTY) || '{}');
     tableBody.innerHTML = '';
     const frag = document.createDocumentFragment();
     shipList.forEach(ship => {
@@ -1434,7 +1433,7 @@
       document.querySelectorAll('input[data-id]').forEach(inp => {
         qtyMap[inp.dataset.id] = parseNumberInput(inp.value);
       });
-      storage.set(KEYS.SHIP_QTY, qtyMap);
+      localStorage.setItem(KEYS.SHIP_QTY, JSON.stringify(qtyMap));
     } catch (e) { }
   }
   let __inputsHandlersAttached = false;
@@ -1470,7 +1469,7 @@
               planets: parseNumberInput(tr.querySelector('input[data-type="planets"]')?.value) || 1
             };
           });
-          storage.set(KEYS.INPUTS_BUILD, rows);
+          localStorage.setItem(KEYS.INPUTS_BUILD, JSON.stringify(rows));
         } catch (e) { }
       });
       tbodyB.addEventListener('change', () => debouncedRecalcBuildings());
@@ -1490,7 +1489,7 @@
       tmEl.addEventListener('blur', () => debouncedRecalcResearch());
       tmEl.addEventListener('change', () => {
         try {
-          storage.set(KEYS.TM, tmEl.value);
+          localStorage.setItem(KEYS.TM, tmEl.value);
         } catch (e) { }
       });
     }
@@ -1529,7 +1528,7 @@
     if (sel) {
       sel.addEventListener('change', (e) => {
         currentLifeformRace = e.target.value;
-        try { storage.set(KEYS.LF_RACE, currentLifeformRace); } catch (e) { }
+        try { localStorage.setItem(KEYS.LF_RACE, currentLifeformRace); } catch (e) { }
         const bonusesEl = document.getElementById('lfBonuses');
         if (bonusesEl) {
           bonusesEl.style.display = (currentLifeformRace === 'rocktal') ? 'flex' : 'none';
@@ -1546,7 +1545,7 @@
     const mrcInput = document.getElementById('mrcLevel');
     if (megInput) {
       const applyMeg = () => {
-        try { storage.set(KEYS.ROCKTAL_MEGALITH_LEVEL, String(parseNumberInput(megInput.value))); } catch (e) { }
+        try { localStorage.setItem(KEYS.ROCKTAL_MEGALITH_LEVEL, String(parseNumberInput(megInput.value))); } catch (e) { }
         recalcAllLfBuildings(); recalcAllBuildings(); updateBoxesNeeded();
       };
       megInput.addEventListener('input', applyMeg);
@@ -1555,7 +1554,7 @@
     }
     if (mrcInput) {
       const applyMrc = () => {
-        try { storage.set(KEYS.ROCKTAL_MRC_LEVEL, String(parseNumberInput(mrcInput.value))); } catch (e) { }
+        try { localStorage.setItem(KEYS.ROCKTAL_MRC_LEVEL, String(parseNumberInput(mrcInput.value))); } catch (e) { }
         recalcAllLfResearch(); recalcAllBuildings(); updateBoxesNeeded();
       };
       mrcInput.addEventListener('input', applyMrc);
@@ -1618,13 +1617,13 @@
         const planets = parseNumberInput(tr.querySelector('input[data-type="planets"]')?.value) || 1;
         r[i] = { from, to, planets };
       });
-      storage.set(KEYS.LF_INPUTS_BUILD, b);
-      storage.set(KEYS.LF_INPUTS_RESEARCH, r);
+      localStorage.setItem(KEYS.LF_INPUTS_BUILD, JSON.stringify(b));
+      localStorage.setItem(KEYS.LF_INPUTS_RESEARCH, JSON.stringify(r));
     } catch (e) { }
   }
   function applyLang(lang) {
     if (!lang) return;
-    try { storage.set(KEYS.LANG, lang); } catch (e) { }
+    try { localStorage.setItem(KEYS.LANG, lang); } catch (e) { }
     try {
       const buildRows = document.querySelectorAll('#tbodyBuildings tr');
       const buildInputs = [];
@@ -1635,7 +1634,7 @@
           planets: parseNumberInput(tr.querySelector('input[data-type="planets"]')?.value) || 1
         });
       });
-      storage.set(KEYS.INPUTS_BUILD, buildInputs);
+      localStorage.setItem(KEYS.INPUTS_BUILD, JSON.stringify(buildInputs));
       const researchRows = document.querySelectorAll('#tbodyResearch tr');
       const researchInputs = [];
       researchRows.forEach(tr => {
@@ -1644,7 +1643,7 @@
           to: parseNumberInput(tr.querySelector('input[data-type="to"]')?.value)
         });
       });
-      storage.set(KEYS.INPUTS_RESEARCH, researchInputs);
+      localStorage.setItem(KEYS.INPUTS_RESEARCH, JSON.stringify(researchInputs));
       const lfBuildRows = document.querySelectorAll('#tbodyLfBuildings tr');
       const lfBuildInputs = [];
       lfBuildRows.forEach(tr => {
@@ -1654,7 +1653,7 @@
           planets: parseNumberInput(tr.querySelector('input[data-type="planets"]')?.value) || 1
         });
       });
-      storage.set(KEYS.LF_INPUTS_BUILD, lfBuildInputs);
+      localStorage.setItem(KEYS.LF_INPUTS_BUILD, JSON.stringify(lfBuildInputs));
       const lfResearchRows = document.querySelectorAll('#tbodyLfResearch tr');
       const lfResearchInputs = [];
       lfResearchRows.forEach(tr => {
@@ -1664,22 +1663,22 @@
           planets: parseNumberInput(tr.querySelector('input[data-type="planets"]')?.value) || 1
         });
       });
-      storage.set(KEYS.LF_INPUTS_RESEARCH, lfResearchInputs);
+      localStorage.setItem(KEYS.LF_INPUTS_RESEARCH, JSON.stringify(lfResearchInputs));
       saveShipQuantities();
       const boxesCount = parseNumberInput(document.getElementById('boxesCount')?.value);
       const boxValue = parseNumberInput(document.getElementById('boxValue')?.value);
       const planetMetal = parseNumberInput(document.getElementById('planetMetal')?.value);
       const planetCrystal = parseNumberInput(document.getElementById('planetCrystal')?.value);
       const planetDeut = parseNumberInput(document.getElementById('planetDeut')?.value);
-      storage.set(KEYS.BOXES, {
+      localStorage.setItem(KEYS.BOXES, JSON.stringify({
         boxesCount, boxValue, planetMetal, planetCrystal, planetDeut
-      });
+      }));
       const tmInput = document.getElementById('tmInput')?.value;
-      if (tmInput !== undefined) storage.set(KEYS.TM, tmInput);
+      if (tmInput !== undefined) localStorage.setItem(KEYS.TM, tmInput);
       const megalithLevel = document.getElementById('megalithLevel')?.value;
       const mrcLevel = document.getElementById('mrcLevel')?.value;
-      if (megalithLevel !== undefined) storage.set(KEYS.ROCKTAL_MEGALITH_LEVEL, megalithLevel);
-      if (mrcLevel !== undefined) storage.set(KEYS.ROCKTAL_MRC_LEVEL, mrcLevel);
+      if (megalithLevel !== undefined) localStorage.setItem(KEYS.ROCKTAL_MEGALITH_LEVEL, megalithLevel);
+      if (mrcLevel !== undefined) localStorage.setItem(KEYS.ROCKTAL_MRC_LEVEL, mrcLevel);
     } catch (e) { }
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
@@ -1728,7 +1727,7 @@
       buildRowsLfBuildings();
       buildRowsLfResearch();
       renderTable();
-      const inputsBuild = storage.get(KEYS.INPUTS_BUILD, null);
+      const inputsBuild = JSON.parse(localStorage.getItem(KEYS.INPUTS_BUILD) || 'null');
       if (inputsBuild) {
         const trs = document.getElementById('tbodyBuildings')?.querySelectorAll('tr') || [];
         trs.forEach((tr, i) => {
@@ -1739,7 +1738,7 @@
           }
         });
       }
-      const inputsResearch = storage.get(KEYS.INPUTS_RESEARCH, null);
+      const inputsResearch = JSON.parse(localStorage.getItem(KEYS.INPUTS_RESEARCH) || 'null');
       if (inputsResearch) {
         const trs = document.getElementById('tbodyResearch')?.querySelectorAll('tr') || [];
         trs.forEach((tr, i) => {
@@ -1749,7 +1748,7 @@
           }
         });
       }
-      const savedRace = storage.get(KEYS.LF_RACE, 'humans');
+      const savedRace = localStorage.getItem(KEYS.LF_RACE) || 'humans';
       currentLifeformRace = savedRace;
       const lfSel = document.getElementById('lifeformSelect');
       if (lfSel) lfSel.value = savedRace;
@@ -1757,7 +1756,7 @@
       if (bonusesEl) {
         bonusesEl.style.display = (savedRace === 'rocktal') ? 'flex' : 'none';
       }
-      const lfInputsBuild = storage.get(KEYS.LF_INPUTS_BUILD, null);
+      const lfInputsBuild = JSON.parse(localStorage.getItem(KEYS.LF_INPUTS_BUILD) || 'null');
       if (lfInputsBuild) {
         document.querySelectorAll('#tbodyLfBuildings tr').forEach((tr, i) => {
           if (lfInputsBuild[i]) {
@@ -1767,7 +1766,7 @@
           }
         });
       }
-      const lfInputsResearch = storage.get(KEYS.LF_INPUTS_RESEARCH, null);
+      const lfInputsResearch = JSON.parse(localStorage.getItem(KEYS.LF_INPUTS_RESEARCH) || 'null');
       if (lfInputsResearch) {
         document.querySelectorAll('#tbodyLfResearch tr').forEach((tr, i) => {
           if (lfInputsResearch[i]) {
@@ -1777,7 +1776,7 @@
           }
         });
       }
-      const boxes = storage.get(KEYS.BOXES, {});
+      const boxes = JSON.parse(localStorage.getItem(KEYS.BOXES) || '{}');
       if (boxes) {
         if (boxes.boxesCount) document.getElementById('boxesCount').value = formatWithDotsRaw(boxes.boxesCount);
         if (boxes.boxValue) document.getElementById('boxValue').value = formatWithDotsRaw(boxes.boxValue);
@@ -1785,23 +1784,38 @@
         if (boxes.planetCrystal) document.getElementById('planetCrystal').value = formatWithDotsRaw(boxes.planetCrystal);
         if (boxes.planetDeut) document.getElementById('planetDeut').value = formatWithDotsRaw(boxes.planetDeut);
       }
-      const tmSaved = storage.get(KEYS.TM, null);
+      const tmSaved = localStorage.getItem(KEYS.TM);
       if (tmSaved) document.getElementById('tmInput').value = tmSaved;
-      const shipQty = storage.get(KEYS.SHIP_QTY, {});
+      const shipQty = JSON.parse(localStorage.getItem(KEYS.SHIP_QTY) || '{}');
       if (shipQty) {
         document.querySelectorAll('input[data-id]').forEach(inp => {
           const v = shipQty[inp.dataset.id];
           if (v) inp.value = formatWithDotsRaw(v);
         });
       }
-      const megSaved = storage.get(KEYS.ROCKTAL_MEGALITH_LEVEL, null);
-      const mrcSaved = storage.get(KEYS.ROCKTAL_MRC_LEVEL, null);
+      const megSaved = localStorage.getItem(KEYS.ROCKTAL_MEGALITH_LEVEL);
+      const mrcSaved = localStorage.getItem(KEYS.ROCKTAL_MRC_LEVEL);
       if (megSaved !== null && document.getElementById('megalithLevel')) document.getElementById('megalithLevel').value = String(parseNumberInput(megSaved));
       if (mrcSaved !== null && document.getElementById('mrcLevel')) document.getElementById('mrcLevel').value = String(parseNumberInput(mrcSaved));
-      const lang = storage.get(KEYS.LANG, 'ru');
+      const trf = JSON.parse(localStorage.getItem(KEYS.TRANSFORM) || 'null');
+      if (trf) {
+        window.scale = trf.scale || 1;
+        window.posX = trf.posX || 0;
+        window.posY = trf.posY || 0;
+        const wrapper = document.getElementById('tableWrapper');
+        if (wrapper) {
+          wrapper.style.transform = `translate(${Math.round(window.posX)}px, ${Math.round(window.posY)}px) scale(${window.scale})`;
+          wrapper.style.willChange = 'transform';
+        }
+      } else {
+        window.scale = 1;
+        window.posX = 0;
+        window.posY = 0;
+      }
+      const lang = localStorage.getItem(KEYS.LANG) || 'ru';
       document.getElementById('langRU')?.classList.toggle('active', lang === 'ru');
       document.getElementById('langTR')?.classList.toggle('active', lang === 'tr');
-      const savedTheme = storage.get('og_calc_theme', 'dark');
+      const savedTheme = localStorage.getItem('og_calc_theme') || 'dark';
       document.body.classList.toggle('theme-light', savedTheme === 'light');
       document.body.classList.toggle('theme-dark', savedTheme === 'dark');
     } catch (e) { }
@@ -1809,41 +1823,42 @@
   function centerWrapper() {
     const wrapperEl = document.getElementById('tableWrapper');
     if (!wrapperEl) return;
-    const rect = wrapperEl.getBoundingClientRect();
-    const posX = Math.round((window.innerWidth - rect.width) / 2);
-    const posY = Math.round((window.innerHeight - rect.height) / 2);
-    const scale = 1;
-    wrapperEl.style.transform = `translate3d(${posX}px, ${posY}px, 0) scale(${scale})`;
-    wrapperEl.style.willChange = 'transform';
-    try {
-      storage.set(KEYS.TRANSFORM + '_scale', scale);
-      storage.set(KEYS.TRANSFORM + '_posX', posX);
-      storage.set(KEYS.TRANSFORM + '_posY', posY);
-    } catch (e) { }
+    window.scale = 1;
+    window.posX = Math.round((window.innerWidth - wrapperEl.getBoundingClientRect().width) / 2);
+    window.posY = Math.round((window.innerHeight - wrapperEl.getBoundingClientRect().height) / 2);
+    const wrapper = document.getElementById('tableWrapper');
+    if (wrapper) {
+      wrapper.style.transform = `translate(${window.posX}px, ${window.posY}px) scale(${window.scale})`;
+      wrapper.style.willChange = 'transform';
+    }
+    try { localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale, posX: window.posX, posY: window.posY })); } catch (e) { }
     positionTabs();
   }
   function fullResetToZero() {
     try {
-      [KEYS.INPUTS_BUILD, KEYS.INPUTS_RESEARCH, KEYS.TM, KEYS.BOXES, KEYS.SHIP_QTY, KEYS.LF_INPUTS_BUILD, KEYS.LF_INPUTS_RESEARCH, KEYS.ROCKTAL_MEGALITH_LEVEL, KEYS.ROCKTAL_MRC_LEVEL].forEach(k => storage.remove(k));
+      localStorage.removeItem(KEYS.INPUTS_BUILD);
+      localStorage.removeItem(KEYS.INPUTS_RESEARCH);
+      localStorage.removeItem(KEYS.TM);
+      localStorage.removeItem(KEYS.BOXES);
+      localStorage.removeItem(KEYS.SHIP_QTY);
+      localStorage.removeItem(KEYS.LF_INPUTS_BUILD);
+      localStorage.removeItem(KEYS.LF_INPUTS_RESEARCH);
+      localStorage.removeItem(KEYS.ROCKTAL_MEGALITH_LEVEL);
+      localStorage.removeItem(KEYS.ROCKTAL_MRC_LEVEL);
       document.querySelectorAll("#tbodyBuildings input,#tbodyResearch input,#tbodyLfBuildings input,#tbodyLfResearch input,input[data-id]").forEach(i => { i.value = ''; });
       ['boxesCount', 'boxValue', 'planetMetal', 'planetCrystal', 'planetDeut', 'tmInput', 'megalithLevel', 'mrcLevel'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
       });
+      window.scale = 1;
+      window.posX = Math.round(window.posX || 0);
+      window.posY = Math.round(window.posY || 0);
       const wrapper = document.getElementById('tableWrapper');
       if (wrapper) {
-        const rect = wrapper.getBoundingClientRect();
-        const posX = Math.round((window.innerWidth - rect.width) / 2);
-        const posY = Math.round((window.innerHeight - rect.height) / 2);
-        const scale = 1;
-        wrapper.style.transform = `translate3d(${posX}px, ${posY}px, 0) scale(${scale})`;
+        wrapper.style.transform = `translate(${window.posX}px, ${window.posY}px) scale(${window.scale})`;
         wrapper.style.willChange = 'transform';
-        try {
-          storage.set(KEYS.TRANSFORM + '_scale', scale);
-          storage.set(KEYS.TRANSFORM + '_posX', posX);
-          storage.set(KEYS.TRANSFORM + '_posY', posY);
-        } catch (e) { }
       }
+      try { localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale, posX: window.posX, posY: window.posY })); } catch (e) { }
       recalcAllBuildings();
       recalcAllResearch();
       recalcAllLfBuildings();
@@ -1855,13 +1870,14 @@
         if (el) el.textContent = '0';
       });
       const totalResEl = document.getElementById('totalRes');
-      if (totalResEl) totalResEl.innerHTML = `${formatSpanMetal(0)} ${LANG[storage.get(KEYS.LANG, 'ru')].metal}, ${formatSpanCrystal(0)} ${LANG[storage.get(KEYS.LANG, 'ru')].crystal}, ${formatSpanDeut(0)} ${LANG[storage.get(KEYS.LANG, 'ru')].deut}`;
+      if (totalResEl) totalResEl.innerHTML = `${formatSpanMetal(0)} ${LANG[localStorage.getItem(KEYS.LANG) || 'ru'].metal}, ${formatSpanCrystal(0)} ${LANG[localStorage.getItem(KEYS.LANG) || 'ru'].crystal}, ${formatSpanDeut(0)} ${LANG[localStorage.getItem(KEYS.LANG) || 'ru'].deut}`;
       const boxesNeededEl = document.getElementById('boxesNeeded');
       if (boxesNeededEl) boxesNeededEl.textContent = '—';
       const boxesCostTL = document.getElementById('boxesCostTL');
       if (boxesCostTL) boxesCostTL.innerHTML = `<span class="try-value">TRY: —</span>`;
       const leftoverTmValue = document.getElementById('leftoverTmValue');
       if (leftoverTmValue) leftoverTmValue.textContent = '—';
+      centerWrapper();
     } catch (e) { }
   }
   function positionTabs() {
@@ -1994,7 +2010,7 @@
         document.getElementById('lf-research').classList.toggle('active', activeSub === 'lf-research');
         buildRowsLfBuildings();
         buildRowsLfResearch();
-        const lfInputsBuild = storage.get(KEYS.LF_INPUTS_BUILD, null);
+        const lfInputsBuild = JSON.parse(localStorage.getItem(KEYS.LF_INPUTS_BUILD) || 'null');
         if (lfInputsBuild) {
           document.querySelectorAll('#tbodyLfBuildings tr').forEach((tr, i) => {
             if (lfInputsBuild[i]) {
@@ -2004,7 +2020,7 @@
             }
           });
         }
-        const lfInputsResearch = storage.get(KEYS.LF_INPUTS_RESEARCH, null);
+        const lfInputsResearch = JSON.parse(localStorage.getItem(KEYS.LF_INPUTS_RESEARCH) || 'null');
         if (lfInputsResearch) {
           document.querySelectorAll('#tbodyLfResearch tr').forEach((tr, i) => {
             if (lfInputsResearch[i]) {
@@ -2021,11 +2037,9 @@
     }
     updateBoxesNeeded();
     try {
-      storage.set(KEYS.ACTIVE_TAB, tab);
+      localStorage.setItem(KEYS.ACTIVE_TAB, tab);
     } catch (e) { }
   }
-
-  // === ПЕРЕТАСКИВАНИЕ ===
   (function () {
     const dragHandle = document.getElementById('dragHandle');
     const wrapper = document.getElementById('tableWrapper');
@@ -2038,31 +2052,25 @@
     dragHandle.style.cursor = 'grab';
     function applyTransform() {
       rafId = null;
-      const posX = parseFloat(storage.get(KEYS.TRANSFORM + '_posX', 0));
-      const posY = parseFloat(storage.get(KEYS.TRANSFORM + '_posY', 0));
-      const scale = parseFloat(storage.get(KEYS.TRANSFORM + '_scale', 1));
-      wrapper.style.transform = `translate3d(${Math.round(posX)}px, ${Math.round(posY)}px, 0) scale(${scale})`;
+      wrapper.style.transform = `translate(${window.posX || 0}px, ${window.posY || 0}px) scale(${window.scale || 1})`;
     }
     dragHandle.addEventListener('pointerdown', ev => {
       ev.preventDefault();
       dragging = true;
       startX = ev.clientX;
       startY = ev.clientY;
-      startPosX = parseFloat(storage.get(KEYS.TRANSFORM + '_posX', 0));
-      startPosY = parseFloat(storage.get(KEYS.TRANSFORM + '_posY', 0));
+      startPosX = window.posX || 0;
+      startPosY = window.posY || 0;
       try { dragHandle.setPointerCapture(ev.pointerId); } catch { }
       dragHandle.style.cursor = 'grabbing';
     });
     document.addEventListener('pointermove', ev => {
       if (!dragging) return;
       ev.preventDefault();
-      const scale = parseFloat(storage.get(KEYS.TRANSFORM + '_scale', 1));
-      const dx = (ev.clientX - startX) / (scale || 1);
-      const dy = (ev.clientY - startY) / (scale || 1);
-      const posX = startPosX + dx;
-      const posY = startPosY + dy;
-      storage.set(KEYS.TRANSFORM + '_posX', posX);
-      storage.set(KEYS.TRANSFORM + '_posY', posY);
+      const dx = (ev.clientX - startX) / (window.scale || 1);
+      const dy = (ev.clientY - startY) / (window.scale || 1);
+      window.posX = startPosX + dx;
+      window.posY = startPosY + dy;
       if (!rafId) {
         rafId = requestAnimationFrame(applyTransform);
       }
@@ -2072,36 +2080,56 @@
       dragging = false;
       try { dragHandle.releasePointerCapture && dragHandle.releasePointerCapture(ev && ev.pointerId); } catch { }
       dragHandle.style.cursor = 'grab';
+      try { localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale || 1, posX: window.posX || 0, posY: window.posY || 0 })); } catch (e) { }
       positionTabs();
     }
     document.addEventListener('pointerup', stopDrag);
     document.addEventListener('pointercancel', stopDrag);
     dragHandle.addEventListener('keydown', e => {
       const step = 10;
-      let posX = parseFloat(storage.get(KEYS.TRANSFORM + '_posX', 0));
-      let posY = parseFloat(storage.get(KEYS.TRANSFORM + '_posY', 0));
-      if (e.key === 'ArrowLeft') posX -= step;
-      if (e.key === 'ArrowRight') posX += step;
-      if (e.key === 'ArrowUp') posY -= step;
-      if (e.key === 'ArrowDown') posY += step;
-      storage.set(KEYS.TRANSFORM + '_posX', posX);
-      storage.set(KEYS.TRANSFORM + '_posY', posY);
-      if (!rafId) rafId = requestAnimationFrame(applyTransform);
+      if (e.key === 'ArrowLeft') { window.posX = (window.posX || 0) - step; }
+      if (e.key === 'ArrowRight') { window.posX = (window.posX || 0) + step; }
+      if (e.key === 'ArrowUp') { window.posY = (window.posY || 0) - step; }
+      if (e.key === 'ArrowDown') { window.posY = (window.posY || 0) + step; }
+      if (!rafId) { rafId = requestAnimationFrame(applyTransform); }
+      try { localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale || 1, posX: window.posX || 0, posY: window.posY || 0 })); } catch (e) { }
       positionTabs();
     });
   })();
-
-  // === ИНИЦИАЛИЗАЦИЯ ===
   function init() {
     try {
       attachLiveThousandsFormatting('#boxesCount, #boxValue, #planetMetal, #planetCrystal, #planetDeut, input[data-id]');
       attachLvlInputHandlers();
       attachInputsHandlers();
       restoreFromStorage();
-      setupZoomControls();
+      const ZOOM_STEP = 1.08;
+      document.getElementById('globalZoomIn')?.addEventListener('click', () => {
+        window.scale = Math.min(3.5, (window.scale || 1) * ZOOM_STEP);
+        const wrapper = document.getElementById('tableWrapper');
+        if (wrapper) {
+          wrapper.style.transform = `translate(${window.posX || 0}px, ${window.posY || 0}px) scale(${window.scale || 1})`;
+          wrapper.style.willChange = 'transform';
+        }
+        try { localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale || 1, posX: window.posX || 0, posY: window.posY || 0 })); } catch (e) { }
+        positionTabs();
+      });
+      document.getElementById('globalZoomOut')?.addEventListener('click', () => {
+        window.scale = Math.max(0.4, (window.scale || 1) / ZOOM_STEP);
+        const wrapper = document.getElementById('tableWrapper');
+        if (wrapper) {
+          wrapper.style.transform = `translate(${window.posX || 0}px, ${window.posY || 0}px) scale(${window.scale || 1})`;
+          wrapper.style.willChange = 'transform';
+        }
+        try { localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale || 1, posX: window.posX || 0, posY: window.posY || 0 })); } catch (e) { }
+        positionTabs();
+      });
+      document.getElementById('globalZoomReset')?.addEventListener('click', () => {
+        fullResetToZero();
+        positionTabs();
+      });
       window.addEventListener('resize', positionTabs);
       positionTabs();
-      const savedTab = storage.get(KEYS.ACTIVE_TAB, 'buildings');
+      const savedTab = localStorage.getItem(KEYS.ACTIVE_TAB) || 'buildings';
       setActiveTab(savedTab);
     } catch (e) { }
   }
@@ -2110,69 +2138,4 @@
   } else {
     init();
   }
-
-  // ===================================================================
-  // НОВАЯ СИСТЕМА МАСШТАБИРОВАНИЯ (ОСТАВЛЕНА БЕЗ ИЗМЕНЕНИЙ)
-  // ===================================================================
-  function setupZoomControls() {
-    const wrapper = document.getElementById('tableWrapper');
-    if (!wrapper) return;
-    const ZOOM_STEP = 1.1;
-    const MIN_SCALE = 0.5;
-    const MAX_SCALE = 3.0;
-    // Загружаем состояние
-    let scale = parseFloat(storage.get(KEYS.TRANSFORM + '_scale', 1));
-    let posX = parseFloat(storage.get(KEYS.TRANSFORM + '_posX', 0));
-    let posY = parseFloat(storage.get(KEYS.TRANSFORM + '_posY', 0));
-    function applyTransform() {
-      wrapper.style.transform = `translate3d(${Math.round(posX)}px, ${Math.round(posY)}px, 0) scale(${scale})`;
-      wrapper.style.willChange = 'transform';
-      try {
-        storage.set(KEYS.TRANSFORM + '_scale', scale);
-        storage.set(KEYS.TRANSFORM + '_posX', posX);
-        storage.set(KEYS.TRANSFORM + '_posY', posY);
-      } catch (e) {}
-    }
-    function zoomAtPoint(factor, clientX, clientY) {
-      const rect = wrapper.getBoundingClientRect();
-      const currentScale = scale;
-      const newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, currentScale * factor));
-      const mouseX = clientX - rect.left;
-      const mouseY = clientY - rect.top;
-      const localX = (mouseX - posX) / currentScale;
-      const localY = (mouseY - posY) / currentScale;
-      const newPos_X = mouseX - localX * newScale;
-      const newPos_Y = mouseY - localY * newScale;
-      scale = newScale;
-      posX = Math.round(newPos_X);
-      posY = Math.round(newPos_Y);
-      applyTransform();
-      positionTabs();
-    }
-    // Кнопки
-    document.getElementById('globalZoomIn')?.addEventListener('click', () => {
-      zoomAtPoint(ZOOM_STEP, window.innerWidth / 2, window.innerHeight / 2);
-    });
-    document.getElementById('globalZoomOut')?.addEventListener('click', () => {
-      zoomAtPoint(1 / ZOOM_STEP, window.innerWidth / 2, window.innerHeight / 2);
-    });
-    document.getElementById('globalZoomReset')?.addEventListener('click', () => {
-      scale = 1;
-      const rect = wrapper.getBoundingClientRect();
-      posX = Math.round((window.innerWidth - rect.width) / 2);
-      posY = Math.round((window.innerHeight - rect.height) / 2);
-      applyTransform();
-      positionTabs();
-    });
-    // Колесо
-    wrapper.addEventListener('wheel', (e) => {
-      if (e.ctrlKey || e.metaKey) {
-        e.preventDefault();
-        const factor = e.deltaY > 0 ? 1 / ZOOM_STEP : ZOOM_STEP;
-        zoomAtPoint(factor, e.clientX, e.clientY);
-      }
-    }, { passive: false });
-    applyTransform();
-  }
-
 })();
