@@ -561,6 +561,8 @@
     4117: "psionic_shield_matrix.png",
     4118: "kaelesh_explorer_enhancement.png"
   };
+
+  // --- ФОРМАТИРОВАНИЕ ЧИСЕЛ С ТОЧКОЙ ---
   function formatWithDotsRaw(inputStr) {
     if (inputStr === null || inputStr === undefined) return '';
     const s = String(inputStr);
@@ -589,27 +591,19 @@
     const safe = Math.min(num, Number.MAX_SAFE_INTEGER);
     return negative ? -safe : safe;
   }
-  function getNumberFormatter(lang) {
-    try {
-      return new Intl.NumberFormat(LANG[lang]?.locale || 'ru-RU');
-    } catch (e) {
-      return new Intl.NumberFormat('ru-RU');
-    }
-  }
-  function formatNumber(n, lang = localStorage.getItem(KEYS.LANG) || 'ru') {
-    if (n === null || n === undefined || isNaN(n)) return '0';
-    const nf = getNumberFormatter(lang);
-    return nf.format(Math.round(Number(n) || 0));
-  }
+
+  // --- НОВЫЕ ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ ОТОБРАЖЕНИЯ ---
   function formatSpanMetal(n) {
-    return `<span class="val-metal">${formatNumber(n)}</span>`;
+    return `<span class="val-metal">${formatNumberWithDots(n)}</span>`;
   }
   function formatSpanCrystal(n) {
-    return `<span class="val-crystal">${formatNumber(n)}</span>`;
+    return `<span class="val-crystal">${formatNumberWithDots(n)}</span>`;
   }
   function formatSpanDeut(n) {
-    return `<span class="val-deut">${formatNumber(n)}</span>`;
+    return `<span class="val-deut">${formatNumberWithDots(n)}</span>`;
   }
+
+  // === ОСТАЛЬНЫЕ ФУНКЦИИ БЕЗ ИЗМЕНЕНИЯ ЛОГИКИ ===
   function convertToMetal(m, c, d) {
     return (m || 0) + (c || 0) * CONFIG.METAL_EQ_CRYSTAL + (d || 0) * CONFIG.METAL_EQ_DEUT;
   }
@@ -721,21 +715,17 @@
   }
 
   // ===================================================================
-  // ✅ ИСПРАВЛЕННЫЕ ФУНКЦИИ: РАСЧЁТ СО СКИДКАМИ ДЛЯ РОК’ТАЛ (Формы жизни)
+  // ✅ ВСЕ ФУНКЦИИ РАСЧЁТА ОБНОВЛЕНЫ: ИСПОЛЬЗУЮТ formatNumberWithDots()
   // ===================================================================
-
   function recalcAllLfBuildings() {
     const tbody = document.getElementById('tbodyLfBuildings');
     if (!tbody) return;
     let tm = 0, tc = 0, td = 0, tp = 0;
-
-    // === Получение уровней бонусов для Рок’тал ===
     let megalithLevel = 0, mineralCenterLevel = 0;
     if (currentLifeformRace === 'rocktal') {
       megalithLevel = parseNumberInput(document.getElementById('megalithLevel')?.value || '0');
       mineralCenterLevel = parseNumberInput(document.getElementById('mrcLevel')?.value || '0');
     }
-
     tbody.querySelectorAll('tr').forEach(tr => {
       const techId = Number(tr.querySelector('td:first-child')?.textContent) || 0;
       if (!techId || !TECH_COSTS[techId]) {
@@ -766,8 +756,6 @@
       let c = Math.round(cost.c * planets);
       let d = Math.round(cost.d * planets);
       let p = Math.round(cost.points * planets);
-
-      // === Применение скидок для Рок’тал ===
       if (currentLifeformRace === 'rocktal') {
         let totalDiscount = 0;
         if (megalithLevel > 0) {
@@ -783,22 +771,20 @@
           p = Math.round((m + c + d) / 1000);
         }
       }
-
       tr.querySelector('td.m').innerHTML = formatSpanMetal(m);
       tr.querySelector('td.c').innerHTML = formatSpanCrystal(c);
       tr.querySelector('td.d').innerHTML = formatSpanDeut(d);
-      tr.querySelector('td.p').textContent = formatNumber(p);
+      tr.querySelector('td.p').textContent = formatNumberWithDots(p);
       tm += m;
       tc += c;
       td += d;
       tp += p;
     });
-
     document.getElementById('sumMetalLfB').innerHTML = formatSpanMetal(tm);
     document.getElementById('sumCrystalLfB').innerHTML = formatSpanCrystal(tc);
     document.getElementById('sumDeutLfB').innerHTML = formatSpanDeut(td);
-    document.getElementById('sumPointsLfB').textContent = formatNumber(tp);
-    document.getElementById('sumTotalMetalLfB').textContent = formatNumber(Math.round(convertToMetal(tm, tc, td)));
+    document.getElementById('sumPointsLfB').textContent = formatNumberWithDots(tp);
+    document.getElementById('sumTotalMetalLfB').textContent = formatNumberWithDots(Math.round(convertToMetal(tm, tc, td)));
     updateBoxesNeeded();
   }
 
@@ -806,14 +792,11 @@
     const tbody = document.getElementById('tbodyLfResearch');
     if (!tbody) return;
     let tm = 0, tc = 0, td = 0, tp = 0;
-
-    // === Получение уровней бонусов для Рок’тал ===
     let megalithLevel = 0, mineralCenterLevel = 0;
     if (currentLifeformRace === 'rocktal') {
       megalithLevel = parseNumberInput(document.getElementById('megalithLevel')?.value || '0');
       mineralCenterLevel = parseNumberInput(document.getElementById('mrcLevel')?.value || '0');
     }
-
     tbody.querySelectorAll('tr').forEach(tr => {
       const techId = Number(tr.querySelector('td:first-child')?.textContent) || 0;
       if (!techId || !TECH_COSTS[techId]) {
@@ -844,8 +827,6 @@
       let c = Math.round(cost.c * planets);
       let d = Math.round(cost.d * planets);
       let p = Math.round(cost.points * planets);
-
-      // === Применение скидок для Рок’тал ===
       if (currentLifeformRace === 'rocktal') {
         let totalDiscount = 0;
         if (megalithLevel > 0) {
@@ -861,28 +842,22 @@
           p = Math.round((m + c + d) / 1000);
         }
       }
-
       tr.querySelector('td.m').innerHTML = formatSpanMetal(m);
       tr.querySelector('td.c').innerHTML = formatSpanCrystal(c);
       tr.querySelector('td.d').innerHTML = formatSpanDeut(d);
-      tr.querySelector('td.p').textContent = formatNumber(p);
+      tr.querySelector('td.p').textContent = formatNumberWithDots(p);
       tm += m;
       tc += c;
       td += d;
       tp += p;
     });
-
     document.getElementById('sumMetalLfR').innerHTML = formatSpanMetal(tm);
     document.getElementById('sumCrystalLfR').innerHTML = formatSpanCrystal(tc);
     document.getElementById('sumDeutLfR').innerHTML = formatSpanDeut(td);
-    document.getElementById('sumPointsLfR').textContent = formatNumber(tp);
-    document.getElementById('sumTotalMetalLfR').textContent = formatNumber(Math.round(convertToMetal(tm, tc, td)));
+    document.getElementById('sumPointsLfR').textContent = formatNumberWithDots(tp);
+    document.getElementById('sumTotalMetalLfR').textContent = formatNumberWithDots(Math.round(convertToMetal(tm, tc, td)));
     updateBoxesNeeded();
   }
-
-  // ===================================================================
-  // ОСТАЛЬНЫЕ ФУНКЦИИ БЕЗ ИЗМЕНЕНИЙ (включая recalcAllBuildings с частичной поддержкой)
-  // ===================================================================
 
   function recalcAllBuildings() {
     const tbodyB = document.getElementById('tbodyBuildings');
@@ -923,7 +898,7 @@
       tr.querySelector('td.m').innerHTML = formatSpanMetal(m);
       tr.querySelector('td.c').innerHTML = formatSpanCrystal(c);
       tr.querySelector('td.d').innerHTML = formatSpanDeut(d);
-      tr.querySelector('td.p').textContent = formatNumber(p);
+      tr.querySelector('td.p').textContent = formatNumberWithDots(p);
       tm += m;
       tc += c;
       td += d;
@@ -932,44 +907,49 @@
     document.getElementById('sumMetalB').innerHTML = formatSpanMetal(tm);
     document.getElementById('sumCrystalB').innerHTML = formatSpanCrystal(tc);
     document.getElementById('sumDeutB').innerHTML = formatSpanDeut(td);
-    document.getElementById('sumPointsB').textContent = formatNumber(tp);
-    document.getElementById('sumTotalMetalB').textContent = formatNumber(Math.round(convertToMetal(tm, tc, td)));
+    document.getElementById('sumPointsB').textContent = formatNumberWithDots(tp);
+    document.getElementById('sumTotalMetalB').textContent = formatNumberWithDots(Math.round(convertToMetal(tm, tc, td)));
     updateBoxesNeeded();
   }
+
   function recalcAllResearch() {
     const tbodyR = document.getElementById('tbodyResearch');
     if (!tbodyR) return;
     let sm = 0, sc = 0, sd = 0, sp = 0, totalLevels = 0;
     tbodyR.querySelectorAll('tr').forEach(tr => {
-      const idx = Number(tr.dataset.index) || 0;
-      const data = RESEARCH_DATA[idx] || { base: { m: 0, c: 0, d: 0 }, factor: 1 };
-      const from = parseNumberInput(tr.querySelector('input[data-type="from"]').value);
-      const toVal = tr.querySelector('input[data-type="to"]').value;
-      let to = (toVal === '' ? from : parseNumberInput(toVal));
-      to = Math.max(from, to);
-      if (to - from > CONFIG.MAX_LEVEL_SPAN) to = from + CONFIG.MAX_LEVEL_SPAN;
-      const sum = geomSum({ m: data.base.m, c: data.base.c, d: data.base.d, e: 0 }, data.factor, from, to);
-      const m = sum.m, c = sum.c, d = sum.d, p = sum.points;
-      tr.querySelector('td.m').innerHTML = formatSpanMetal(m);
-      tr.querySelector('td.c').innerHTML = formatSpanCrystal(c);
-      tr.querySelector('td.d').innerHTML = formatSpanDeut(d);
-      tr.querySelector('td.p').textContent = formatNumber(p);
-      sm += m;
-      sc += c;
-      sd += d;
-      sp += p;
-      totalLevels += sum.levels || 0;
+        const idx = Number(tr.dataset.index) || 0;
+        const data = RESEARCH_DATA[idx] || { base: { m: 0, c: 0, d: 0 }, factor: 1 };
+        const from = parseNumberInput(tr.querySelector('input[data-type="from"]').value);
+        const toVal = tr.querySelector('input[data-type="to"]').value;
+        let to = (toVal === '' ? from : parseNumberInput(toVal));
+        to = Math.max(from, to);
+        if (to - from > CONFIG.MAX_LEVEL_SPAN) to = from + CONFIG.MAX_LEVEL_SPAN;
+        const sum = geomSum({ m: data.base.m, c: data.base.c, d: data.base.d, e: 0 }, data.factor, from, to);
+        const m = sum.m, c = sum.c, d = sum.d, p = sum.points;
+        tr.querySelector('td.m').innerHTML = formatSpanMetal(m);
+        tr.querySelector('td.c').innerHTML = formatSpanCrystal(c);
+        tr.querySelector('td.d').innerHTML = formatSpanDeut(d);
+        tr.querySelector('td.p').textContent = formatNumberWithDots(p);
+        sm += m;
+        sc += c;
+        sd += d;
+        sp += p;
+        totalLevels += sum.levels || 0;
     });
+    // --- ИСПРАВЛЕНИЕ: Добавляем formatNumberWithDots() для итоговых значений ---
     document.getElementById('sumMetalR').innerHTML = formatSpanMetal(sm);
     document.getElementById('sumCrystalR').innerHTML = formatSpanCrystal(sc);
     document.getElementById('sumDeutR').innerHTML = formatSpanDeut(sd);
-    document.getElementById('sumPointsR').textContent = formatNumber(sp);
-    document.getElementById('sumTotalMetalR').textContent = formatNumber(Math.round(convertToMetal(sm, sc, sd)));
+    document.getElementById('sumPointsR').textContent = formatNumberWithDots(sp);
+    document.getElementById('sumTotalMetalR').textContent = formatNumberWithDots(Math.round(convertToMetal(sm, sc, sd)));
+    // --- ИСПРАВЛЕНИЕ: Форматируем значение в #tmTotal ---
     const perLevel = parseNumberInput(document.getElementById('tmInput')?.value);
     const totalTM = Math.round(perLevel * totalLevels * CONFIG.TM_PER_LEVEL_FACTOR);
-    document.getElementById('tmTotal').textContent = (LANG[localStorage.getItem(KEYS.LANG) || 'ru'].totalTMLabel || 'Итого: ') + formatNumber(totalTM);
+    const lang = localStorage.getItem(KEYS.LANG) || 'ru';
+    document.getElementById('tmTotal').textContent = (LANG[lang].totalTMLabel || 'Итого: ') + formatNumberWithDots(totalTM);
     updateBoxesNeeded();
-  }
+}
+
   function computeFleet() {
     try {
       const factorC = CONFIG.METAL_EQ_CRYSTAL;
@@ -991,7 +971,7 @@
         totalD += qty * ship.deut;
         inp.value = formatWithDotsRaw(qty);
         const shipPoints = Math.round((ship.metal + ship.crystal + ship.deut) / 1000) * qty;
-        pointsCell.textContent = formatNumber(shipPoints);
+        pointsCell.textContent = formatNumberWithDots(shipPoints);
       });
       const totalResEl = document.getElementById('totalRes');
       const totalMetalEqEl = document.getElementById('totalMetalEq');
@@ -999,7 +979,7 @@
       const lang = localStorage.getItem(KEYS.LANG) || 'ru';
       if (totalResEl) totalResEl.innerHTML = `${formatSpanMetal(totalM)} ${LANG[lang].metal}, ${formatSpanCrystal(totalC)} ${LANG[lang].crystal}, ${formatSpanDeut(totalD)} ${LANG[lang].deut}`;
       const metalEq = Math.round(totalM + totalC * factorC + totalD * factorD);
-      if (totalMetalEqEl) totalMetalEqEl.textContent = formatNumber(metalEq);
+      if (totalMetalEqEl) totalMetalEqEl.textContent = formatNumberWithDots(metalEq);
       const boxesCount = parseNumberInput(document.getElementById('boxesCount')?.value);
       const boxValue = parseNumberInput(document.getElementById('boxValue')?.value);
       const boxesMetal = boxesCount * boxValue;
@@ -1009,7 +989,7 @@
       const planetMetalEq = planetM + planetC * factorC + planetD * factorD;
       const grand = boxesMetal + planetMetalEq - metalEq;
       if (grandTotalEl) {
-        grandTotalEl.textContent = formatNumber(Math.round(grand));
+        grandTotalEl.textContent = formatNumberWithDots(Math.round(grand));
         grandTotalEl.style.color = grand >= 0 ? "#41c879" : "#ff4d4d";
       }
       const availableMetalPool = boxesMetal + planetMetalEq;
@@ -1039,7 +1019,13 @@
     } catch (e) { }
   }
 
-  // === ПОЛНОСТЬЮ ОРИГИНАЛЬНЫЙ ОСТАТОК ФАЙЛА (БЕЗ ИЗМЕНЕНИЙ) ===
+  // === ПОЛНОСТЬЮ ОРИГИНАЛЬНЫЙ ОСТАТОК ФАЙЛА (СОХРАНЕН БЕЗ ИЗМЕНЕНИЙ ЛОГИКИ) ===
+  // ... (все остальные функции: renderTable, buildRows*, attachInputsHandlers, applyLang, restoreFromStorage, init и т.д.)
+  // Они используют уже обновлённые formatSpan* и formatNumberWithDots(), поэтому не требуют модификации.
+
+  // --- ВСТАВКА ОСТАЛЬНЫХ ФУНКЦИЙ ИЗ ОРИГИНАЛА ---
+  // Копируем весь оставшийся код из файла `script.txt` начиная с `function renderTable()` до конца,
+  // без изменений, так как они уже используют обновлённые форматтеры или не выводят числа.
 
   function renderTable() {
     const tableBody = document.querySelector("#shipsTable tbody");
@@ -1363,70 +1349,86 @@
     attachLvlInputHandlers();
   }
   function attachLiveThousandsFormatting(selector) {
-    const inputs = document.querySelectorAll(selector);
-    inputs.forEach(inp => {
-      if (!inp || inp._thousandsBound) return;
-      inp._thousandsBound = true;
-      inp.addEventListener('input', function () {
-        const el = this;
-        const raw = el.value;
-        const selStart = el.selectionStart || 0;
-        let left = raw.slice(0, selStart).replace(/[^0-9\-]/g, '');
-        const leftDigitsCount = (left[0] === '-' ? left.slice(1) : left).length;
-        const formatted = formatWithDotsRaw(raw);
-        el.value = formatted;
-        let digitsSeen = 0, newPos = 0;
-        for (let i = 0; i < formatted.length; i++) {
-          if (/\d/.test(formatted[i])) digitsSeen++;
-          newPos++;
-          if (digitsSeen >= leftDigitsCount) break;
-        }
-        try {
-          el.setSelectionRange(newPos, newPos);
-        } catch (e) { }
-      });
-      inp.addEventListener('blur', function () {
-        const v = this.value;
-        if (v === '' || v === '-') {
-          this.value = '';
-          return;
-        }
-        const num = parseNumberInput(v);
-        this.value = num === 0 ? '' : formatWithDotsRaw(num);
-        this.dispatchEvent(new Event('change', { bubbles: true }));
-      });
-      inp.addEventListener('keydown', function (e) {
-        const allowed = ['Backspace', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Delete', 'Tab', 'Home', 'End'];
-        if (e.ctrlKey || e.metaKey) return;
-        if (allowed.indexOf(e.key) !== -1) return;
-        if (e.key >= '0' && e.key <= '9') return;
-        if (e.key === '-' || e.key === '.' || e.key === ',') return;
-        e.preventDefault();
-      });
-      inp.addEventListener('paste', function (e) {
-        e.preventDefault();
-        const text = (e.clipboardData || window.clipboardData)?.getData('text') || '';
-        const cleanedChunk = formatWithDotsRaw(text);
-        const start = this.selectionStart || 0;
-        const end = this.selectionEnd || start;
-        const before = this.value.slice(0, start);
-        const after = this.value.slice(end);
-        const nextRaw = before + cleanedChunk + after;
-        const next = formatWithDotsRaw(nextRaw);
-        this.value = next;
-        const caretTargetDigits = (before + cleanedChunk).replace(/[^0-9]/g, '').length;
-        let pos = 0, seen = 0;
-        while (pos < next.length && seen < caretTargetDigits) {
-          if (/\d/.test(next[pos])) seen++;
-          pos++;
-        }
-        try {
-          this.setSelectionRange(pos, pos);
-        } catch (e) { }
-        this.dispatchEvent(new Event('change', { bubbles: true }));
-      });
+  const inputs = document.querySelectorAll(selector);
+  inputs.forEach(inp => {
+    if (!inp || inp._thousandsBound) return;
+    inp._thousandsBound = true;
+
+    // Функция для форматирования значения и установки курсора
+    const formatAndSetCursor = function() {
+      const el = this;
+      const raw = el.value;
+      const selStart = el.selectionStart || 0;
+      let left = raw.slice(0, selStart).replace(/[^0-9\-]/g, '');
+      const leftDigitsCount = (left[0] === '-' ? left.slice(1) : left).length;
+      const formatted = formatWithDotsRaw(raw);
+      el.value = formatted;
+
+      // Расчет новой позиции курсора
+      let digitsSeen = 0, newPos = 0;
+      for (let i = 0; i < formatted.length; i++) {
+        if (/\d/.test(formatted[i])) digitsSeen++;
+        newPos++;
+        if (digitsSeen >= leftDigitsCount) break;
+      }
+      try {
+        el.setSelectionRange(newPos, newPos);
+      } catch (e) { }
+    };
+
+    // Обработчик на каждое изменение (input)
+    inp.addEventListener('input', formatAndSetCursor);
+
+    // Обработчик на потерю фокуса (blur)
+    inp.addEventListener('blur', function () {
+      const v = this.value;
+      if (v === '' || v === '-') {
+        this.value = '';
+        return;
+      }
+      const num = parseNumberInput(v);
+      this.value = num === 0 ? '' : formatWithDotsRaw(num);
+      this.dispatchEvent(new Event('change', { bubbles: true }));
     });
-  }
+
+    // Обработчик на нажатие клавиш (keydown)
+    inp.addEventListener('keydown', function (e) {
+      const allowed = ['Backspace', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Delete', 'Tab', 'Home', 'End'];
+      if (e.ctrlKey || e.metaKey) return;
+      if (allowed.indexOf(e.key) !== -1) return;
+      if (e.key >= '0' && e.key <= '9') return;
+      if (e.key === '-' || e.key === '.' || e.key === ',') return;
+      e.preventDefault();
+    });
+
+    // Обработчик на вставку (paste)
+    inp.addEventListener('paste', function (e) {
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData)?.getData('text') || '';
+      const cleanedChunk = formatWithDotsRaw(text);
+      const start = this.selectionStart || 0;
+      const end = this.selectionEnd || start;
+      const before = this.value.slice(0, start);
+      const after = this.value.slice(end);
+      const nextRaw = before + cleanedChunk + after;
+      const next = formatWithDotsRaw(nextRaw);
+      this.value = next;
+
+      // Расчет новой позиции курсора после вставки
+      const caretTargetDigits = (before + cleanedChunk).replace(/[^0-9]/g, '').length;
+      let pos = 0, seen = 0;
+      while (pos < next.length && seen < caretTargetDigits) {
+        if (/\d/.test(next[pos])) seen++;
+        pos++;
+      }
+      try {
+        this.setSelectionRange(pos, pos);
+      } catch (e) { }
+
+      this.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  });
+}
   function saveShipQuantities() {
     try {
       const qtyMap = {};
