@@ -561,7 +561,6 @@
     4117: "psionic_shield_matrix.png",
     4118: "kaelesh_explorer_enhancement.png"
   };
-
   // --- ФОРМАТИРОВАНИЕ ЧИСЕЛ С ТОЧКОЙ ---
   function formatWithDotsRaw(inputStr) {
     if (inputStr === null || inputStr === undefined) return '';
@@ -591,7 +590,6 @@
     const safe = Math.min(num, Number.MAX_SAFE_INTEGER);
     return negative ? -safe : safe;
   }
-
   // --- НОВЫЕ ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ ОТОБРАЖЕНИЯ ---
   function formatSpanMetal(n) {
     return `<span class="val-metal">${formatNumberWithDots(n)}</span>`;
@@ -602,7 +600,6 @@
   function formatSpanDeut(n) {
     return `<span class="val-deut">${formatNumberWithDots(n)}</span>`;
   }
-
   // === ОСТАЛЬНЫЕ ФУНКЦИИ БЕЗ ИЗМЕНЕНИЯ ЛОГИКИ ===
   function convertToMetal(m, c, d) {
     return (m || 0) + (c || 0) * CONFIG.METAL_EQ_CRYSTAL + (d || 0) * CONFIG.METAL_EQ_DEUT;
@@ -667,7 +664,7 @@
   }
   function geomSum(base, factor, from, to) {
     const len = Math.max(0, to - from);
-    if (len <= 0) return { m: 0, c: 0, d: 0, e: 0, points: 0, levels: 0 };
+    if (len <= 0) return { m: 0, c: 0, d: 0, points: 0, levels: 0 };
     const expoStart = Math.max(0, from);
     const count = len;
     const sum = (b) => {
@@ -678,9 +675,8 @@
     const m = Math.round(sum(base.m));
     const c = Math.round(sum(base.c));
     const d = Math.round(sum(base.d));
-    const e = Math.round(sum(base.e || 0));
     const points = Math.round((m + c + d) / 1000);
-    return { m, c, d, e, points, levels: count };
+    return { m, c, d, points, levels: count };
   }
   function getActiveTab() {
     return document.querySelector('.tab-btn.active')?.dataset.tab || 'buildings';
@@ -713,7 +709,6 @@
       });
     });
   }
-
   // ===================================================================
   // ✅ ВСЕ ФУНКЦИИ РАСЧЁТА ОБНОВЛЕНЫ: ИСПОЛЬЗУЮТ formatNumberWithDots()
   // ===================================================================
@@ -787,7 +782,6 @@
     document.getElementById('sumTotalMetalLfB').textContent = formatNumberWithDots(Math.round(convertToMetal(tm, tc, td)));
     updateBoxesNeeded();
   }
-
   function recalcAllLfResearch() {
     const tbody = document.getElementById('tbodyLfResearch');
     if (!tbody) return;
@@ -858,7 +852,6 @@
     document.getElementById('sumTotalMetalLfR').textContent = formatNumberWithDots(Math.round(convertToMetal(tm, tc, td)));
     updateBoxesNeeded();
   }
-
   function recalcAllBuildings() {
     const tbodyB = document.getElementById('tbodyBuildings');
     if (!tbodyB) return;
@@ -877,7 +870,7 @@
       to = Math.max(from, to);
       if (to - from > CONFIG.MAX_LEVEL_SPAN) to = from + CONFIG.MAX_LEVEL_SPAN;
       const planets = Math.max(1, parseNumberInput(tr.querySelector('input[data-type="planets"]').value) || 1);
-      const sum = geomSum({ m: data.base.m, c: data.base.c, d: data.base.d, e: 0 }, data.factor, from, to);
+      const sum = geomSum({ m: data.base.m, c: data.base.c, d: data.base.d }, data.factor, from, to);
       let m = Math.round(sum.m * planets);
       let c = Math.round(sum.c * planets);
       let d = Math.round(sum.d * planets);
@@ -911,7 +904,6 @@
     document.getElementById('sumTotalMetalB').textContent = formatNumberWithDots(Math.round(convertToMetal(tm, tc, td)));
     updateBoxesNeeded();
   }
-
   function recalcAllResearch() {
     const tbodyR = document.getElementById('tbodyResearch');
     if (!tbodyR) return;
@@ -924,7 +916,7 @@
         let to = (toVal === '' ? from : parseNumberInput(toVal));
         to = Math.max(from, to);
         if (to - from > CONFIG.MAX_LEVEL_SPAN) to = from + CONFIG.MAX_LEVEL_SPAN;
-        const sum = geomSum({ m: data.base.m, c: data.base.c, d: data.base.d, e: 0 }, data.factor, from, to);
+        const sum = geomSum({ m: data.base.m, c: data.base.c, d: data.base.d }, data.factor, from, to);
         const m = sum.m, c = sum.c, d = sum.d, p = sum.points;
         tr.querySelector('td.m').innerHTML = formatSpanMetal(m);
         tr.querySelector('td.c').innerHTML = formatSpanCrystal(c);
@@ -936,20 +928,17 @@
         sp += p;
         totalLevels += sum.levels || 0;
     });
-    // --- ИСПРАВЛЕНИЕ: Добавляем formatNumberWithDots() для итоговых значений ---
     document.getElementById('sumMetalR').innerHTML = formatSpanMetal(sm);
     document.getElementById('sumCrystalR').innerHTML = formatSpanCrystal(sc);
     document.getElementById('sumDeutR').innerHTML = formatSpanDeut(sd);
     document.getElementById('sumPointsR').textContent = formatNumberWithDots(sp);
     document.getElementById('sumTotalMetalR').textContent = formatNumberWithDots(Math.round(convertToMetal(sm, sc, sd)));
-    // --- ИСПРАВЛЕНИЕ: Форматируем значение в #tmTotal ---
     const perLevel = parseNumberInput(document.getElementById('tmInput')?.value);
     const totalTM = Math.round(perLevel * totalLevels * CONFIG.TM_PER_LEVEL_FACTOR);
     const lang = localStorage.getItem(KEYS.LANG) || 'ru';
     document.getElementById('tmTotal').textContent = (LANG[lang].totalTMLabel || 'Итого: ') + formatNumberWithDots(totalTM);
     updateBoxesNeeded();
-}
-
+  }
   function computeFleet() {
     try {
       const factorC = CONFIG.METAL_EQ_CRYSTAL;
@@ -1018,15 +1007,6 @@
       updateBoxesNeeded();
     } catch (e) { }
   }
-
-  // === ПОЛНОСТЬЮ ОРИГИНАЛЬНЫЙ ОСТАТОК ФАЙЛА (СОХРАНЕН БЕЗ ИЗМЕНЕНИЙ ЛОГИКИ) ===
-  // ... (все остальные функции: renderTable, buildRows*, attachInputsHandlers, applyLang, restoreFromStorage, init и т.д.)
-  // Они используют уже обновлённые formatSpan* и formatNumberWithDots(), поэтому не требуют модификации.
-
-  // --- ВСТАВКА ОСТАЛЬНЫХ ФУНКЦИЙ ИЗ ОРИГИНАЛА ---
-  // Копируем весь оставшийся код из файла `script.txt` начиная с `function renderTable()` до конца,
-  // без изменений, так как они уже используют обновлённые форматтеры или не выводят числа.
-
   function renderTable() {
     const tableBody = document.querySelector("#shipsTable tbody");
     if (!tableBody) return;
@@ -1218,6 +1198,7 @@
     tbodyR.appendChild(frag);
     attachLvlInputHandlers();
   }
+  // ✅ ВАЖНО: УДАЛЕН СТОЛБЕЦ ЭНЕРГИИ — БОЛЬШЕ НЕ СОЗДАЁМ tdE
   function buildRowsLfBuildings() {
     const tbody = document.getElementById('tbodyLfBuildings');
     if (!tbody) return;
@@ -1271,18 +1252,18 @@
       const tdD = document.createElement('td');
       tdD.className = 'd';
       tdD.innerHTML = '<span class="val-deut">0</span>';
-      const tdE = document.createElement('td');
-      tdE.className = 'e';
-      tdE.textContent = '0';
+      // ❌ УДАЛЕНО: const tdE = document.createElement('td'); tdE.className = 'e'; tdE.textContent = '0';
       const tdP = document.createElement('td');
       tdP.className = 'p';
       tdP.textContent = '0';
-      tr.append(tdFrom, tdTo, tdPlanets, tdM, tdC, tdD, tdE, tdP);
+      // ❌ УДАЛЕНО tdE из append
+      tr.append(tdFrom, tdTo, tdPlanets, tdM, tdC, tdD, tdP);
       frag.appendChild(tr);
     };
     tbody.appendChild(frag);
     attachLvlInputHandlers();
   }
+  // ✅ ВАЖНО: УДАЛЕН СТОЛБЕЦ ЭНЕРГИИ — БОЛЬШЕ НЕ СОЗДАЁМ tdE
   function buildRowsLfResearch() {
     const tbody = document.getElementById('tbodyLfResearch');
     if (!tbody) return;
@@ -1336,13 +1317,12 @@
       const tdD = document.createElement('td');
       tdD.className = 'd';
       tdD.innerHTML = '<span class="val-deut">0</span>';
-      const tdE = document.createElement('td');
-      tdE.className = 'e';
-      tdE.textContent = '0';
+      // ❌ УДАЛЕНО: const tdE = document.createElement('td'); tdE.className = 'e'; tdE.textContent = '0';
       const tdP = document.createElement('td');
       tdP.className = 'p';
       tdP.textContent = '0';
-      tr.append(tdFrom, tdTo, tdPlanets, tdM, tdC, tdD, tdE, tdP);
+      // ❌ УДАЛЕНО tdE из append
+      tr.append(tdFrom, tdTo, tdPlanets, tdM, tdC, tdD, tdP);
       frag.appendChild(tr);
     };
     tbody.appendChild(frag);
@@ -1353,8 +1333,6 @@
   inputs.forEach(inp => {
     if (!inp || inp._thousandsBound) return;
     inp._thousandsBound = true;
-
-    // Функция для форматирования значения и установки курсора
     const formatAndSetCursor = function() {
       const el = this;
       const raw = el.value;
@@ -1363,8 +1341,6 @@
       const leftDigitsCount = (left[0] === '-' ? left.slice(1) : left).length;
       const formatted = formatWithDotsRaw(raw);
       el.value = formatted;
-
-      // Расчет новой позиции курсора
       let digitsSeen = 0, newPos = 0;
       for (let i = 0; i < formatted.length; i++) {
         if (/\d/.test(formatted[i])) digitsSeen++;
@@ -1375,11 +1351,7 @@
         el.setSelectionRange(newPos, newPos);
       } catch (e) { }
     };
-
-    // Обработчик на каждое изменение (input)
     inp.addEventListener('input', formatAndSetCursor);
-
-    // Обработчик на потерю фокуса (blur)
     inp.addEventListener('blur', function () {
       const v = this.value;
       if (v === '' || v === '-') {
@@ -1390,8 +1362,6 @@
       this.value = num === 0 ? '' : formatWithDotsRaw(num);
       this.dispatchEvent(new Event('change', { bubbles: true }));
     });
-
-    // Обработчик на нажатие клавиш (keydown)
     inp.addEventListener('keydown', function (e) {
       const allowed = ['Backspace', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Delete', 'Tab', 'Home', 'End'];
       if (e.ctrlKey || e.metaKey) return;
@@ -1400,8 +1370,6 @@
       if (e.key === '-' || e.key === '.' || e.key === ',') return;
       e.preventDefault();
     });
-
-    // Обработчик на вставку (paste)
     inp.addEventListener('paste', function (e) {
       e.preventDefault();
       const text = (e.clipboardData || window.clipboardData)?.getData('text') || '';
@@ -1413,8 +1381,6 @@
       const nextRaw = before + cleanedChunk + after;
       const next = formatWithDotsRaw(nextRaw);
       this.value = next;
-
-      // Расчет новой позиции курсора после вставки
       const caretTargetDigits = (before + cleanedChunk).replace(/[^0-9]/g, '').length;
       let pos = 0, seen = 0;
       while (pos < next.length && seen < caretTargetDigits) {
@@ -1424,7 +1390,6 @@
       try {
         this.setSelectionRange(pos, pos);
       } catch (e) { }
-
       this.dispatchEvent(new Event('change', { bubbles: true }));
     });
   });
@@ -1708,8 +1673,8 @@
     buildRowsBuildings();
     buildRowsResearch();
     renderTable();
-    buildRowsLfBuildings();
-    buildRowsLfResearch();
+    buildRowsLfBuildings(); // ✅ без столбца энергии
+    buildRowsLfResearch();  // ✅ без столбца энергии
     restoreFromStorage();
     attachLiveThousandsFormatting('#boxesCount, #boxValue, #planetMetal, #planetCrystal, #planetDeut, input[data-id]');
     attachInputsHandlers();
@@ -1726,8 +1691,8 @@
     try {
       buildRowsBuildings();
       buildRowsResearch();
-      buildRowsLfBuildings();
-      buildRowsLfResearch();
+      buildRowsLfBuildings(); // ✅ без столбца энергии
+      buildRowsLfResearch();  // ✅ без столбца энергии
       renderTable();
       const inputsBuild = JSON.parse(localStorage.getItem(KEYS.INPUTS_BUILD) || 'null');
       if (inputsBuild) {
@@ -2010,8 +1975,8 @@
         document.querySelector(`.lf-subtab-btn[data-subtab="${activeSub}"]`)?.classList.add('active');
         document.getElementById('lf-buildings').classList.toggle('active', activeSub === 'lf-buildings');
         document.getElementById('lf-research').classList.toggle('active', activeSub === 'lf-research');
-        buildRowsLfBuildings();
-        buildRowsLfResearch();
+        buildRowsLfBuildings(); // ✅ без столбца энергии
+        buildRowsLfResearch();  // ✅ без столбца энергии
         const lfInputsBuild = JSON.parse(localStorage.getItem(KEYS.LF_INPUTS_BUILD) || 'null');
         if (lfInputsBuild) {
           document.querySelectorAll('#tbodyLfBuildings tr').forEach((tr, i) => {
