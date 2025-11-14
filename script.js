@@ -13,7 +13,6 @@
   };
   // --- НОВАЯ ПЕРЕМЕННАЯ ---
   let isSumAllTabsMode = false;
-
   const IMAGES_ROOT_PATH = 'images/';
   const IMAGES_BUILDINGS_PATH = 'images/buildings/';
   const IMAGES_RESEARCH_PATH = 'images/research/';
@@ -101,7 +100,7 @@
     3108: [160000, 120000, 50000, 0, 6000, 1.5, 1.5, 1.5, 0, 1.4],
     3109: [160000, 120000, 50000, 0, 6500, 1.5, 1.5, 1.5, 0, 1.4],
     3110: [85000, 40000, 35000, 0, 7000, 1.2, 1.2, 1.2, 0, 1.3],
-    3111: [120000, 30000, 25000, 0, 7500, 1.3, 1.3, 1.3, 0, 1.3],
+    3111: [120000, 30000, 25000, 0, 7500, 1.3, 1.3, 1.5, 0, 1.3],
     3112: [160000, 120000, 50000, 0, 8000, 1.5, 1.5, 1.5, 0, 1.4],
     3113: [200000, 100000, 100000, 0, 8500, 1.5, 1.5, 1.5, 0, 1.3],
     3114: [160000, 120000, 50000, 0, 9000, 1.5, 1.5, 1.5, 0, 1.4],
@@ -185,8 +184,11 @@
       rocktal: "Рок’тал",
       mechas: "Мехи",
       kaelesh: "Кэлиш",
-      // НОВЫЙ ПЕРЕВОД
-      sumAllTabs: "Сумма по всем вкладкам"
+      // НОВЫЕ ПЕРЕВОДЫ
+      lfMegalith: "Мегалит (ур.)",
+      lfMineralCenter: "Центр минералов (ур.)",
+      sumAllTabs: "Сумма по всем вкладкам",
+      dragHandleLabel: "Переместить таблицу"
     },
     tr: {
       tmLabel: "Karanlık Madde",
@@ -194,7 +196,7 @@
       tabBuildings: "Binalar",
       tabResearch: "Araştırmalar",
       tabFleet: "Filo",
-      tabLifeforms: "Yaşam biçimleri",
+      tabLifeforms: "Canlı türü",
       lfTabBuildings: "Binalar",
       lfTabResearch: "Araştırmalar",
       lfBuilding: "Bina",
@@ -232,8 +234,11 @@
       rocktal: "Rock’tal",
       mechas: "Mekanikler",
       kaelesh: "Kaelesh",
-      // НОВЫЙ ПЕРЕВОД
-      sumAllTabs: "Tüm sekmelerde toplam"
+      // НОВЫЕ ПЕРЕВОДЫ
+      lfMegalith: "Megalit (sev.)",
+      lfMineralCenter: "Maden Merkezi (sev.)",
+      sumAllTabs: "Tüm sekmelerde toplam",
+      dragHandleLabel: "Tabloyu Taşı"
     }
   };
   const BUILDINGS_DATA = [
@@ -1402,7 +1407,6 @@
       localStorage.setItem(KEYS.SHIP_QTY, JSON.stringify(qtyMap));
     } catch (e) { }
   }
-
   // --- НОВАЯ ФУНКЦИЯ ---
   function getSumAllTabsMetalValue() {
     let total = 0;
@@ -1413,14 +1417,12 @@
       const sumLfB = parseNumberInput(document.getElementById('sumTotalMetalLfB')?.textContent) || 0;
       const sumLfR = parseNumberInput(document.getElementById('sumTotalMetalLfR')?.textContent) || 0;
       const sumFleet = parseNumberInput(document.getElementById('totalMetalEq')?.textContent) || 0;
-
       total = sumB + sumR + sumLfB + sumLfR + sumFleet;
     } catch (e) {
       console.error("Ошибка при расчете суммы по всем вкладкам:", e);
     }
     return total;
   }
-
   let __inputsHandlersAttached = false;
   function attachInputsHandlers() {
     if (__inputsHandlersAttached) return;
@@ -1440,7 +1442,6 @@
     const debouncedRecalcLfResearch = debounce(() => {
       if (getActiveTab() === 'lifeforms') recalcAllLfResearch();
     }, 120);
-
     // --- НОВЫЙ ОБРАБОТЧИК ---
     document.getElementById('sumAllTabsCheckbox')?.addEventListener('change', (e) => {
       isSumAllTabsMode = e.target.checked;
@@ -1449,7 +1450,6 @@
       // Обновляем расчет
       updateBoxesNeeded();
     });
-
     const tbodyB = document.getElementById('tbodyBuildings');
     if (tbodyB) {
       tbodyB.addEventListener('input', e => {
@@ -1792,7 +1792,6 @@
       const mrcSaved = localStorage.getItem(KEYS.ROCKTAL_MRC_LEVEL);
       if (megSaved !== null && document.getElementById('megalithLevel')) document.getElementById('megalithLevel').value = String(parseNumberInput(megSaved));
       if (mrcSaved !== null && document.getElementById('mrcLevel')) document.getElementById('mrcLevel').value = String(parseNumberInput(mrcSaved));
-
       // --- НОВОЕ ВОССТАНОВЛЕНИЕ СОСТОЯНИЯ ЧЕКБОКСА ---
       try {
         const savedSumAllTabs = localStorage.getItem(KEYS.SUM_ALL_TABS);
@@ -1802,7 +1801,6 @@
           if (checkbox) checkbox.checked = isSumAllTabsMode;
         }
       } catch (e) { }
-
       const trf = JSON.parse(localStorage.getItem(KEYS.TRANSFORM) || 'null');
       if (trf) {
         window.scale = trf.scale || 1;
@@ -1855,7 +1853,6 @@
       localStorage.removeItem(KEYS.SUM_ALL_TABS);
       isSumAllTabsMode = false;
       document.getElementById('sumAllTabsCheckbox').checked = false;
-
       document.querySelectorAll("#tbodyBuildings input,#tbodyResearch input,#tbodyLfBuildings input,#tbodyLfResearch input,input[data-id]").forEach(i => { i.value = ''; });
       ['boxesCount', 'boxValue', 'planetMetal', 'planetCrystal', 'planetDeut', 'tmInput', 'megalithLevel', 'mrcLevel'].forEach(id => {
         const el = document.getElementById(id);
@@ -1905,7 +1902,6 @@
       tabsLeftEl.style.top = `${Math.max(0, Math.round(offsetWithinWrapper + extra))}px`;
     } catch (e) { }
   }
-
   // --- ИЗМЕНЕННАЯ ФУНКЦИЯ ---
   function updateBoxesNeeded() {
     try {
@@ -1913,7 +1909,6 @@
       const boxValueInput = document.getElementById('boxValue');
       const boxValue = parseNumberInput(boxValueInput?.value || '');
       let targetMetal = 0;
-
       if (!boxValue || boxValue <= 0) {
         boxesNeededEl && (boxesNeededEl.textContent = '—');
         document.getElementById('boxesCostTL').innerHTML = `<span class="try-value">TRY: —</span>`;
@@ -1921,20 +1916,17 @@
         leftover && (leftover.textContent = '—');
         return;
       }
-
       // Определяем, какой режим используется
       if (isSumAllTabsMode) {
         targetMetal = getSumAllTabsMetalValue();
       } else {
         targetMetal = getCurrentTotalMetalValue();
       }
-
       const needed = Math.ceil(targetMetal / boxValue);
       boxesNeededEl && (boxesNeededEl.textContent = formatWithDotsRaw(needed));
       updateBoxesCostTL(targetMetal); // Передаем значение, чтобы не считать заново
     } catch (e) { }
   }
-
   // --- ИЗМЕНЕННАЯ ФУНКЦИЯ ---
   function updateBoxesCostTL(targetMetal = null) {
     try {
@@ -1942,25 +1934,21 @@
       const leftoverTmValueEl = document.getElementById('leftoverTmValue');
       const boxValueInput = document.getElementById('boxValue');
       if (!boxesCostTLEl) return;
-
       const boxValue = parseNumberInput(boxValueInput?.value || '');
       if (boxValue <= 0) {
         boxesCostTLEl.innerHTML = `<span class="try-value">TRY: —</span>`;
         leftoverTmValueEl && (leftoverTmValueEl.textContent = '—');
         return;
       }
-
       // Если не передано значение, получаем текущее
       if (targetMetal === null) {
         targetMetal = isSumAllTabsMode ? getSumAllTabsMetalValue() : getCurrentTotalMetalValue();
       }
-
       if (!Number.isFinite(targetMetal) || targetMetal <= 0) {
         boxesCostTLEl.innerHTML = `<span class="try-value">TRY: 0</span>`;
         leftoverTmValueEl && (leftoverTmValueEl.textContent = '0');
         return;
       }
-
       const neededBoxesRaw = Math.ceil(targetMetal / boxValue);
       const MAX_ALLOWED_BOXES = 1e9;
       if (neededBoxesRaw > MAX_ALLOWED_BOXES) {
@@ -1968,29 +1956,24 @@
         leftoverTmValueEl && (leftoverTmValueEl.textContent = '—');
         return;
       }
-
       const requiredTM = neededBoxesRaw * CONFIG.TM_PER_BOX;
       const pack = (CONFIG.TM_PACKS && CONFIG.TM_PACKS[0]) || null;
       const packTm = pack && Number.isFinite(Number(pack.tm)) ? Number(pack.tm) : 0;
       const packPriceTRY = pack && (Number.isFinite(Number(pack.priceTRY)) ? Number(pack.priceTRY) : 0);
-
       if (packTm <= 0 || packPriceTRY <= 0) {
         boxesCostTLEl.innerHTML = `<span class="try-value">TRY: —</span>`;
         leftoverTmValueEl && (leftoverTmValueEl.textContent = '—');
         return;
       }
-
       const packsCount = Math.max(1, Math.ceil(requiredTM / packTm));
       const totalTRY = packsCount * packPriceTRY;
       const leftoverTM = packsCount * packTm - requiredTM;
-
       const tryValue = formatNumberWithDots(totalTRY);
       const bynValue = formatNumberWithDots(Math.round(totalTRY / 12.35));
       boxesCostTLEl.innerHTML = `<span class="try-value">TRY: ${tryValue} / BYN: ${bynValue}</span>`;
       leftoverTmValueEl && (leftoverTmValueEl.textContent = leftoverTM > 0 ? formatWithDotsRaw(leftoverTM) : '0');
     } catch (e) { }
   }
-
   function getCurrentTotalMetalValue() {
     try {
       const active = document.querySelector('.tab-btn.active')?.dataset.tab;
