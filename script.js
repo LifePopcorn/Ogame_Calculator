@@ -8,16 +8,16 @@
     METAL_EQ_DEUT: 3,
     MAX_LEVEL_SPAN: 1000,
     TM_PER_LEVEL_FACTOR: 2,
-    MEGALITH_DISCOUNT_PER_LEVEL: 0.05,
-    MINERAL_CENTER_DISCOUNT_PER_LEVEL: 0.05
+    // --- ИСПРАВЛЕНО: Правильные проценты бонусов ---
+    MEGALITH_DISCOUNT_PER_LEVEL: 0.01,      // 1% за уровень Мегалита
+    MINERAL_CENTER_DISCOUNT_PER_LEVEL: 0.005, // 0.5% за уровень Центра минералов
+    // --- НОВАЯ КОНСТАНТА: Бонус Рунного Техно-ума за уровень ---
+    RUNO_TECH_DISCOUNT_PER_LEVEL: 0.0025    // 0.25% за уровень Рунного Техно-ума
   };
-  // --- НОВАЯ ПЕРЕМЕННАЯ ---
-  let isSumAllTabsMode = false;
-  const IMAGES_ROOT_PATH = 'images/';
-  const IMAGES_BUILDINGS_PATH = 'images/buildings/';
-  const IMAGES_RESEARCH_PATH = 'images/research/';
-  const IMAGES_SHIPS_PATH = 'images/ships/';
-  const TECH_COSTS = {
+  // --- НОВАЯ КОНСТАНТА: ID зданий, на которые влияет Центр исследования минералов ---
+  const MRC_REDUCTABLE_IDS = new Set([1, 2, 3, 4, 12, 2001, 2002]);
+  // --- НОВАЯ КОНСТАНТА: Данные для Форм Жизни ---
+  const TECH_COSTS_LF = {
     1001: [7, 2, 0, 0, 40, 1.2, 1.2, 0, 0, 1.21],
     1002: [5, 2, 0, 8, 40, 1.23, 1.23, 0, 1.02, 1.25],
     1003: [20000, 25000, 10000, 10, 16000, 1.3, 1.3, 1.3, 1.08, 1.25],
@@ -41,7 +41,7 @@
     1109: [320000, 240000, 100000, 0, 6500, 1.5, 1.5, 1.5, 0, 1.4],
     1110: [320000, 240000, 100000, 0, 7000, 1.5, 1.5, 1.5, 0, 1.4],
     1111: [120000, 30000, 25000, 0, 7500, 1.5, 1.5, 1.5, 0, 1.3],
-    1112: [100000, 40000, 30000, 0, 10000, 1.5, 1.5, 1.5, 0, 1.3],
+    1112: [100000, 40000, 30000, 0, 10000, 1.3, 1.3, 1.3, 0, 1.3],
     1113: [200000, 100000, 100000, 0, 8500, 1.3, 1.3, 1.3, 0, 1.3],
     1114: [160000, 120000, 50000, 0, 9000, 1.5, 1.5, 1.5, 0, 1.4],
     1115: [160000, 120000, 50000, 0, 9500, 1.5, 1.5, 1.5, 0, 1.4],
@@ -100,7 +100,7 @@
     3108: [160000, 120000, 50000, 0, 6000, 1.5, 1.5, 1.5, 0, 1.4],
     3109: [160000, 120000, 50000, 0, 6500, 1.5, 1.5, 1.5, 0, 1.4],
     3110: [85000, 40000, 35000, 0, 7000, 1.2, 1.2, 1.2, 0, 1.3],
-    3111: [120000, 30000, 25000, 0, 7500, 1.3, 1.3, 1.5, 0, 1.3],
+    3111: [120000, 30000, 25000, 0, 7500, 1.3, 1.3, 1.3, 0, 1.3],
     3112: [160000, 120000, 50000, 0, 8000, 1.5, 1.5, 1.5, 0, 1.4],
     3113: [200000, 100000, 100000, 0, 8500, 1.5, 1.5, 1.5, 0, 1.3],
     3114: [160000, 120000, 50000, 0, 9000, 1.5, 1.5, 1.5, 0, 1.4],
@@ -139,218 +139,7 @@
     4117: [500000, 300000, 200000, 0, 13000, 1.5, 1.5, 1.5, 0, 1.3],
     4118: [300000, 180000, 120000, 0, 11000, 1.7, 1.7, 1.7, 0, 1.4]
   };
-  const LANG = {
-    ru: {
-      tmLabel: "Тёмная материя",
-      totalTMLabel: "Итого: ",
-      tabBuildings: "Постройки",
-      tabResearch: "Исследования",
-      tabFleet: "Флот",
-      tabLifeforms: "Формы жизни",
-      lfTabBuildings: "Постройки",
-      lfTabResearch: "Исследования",
-      lfBuilding: "Постройка",
-      lfResearch: "Исследование",
-      energy: "Энергия",
-      locale: "ru-RU",
-      boxesLabel: "Коробка с металлом",
-      needOpen: "Нужно открыть:",
-      boxes: "коробок",
-      building: "Постройка",
-      from: "От",
-      to: "До",
-      planets: "Планеты",
-      metal: "Металл",
-      crystal: "Кристалл",
-      deut: "Дейтерий",
-      points: "Очки",
-      total: "Итого",
-      totalInMetal: "Всего в металле",
-      research: "Исследование",
-      ship: "Корабль",
-      qty: "Количество",
-      planetResources: "Ресурсы на планете",
-      deliveryTotals: "Итого по ресурсам:",
-      metalEq: "Эквивалент в металле:",
-      grandAfter: "Остаток после вычета:",
-      leftoverLabel: "Остаток ТМ",
-      boxesCountPh: "Кол-во коробок",
-      boxValuePh: "Металла в 1 коробке",
-      planetMetalPh: "Металл",
-      planetCrystalPh: "Кристалл",
-      planetDeutPh: "Дейтерий",
-      lfSelectLabel: "Форма жизни",
-      humans: "Люди",
-      rocktal: "Рок’тал",
-      mechas: "Мехи",
-      kaelesh: "Кэлиш",
-      // НОВЫЕ ПЕРЕВОДЫ
-      lfMegalith: "Мегалит (ур.)",
-      lfMineralCenter: "Центр минералов (ур.)",
-      sumAllTabs: "Сумма по всем вкладкам",
-      dragHandleLabel: "Переместить таблицу"
-    },
-    tr: {
-      tmLabel: "Karanlık Madde",
-      totalTMLabel: "Toplam: ",
-      tabBuildings: "Binalar",
-      tabResearch: "Araştırmalar",
-      tabFleet: "Filo",
-      tabLifeforms: "Canlı türü",
-      lfTabBuildings: "Binalar",
-      lfTabResearch: "Araştırmalar",
-      lfBuilding: "Bina",
-      lfResearch: "Araştırma",
-      energy: "Enerji",
-      locale: "tr-TR",
-      boxesLabel: "Metal Paketi",
-      needOpen: "Açılmalı:",
-      boxes: "kutu",
-      building: "Bina",
-      from: "Başlangıç",
-      to: "Hedef",
-      planets: "Gezegenler",
-      metal: "Metal",
-      crystal: "Kristal",
-      deut: "Deuterium",
-      points: "Puan",
-      total: "Toplam",
-      totalInMetal: "Metalde toplam",
-      research: "Araştırma",
-      ship: "Gemi",
-      qty: "Adet",
-      planetResources: "Gezegendeki kaynaklar",
-      deliveryTotals: "Toplam kaynaklar:",
-      metalEq: "Metale eşdeğer:",
-      grandAfter: "Toplamdan sonra kalan:",
-      leftoverLabel: "Kalan KM",
-      boxesCountPh: "Kutu sayısı",
-      boxValuePh: "Bir kutudaki metal",
-      planetMetalPh: "Metal",
-      planetCrystalPh: "Kristal",
-      planetDeutPh: "Deuterium",
-      lfSelectLabel: "Yaşam biçimi",
-      humans: "İnsanlar",
-      rocktal: "Rock’tal",
-      mechas: "Mekanikler",
-      kaelesh: "Kaelesh",
-      // НОВЫЕ ПЕРЕВОДЫ
-      lfMegalith: "Megalit (sev.)",
-      lfMineralCenter: "Maden Merkezi (sev.)",
-      sumAllTabs: "Tüm sekmelerde toplam",
-      dragHandleLabel: "Tabloyu Taşı"
-    }
-  };
-  const BUILDINGS_DATA = [
-    { base: { m: 60, c: 15, d: 0 }, factor: 1.5 },
-    { base: { m: 48, c: 24, d: 0 }, factor: 1.6 },
-    { base: { m: 225, c: 75, d: 0 }, factor: 1.5 },
-    { base: { m: 75, c: 30, d: 0 }, factor: 1.5 },
-    { base: { m: 900, c: 360, d: 180 }, factor: 1.8 },
-    { base: { m: 400, c: 120, d: 200 }, factor: 2.0 },
-    { base: { m: 1000000, c: 500000, d: 100000 }, factor: 2.0 },
-    { base: { m: 400, c: 200, d: 100 }, factor: 2.0 },
-    { base: { m: 2000, c: 0, d: 0 }, factor: 2.0 },
-    { base: { m: 2000, c: 1000, d: 0 }, factor: 2.0 },
-    { base: { m: 2000, c: 2000, d: 0 }, factor: 2.0 },
-    { base: { m: 200, c: 400, d: 200 }, factor: 2.0 },
-    { base: { m: 50000, c: 100000, d: 0 }, factor: 2.0 },
-    { base: { m: 20000, c: 40000, d: 0 }, factor: 2.0 },
-    { base: { m: 200, c: 0, d: 50 }, factor: 2.0 },
-    { base: { m: 20000, c: 20000, d: 0 }, factor: 2.0 }
-  ];
-  const BUILDING_NAMES = {
-    ru: [
-      "Рудник по добыче металла", "Рудник по добыче кристалла", "Синтезатор дейтерия", "Солнечная электростанция",
-      "Термоядерная электростанция", "Фабрика роботов", "Фабрика нанитов", "Верфь",
-      "Хранилище металла", "Хранилище кристалла", "Хранилище дейтерия", "Исслед-кая лаборатория",
-      "Терраформер", "Склад альянса", "Космическая док", "Ракетная шахта"
-    ],
-    tr: [
-      "Metal Madeni", "Kristal Madeni", "Deuterium Sentezleyici", "Solar Enerji Santrali",
-      "Füzyon Santrali", "Robot Fabrikası", "Nanite Fabrikası", "Tersane",
-      "Metal Deposu", "Kristal Deposu", "Deuterium Tankeri", "Bilimsel Araştırma Laboratuvarı",
-      "Terraformer", "İttifak Deposu", "Uzay İskelesi", "Roket Silosu"
-    ]
-  };
-  const ICONS_BUILDINGS = [
-    "metal_mine.png", "crystal_mine.png", "deuterium_synth.png", "solar_plant.png",
-    "fusion_plant.png", "robot_factory.png", "nanite_factory.png", "shipyard.png",
-    "metal_storage.png", "crystal_storage.png", "deuterium_tank.png", "research_lab.png",
-    "terraformer.png", "alliance_depot.png", "dock.png", "missile_silo.png"
-  ];
-  const RESEARCH_DATA = [
-    { base: { m: 200, c: 1000, d: 200 }, factor: 2.0 },
-    { base: { m: 0, c: 400, d: 600 }, factor: 2.0 },
-    { base: { m: 800, c: 200, d: 0 }, factor: 2.0 },
-    { base: { m: 200, c: 600, d: 0 }, factor: 2.0 },
-    { base: { m: 1000, c: 0, d: 0 }, factor: 2.0 },
-    { base: { m: 0, c: 800, d: 400 }, factor: 2.0 },
-    { base: { m: 0, c: 4000, d: 2000 }, factor: 2.0 },
-    { base: { m: 400, c: 0, d: 600 }, factor: 2.0 },
-    { base: { m: 2000, c: 4000, d: 600 }, factor: 2.0 },
-    { base: { m: 10000, c: 20000, d: 6000 }, factor: 2.0 },
-    { base: { m: 200, c: 100, d: 0 }, factor: 2.0 },
-    { base: { m: 1000, c: 300, d: 100 }, factor: 2.0 },
-    { base: { m: 2000, c: 4000, d: 1000 }, factor: 2.0 },
-    { base: { m: 240000, c: 400000, d: 160000 }, factor: 2.0 },
-    { base: { m: 4000, c: 8000, d: 4000 }, factor: 1.75 },
-    { base: { m: 0, c: 0, d: 0 }, factor: 3.0 }
-  ];
-  const RESEARCH_NAMES = {
-    ru: [
-      "Шпионаж", "Компьютерная технология", "Оружейная технология", "Щитовая технология",
-      "Броня космических кораблей", "Энергетическая технология", "Гипер-нная технология", "Реактивный Двигатель",
-      "Импульсный Двигатель", "Гипер-нный Двигатель", "Лазерная технология", "Ионная технология",
-      "Плазменная технология", "М.И.С", "Астрофизика", "Гравитационная технология"
-    ],
-    tr: [
-      "Casusluk Tekniği", "Bilgisayar Teknolojisi", "Silah Teknolojisi", "Koruyucu Kalkan Tekniği",
-      "Uzay Gemisi Zırhlandırması", "Enerji Tekniği", "Hiperuzay Teknolojisi", "Yanmalı Motor Takımı",
-      "İtki Motoru", "Hiperuzay İticisi", "Lazer Tekniği", "İyon Tekniği",
-      "Plazma Tekniği", "Galaksiler Arası Araştırma Ağı", "Astrofizik", "Gravitasyon Araştırması"
-    ]
-  };
-  const ICONS_RESEARCH = [
-    "spy.png", "computer.png", "weapons.png", "shield.png",
-    "armor.png", "energy.png", "hyperspace.png", "combustion.png",
-    "impulse.png", "hyperdrive.png", "laser.png", "ion.png",
-    "plasma.png", "irn.png", "astro.png", "graviton.png"
-  ];
-  const shipList = [
-    { id: "small_cargo", ru: "Малый транспорт", tr: "Küçük Nakliye", metal: 2000, crystal: 2000, deut: 0, img: "maly_transport.png" },
-    { id: "large_cargo", ru: "Большой транспорт", tr: "Büyük Nakliye", metal: 6000, crystal: 6000, deut: 0, img: "bolshoy_transport.png" },
-    { id: "light_fighter", ru: "Лёгкий истребитель", tr: "Hafif Avcı", metal: 3000, crystal: 1000, deut: 0, img: "legkiy_istrebitel.png" },
-    { id: "heavy_fighter", ru: "Тяжёлый истребитель", tr: "Ağır Avcı", metal: 6000, crystal: 4000, deut: 0, img: "tyazhely_istrebitel.png" },
-    { id: "cruiser", ru: "Крейсер", tr: "Kruvazör", metal: 20000, crystal: 7000, deut: 2000, img: "kreiser.png" },
-    { id: "battleship", ru: "Линкор", tr: "Komuta Gemisi", metal: 45000, crystal: 15000, deut: 0, img: "linkor.png" },
-    { id: "recycler", ru: "Переработчик", tr: "Geri Dönüşümcü", metal: 10000, crystal: 6000, deut: 2000, img: "recycler.png" },
-    { id: "bomber", ru: "Бомбардировщик", tr: "Bombardıman Gemisi", metal: 50000, crystal: 25000, deut: 15000, img: "bombardirovshik.png" },
-    { id: "destroyer", ru: "Уничтожитель", tr: "Muhrip", metal: 60000, crystal: 50000, deut: 15000, img: "unichtozhitel.png" },
-    { id: "battlecruiser", ru: "Линейный крейсер", tr: "Fırkateyn", metal: 30000, crystal: 40000, deut: 15000, img: "battlecruiser.png" },
-    { id: "death_star", ru: "Звезда смерти", tr: "Ölüm Yıldızı", metal: 5000000, crystal: 4000000, deut: 1000000, img: "death_star.png" },
-    { id: "reaper", ru: "Жнец", tr: "Azrail", metal: 85000, crystal: 55000, deut: 20000, img: "reaper.png" },
-    { id: "pathfinder", ru: "Первопроходец", tr: "Rehber", metal: 8000, crystal: 15000, deut: 8000, img: "pathfinder.png" }
-  ];
-  const LIFEFORM_RACES = ['humans', 'rocktal', 'mechas', 'kaelesh'];
-  let currentLifeformRace = localStorage.getItem('og_calc_lf_race_v1') || 'humans';
-  const KEYS = {
-    LANG: 'og_calc_lang_v2',
-    TRANSFORM: 'og_calc_transform_v2',
-    INPUTS_BUILD: 'og_calc_inputs_build_v2',
-    INPUTS_RESEARCH: 'og_calc_inputs_research_v2',
-    TM: 'og_calc_tm_v2',
-    BOXES: 'og_calc_boxes_v2',
-    SHIP_QTY: 'og_calc_ship_qty_v2',
-    ACTIVE_TAB: 'og_calc_active_tab_v2',
-    LF_INPUTS_BUILD: 'og_calc_lf_inputs_build_v1',
-    LF_INPUTS_RESEARCH: 'og_calc_lf_inputs_research_v1',
-    LF_RACE: 'og_calc_lf_race_v1',
-    ROCKTAL_MEGALITH_LEVEL: 'og_calc_rocktal_megalith_level',
-    ROCKTAL_MRC_LEVEL: 'og_calc_rocktal_mrc_level',
-    // НОВЫЙ КЛЮЧ
-    SUM_ALL_TABS: 'og_calc_sum_all_tabs'
-  };
+  // --- НОВАЯ КОНСТАНТА: Переводы для Форм Жизни ---
   const LF_BUILDING_NAMES = {
     ru: {
       1001: "Жилые кварталы", 1002: "Биосферическая ферма", 1003: "Центр Исследований", 1004: "Академия наук",
@@ -443,14 +232,6 @@
       4116: "Hız Artışı (Komuta Gemisi)", 4117: "Psionik Kalkan Matrisi", 4118: "Kâşif için Kaelesh Geliştirme"
     }
   };
-  function getLfBuildingName(techId) {
-    const lang = localStorage.getItem(KEYS.LANG) || 'ru';
-    return LF_BUILDING_NAMES[lang]?.[techId] || LF_BUILDING_NAMES.ru?.[techId] || `ID ${techId}`;
-  }
-  function getLfResearchName(techId) {
-    const lang = localStorage.getItem(KEYS.LANG) || 'ru';
-    return LF_RESEARCH_NAMES[lang]?.[techId] || LF_RESEARCH_NAMES.ru?.[techId] || `ID ${techId}`;
-  }
   const LF_BUILDING_FILENAMES = {
     1001: "residential_sector.png",
     1002: "biosphere_farm.png",
@@ -575,6 +356,296 @@
     4117: "psionic_shield_matrix.png",
     4118: "kaelesh_explorer_enhancement.png"
   };
+  // --- НОВАЯ ПЕРЕМЕННАЯ ---
+  let isSumAllTabsMode = false;
+  const IMAGES_ROOT_PATH = 'images/';
+  const IMAGES_BUILDINGS_PATH = 'images/buildings/';
+  const IMAGES_RESEARCH_PATH = 'images/research/';
+  const IMAGES_SHIPS_PATH = 'images/ships/';
+  // --- ИСПРАВЛЕНО: Теперь используем TECH_COSTS_LF ---
+  const TECH_COSTS = TECH_COSTS_LF; // Используем новую константу
+  const LANG = {
+    ru: {
+      tmLabel: "Тёмная материя",
+      totalTMLabel: "Итого: ",
+      tabBuildings: "Постройки",
+      tabResearch: "Исследования",
+      tabFleet: "Флот",
+      tabLifeforms: "Формы жизни",
+      lfTabBuildings: "Постройки",
+      lfTabResearch: "Исследования",
+      lfBuilding: "Постройка",
+      lfResearch: "Исследование",
+      energy: "Энергия",
+      locale: "ru-RU",
+      boxesLabel: "Коробка с металлом",
+      needOpen: "Нужно открыть:",
+      boxes: "коробок",
+      building: "Постройка",
+      from: "От",
+      to: "До",
+      planets: "Планеты",
+      metal: "Металл",
+      crystal: "Кристалл",
+      deut: "Дейтерий",
+      points: "Очки",
+      total: "Итого",
+      totalInMetal: "Всего в металле",
+      research: "Исследование",
+      ship: "Корабль",
+      qty: "Количество",
+      planetResources: "Ресурсы на планете",
+      deliveryTotals: "Итого по ресурсам:",
+      metalEq: "Эквивалент в металле:",
+      grandAfter: "Остаток после вычета:",
+      leftoverLabel: "Остаток ТМ",
+      boxesCountPh: "Кол-во коробок",
+      boxValuePh: "Металла в 1 коробке",
+      planetMetalPh: "Металл",
+      planetCrystalPh: "Кристалл",
+      planetDeutPh: "Дейтерий",
+      lfSelectLabel: "Форма жизни",
+      humans: "Люди",
+      rocktal: "Рок’тал",
+      mechas: "Мехи",
+      kaelesh: "Кэлиш",
+      // НОВЫЕ ПЕРЕВОДЫ
+      lfMegalith: "Мегалит",
+      lfMineralCenter: "Центр минералов",
+      lfRunoTech: "Рунный Техно-ум",
+      sumAllTabs: "Сумма по всем вкладкам",
+      dragHandleLabel: "Переместить таблицу"
+    },
+    tr: {
+      tmLabel: "Karanlık Madde",
+      totalTMLabel: "Toplam: ",
+      tabBuildings: "Binalar",
+      tabResearch: "Araştırmalar",
+      tabFleet: "Filo",
+      tabLifeforms: "Canlı türü",
+      lfTabBuildings: "Binalar",
+      lfTabResearch: "Araştırmalar",
+      lfBuilding: "Bina",
+      lfResearch: "Araştırma",
+      energy: "Enerji",
+      locale: "tr-TR",
+      boxesLabel: "Metal Paketi",
+      needOpen: "Açılmalı:",
+      boxes: "kutu",
+      building: "Bina",
+      from: "Başlangıч",
+      to: "Hedef",
+      planets: "Gezegenler",
+      metal: "Metal",
+      crystal: "Kristal",
+      deut: "Deuterium",
+      points: "Puan",
+      total: "Toplam",
+      totalInMetal: "Metalde toplam",
+      research: "Araştırma",
+      ship: "Gemi",
+      qty: "Adet",
+      planetResources: "Gezegendeki kaynaklar",
+      deliveryTotals: "Toplam kaynaklar:",
+      metalEq: "Metale eşdeğer:",
+      grandAfter: "Toplamdan sonra kalan:",
+      leftoverLabel: "Kalan KM",
+      boxesCountPh: "Kutu sayısı",
+      boxValuePh: "Bir kutudaki metal",
+      planetMetalPh: "Metal",
+      planetCrystalPh: "Kristal",
+      planetDeutPh: "Deuterium",
+      lfSelectLabel: "Yaşam biçimi",
+      humans: "İnsanlar",
+      rocktal: "Rock’tal",
+      mechas: "Mekanikler",
+      kaelesh: "Kaelesh",
+      // НОВЫЕ ПЕРЕВОДЫ
+      lfMegalith: "Megalit",
+      lfMineralCenter: "Maden Merkezi",
+      lfRunoTech: "Rune Tekno-Zekası",
+      sumAllTabs: "Tüm sekmelerde toplam",
+      dragHandleLabel: "Tabloyu Taşı"
+    }
+  };
+  const BUILDINGS_DATA = [
+    { base: { m: 60, c: 15, d: 0 }, factor: 1.5 },
+    { base: { m: 48, c: 24, d: 0 }, factor: 1.6 },
+    { base: { m: 225, c: 75, d: 0 }, factor: 1.5 },
+    { base: { m: 75, c: 30, d: 0 }, factor: 1.5 },
+    { base: { m: 900, c: 360, d: 180 }, factor: 1.8 },
+    { base: { m: 400, c: 120, d: 200 }, factor: 2.0 },
+    { base: { m: 1000000, c: 500000, d: 100000 }, factor: 2.0 },
+    { base: { m: 400, c: 200, d: 100 }, factor: 2.0 },
+    { base: { m: 2000, c: 0, d: 0 }, factor: 2.0 },
+    { base: { m: 2000, c: 1000, d: 0 }, factor: 2.0 },
+    { base: { m: 2000, c: 2000, d: 0 }, factor: 2.0 },
+    { base: { m: 200, c: 400, d: 200 }, factor: 2.0 },
+    { base: { m: 50000, c: 100000, d: 0 }, factor: 2.0 },
+    { base: { m: 20000, c: 40000, d: 0 }, factor: 2.0 },
+    { base: { m: 200, c: 0, d: 50 }, factor: 2.0 },
+    { base: { m: 20000, c: 20000, d: 0 }, factor: 2.0 }
+  ];
+  const BUILDING_NAMES = {
+    ru: [
+      "Рудник по добыче металла", "Рудник по добыче кристалла", "Синтезатор дейтерия", "Солнечная электростанция",
+      "Термоядерная электростанция", "Фабрика роботов", "Фабрика нанитов", "Верфь",
+      "Хранилище металла", "Хранилище кристалла", "Хранилище дейтерия", "Исслед-кая лаборатория",
+      "Терраформер", "Склад альянса", "Космическая док", "Ракетная шахта"
+    ],
+    tr: [
+      "Metal Madeni", "Kristal Madeni", "Deuterium Sentezleyici", "Solar Enerji Santrali",
+      "Füzyon Santrali", "Robot Fabrikası", "Nanite Fabrikası", "Tersane",
+      "Metal Deposu", "Kristal Deposu", "Deuterium Tankeri", "Bilimsel Araştırma Laboratuvarı",
+      "Terraformer", "İttifak Deposu", "Uzay İskelesi", "Roket Silosu"
+    ]
+  };
+  const ICONS_BUILDINGS = [
+    "metal_mine.png", "crystal_mine.png", "deuterium_synth.png", "solar_plant.png",
+    "fusion_plant.png", "robot_factory.png", "nanite_factory.png", "shipyard.png",
+    "metal_storage.png", "crystal_storage.png", "deuterium_tank.png", "research_lab.png",
+    "terraformer.png", "alliance_depot.png", "dock.png", "missile_silo.png"
+  ];
+  const RESEARCH_DATA = [
+    { base: { m: 200, c: 1000, d: 200 }, factor: 2.0 },
+    { base: { m: 0, c: 400, d: 600 }, factor: 2.0 },
+    { base: { m: 800, c: 200, d: 0 }, factor: 2.0 },
+    { base: { m: 200, c: 600, d: 0 }, factor: 2.0 },
+    { base: { m: 1000, c: 0, d: 0 }, factor: 2.0 },
+    { base: { m: 0, c: 800, d: 400 }, factor: 2.0 },
+    { base: { m: 0, c: 4000, d: 2000 }, factor: 2.0 },
+    { base: { m: 400, c: 0, d: 600 }, factor: 2.0 },
+    { base: { m: 2000, c: 4000, d: 600 }, factor: 2.0 },
+    { base: { m: 10000, c: 20000, d: 6000 }, factor: 2.0 },
+    { base: { m: 200, c: 100, d: 0 }, factor: 2.0 },
+    { base: { m: 1000, c: 300, d: 100 }, factor: 2.0 },
+    { base: { m: 2000, c: 4000, d: 1000 }, factor: 2.0 },
+    { base: { m: 240000, c: 400000, d: 160000 }, factor: 2.0 },
+    { base: { m: 4000, c: 8000, d: 4000 }, factor: 1.75 },
+    { base: { m: 0, c: 0, d: 0 }, factor: 3.0 }
+  ];
+  const RESEARCH_NAMES = {
+    ru: [
+      "Шпионаж", "Компьютерная технология", "Оружейная технология", "Щитовая технология",
+      "Броня космических кораблей", "Энергетическая технология", "Гипер-нная технология", "Реактивный Двигатель",
+      "Импульсный Двигатель", "Гипер-нный Двигатель", "Лазерная технология", "Ионная технология",
+      "Плазменная технология", "М.И.С", "Астрофизика", "Гравитационная технология"
+    ],
+    tr: [
+      "Casusluk Tekniği", "Bilgisayar Teknolojisi", "Silah Teknolojisi", "Koruyucu Kalkan Tekniği",
+      "Uzay Gemisi Zırhlandırması", "Enerji Tekniği", "Hiperuzay Teknolojisi", "Yanmalı Motor Takımı",
+      "İtki Motoru", "Hiperuzay İticisi", "Lazer Tekniği", "İyon Tekniği",
+      "Plazma Tekniği", "Galaksiler Arası Araştırma Ağı", "Astrofizik", "Gravitasyon Araştırması"
+    ]
+  };
+  const ICONS_RESEARCH = [
+    "spy.png", "computer.png", "weapons.png", "shield.png",
+    "armor.png", "energy.png", "hyperspace.png", "combustion.png",
+    "impulse.png", "hyperdrive.png", "laser.png", "ion.png",
+    "plasma.png", "irn.png", "astro.png", "graviton.png"
+  ];
+  const shipList = [
+    { id: "small_cargo", ru: "Малый транспорт", tr: "Küçük Nakliye", metal: 2000, crystal: 2000, deut: 0, img: "maly_transport.png" },
+    { id: "large_cargo", ru: "Большой транспорт", tr: "Büyük Nakliye", metal: 6000, crystal: 6000, deut: 0, img: "bolshoy_transport.png" },
+    { id: "light_fighter", ru: "Лёгкий истребитель", tr: "Hafif Avcı", metal: 3000, crystal: 1000, deut: 0, img: "legkiy_istrebitel.png" },
+    { id: "heavy_fighter", ru: "Тяжёлый истребитель", tr: "Ağır Avcı", metal: 6000, crystal: 4000, deut: 0, img: "tyazhely_istrebitel.png" },
+    { id: "cruiser", ru: "Крейсер", tr: "Kruvazör", metal: 20000, crystal: 7000, deut: 2000, img: "kreiser.png" },
+    { id: "battleship", ru: "Линкор", tr: "Komuta Gemisi", metal: 45000, crystal: 15000, deut: 0, img: "linkor.png" },
+    { id: "recycler", ru: "Переработчик", tr: "Geri Dönüşümcü", metal: 10000, crystal: 6000, deut: 2000, img: "recycler.png" },
+    { id: "bomber", ru: "Бомбардировщик", tr: "Bombardıman Gemisi", metal: 50000, crystal: 25000, deut: 15000, img: "bombardirovshik.png" },
+    { id: "destroyer", ru: "Уничтожитель", tr: "Muhrip", metal: 60000, crystal: 50000, deut: 15000, img: "unichtozhitel.png" },
+    { id: "battlecruiser", ru: "Линейный крейсер", tr: "Fırkateyn", metal: 30000, crystal: 40000, deut: 15000, img: "battlecruiser.png" },
+    { id: "death_star", ru: "Звезда смерти", tr: "Ölüm Yıldızı", metal: 5000000, crystal: 4000000, deut: 1000000, img: "death_star.png" },
+    { id: "reaper", ru: "Жнец", tr: "Azrail", metal: 85000, crystal: 55000, deut: 20000, img: "reaper.png" },
+    { id: "pathfinder", ru: "Первопроходец", tr: "Rehber", metal: 8000, crystal: 15000, deut: 8000, img: "pathfinder.png" }
+  ];
+  const LIFEFORM_RACES = ['humans', 'rocktal', 'mechas', 'kaelesh'];
+  let currentLifeformRace = localStorage.getItem('og_calc_lf_race_v1') || 'humans';
+  const KEYS = {
+    LANG: 'og_calc_lang_v2',
+    TRANSFORM: 'og_calc_transform_v2',
+    INPUTS_BUILD: 'og_calc_inputs_build_v2',
+    INPUTS_RESEARCH: 'og_calc_inputs_research_v2',
+    TM: 'og_calc_tm_v2',
+    BOXES: 'og_calc_boxes_v2',
+    SHIP_QTY: 'og_calc_ship_qty_v2',
+    ACTIVE_TAB: 'og_calc_active_tab_v2',
+    LF_INPUTS_BUILD: 'og_calc_lf_inputs_build_v1',
+    LF_INPUTS_RESEARCH: 'og_calc_lf_inputs_research_v1',
+    LF_RACE: 'og_calc_lf_race_v1',
+    ROCKTAL_MEGALITH_LEVEL: 'og_calc_rocktal_megalith_level',
+    ROCKTAL_MRC_LEVEL: 'og_calc_rocktal_mrc_level',
+    // НОВЫЙ КЛЮЧ
+    SUM_ALL_TABS: 'og_calc_sum_all_tabs'
+  };
+  // --- НОВАЯ ФУНКЦИЯ: calcBuildCostLF ---
+  // Вычисляет стоимость изучения/постройки для Форм Жизни (один уровень)
+  function calcBuildCostLF(techID, techLevel, techData, costRdc) {
+    if (techLevel < 1) return [0, 0, 0];
+    const data = techData[techID];
+    if (data === undefined) return [0, 0, 0];
+    const cost = [0, 0, 0];
+    costRdc = Math.min(0.99, costRdc);
+    for (let i = 0; i < 3; i++) { // i=0: metal, i=1: crystal, i=2: deuterium
+      // Формула: (1 - costRdc) * floor( base_resource * techLevel * factor^(techLevel - 1) )
+      cost[i] = Math.floor((1 - costRdc) * Math.floor(data[i] * techLevel * Math.pow(data[5 + i], (techLevel - 1))));
+    }
+    return cost;
+  }
+  // --- НОВАЯ ФУНКЦИЯ: getBuildCostLF ---
+  // Вычисляет стоимость изучения/постройки нескольких уровней техи для Форм Жизни
+  function getBuildCostLF(techID, techLevelFrom, techLevelTo, techData, ionTechLevel, rsrCostRdc, bldCostRdc = 0) {
+    let totalCost = [0, 0, 0];
+    const costReduction = Number(techID) % 1000 < 100 ? bldCostRdc : 0.01 * rsrCostRdc; // bldCostRdc для зданий, rsrCostRdc (в %) для исследований
+    if (Number(techLevelFrom) > Number(techLevelTo)) {
+      // Снос
+      for (let i = Number(techLevelFrom) - 1; i >= Math.max(Number(techLevelTo), 0); i--) {
+        const levelToUse = i === 0 ? 1 : i; // При сносе до 0 уровня, сносим с 1-го
+        const cost = calcDeconstrCostLF(techID, levelToUse, techData, ionTechLevel);
+        totalCost[0] += cost[0];
+        totalCost[1] += cost[1];
+        totalCost[2] += cost[2];
+      }
+    } else {
+      // Постройка
+      for (let i = Number(techLevelFrom) + 1; i <= Number(techLevelTo); i++) {
+        const cost = calcBuildCostLF(techID, i, techData, costReduction);
+        totalCost[0] += cost[0];
+        totalCost[1] += cost[1];
+        totalCost[2] += cost[2];
+      }
+    }
+    return totalCost;
+  }
+  // --- НОВАЯ ФУНКЦИЯ: calcDeconstrCostLF ---
+  // Вычисляет стоимость сноса постройки для Форм Жизни (один уровень)
+  function calcDeconstrCostLF(techID, techLevel, techData, ionTechLevel) {
+    const cost = [0, 0, 0];
+    if (techLevel < 0) { return cost; }
+    // Сносить можно только здания (ID % 1000 <= 100)
+    if (Number(techID) % 1000 > 100) { return cost; }
+    const data = techData[techID];
+    if (data === undefined) { return cost; }
+    const ionReduction = 1 - (0.04 * parseNumberInput(ionTechLevel)); // Используем parseNumberInput
+    for (let i = 0; i < 3; i++) {
+      // Формула: floor( floor( base_resource * techLevel * factor^(techLevel - 1) ) * (1 - 0.04 * ionTechLevel) )
+      cost[i] = Math.floor(Math.floor(data[i] * techLevel * Math.pow(data[5 + i], techLevel - 1)) * ionReduction);
+    }
+    return cost;
+  }
+  // --- НОВАЯ ФУНКЦИЯ: getBuildEnergyCostLF ---
+  // Вычисляет кол-во энергии, требуемое для изучения/постройки для Форм Жизни
+  function getBuildEnergyCostLF(techID, techLevel, techData, ionTechLevel, bldCostRdc = 0) {
+    if (techLevel < 1) return 0;
+    const data = techData[techID];
+    if (data === undefined) return 0;
+    // data[3] - base_energy, data[8] - energy_factor
+    let buildCost = Math.floor(Math.floor(data[3] * techLevel * Math.pow(data[8], techLevel)) * (1 - 0.04 * parseNumberInput(ionTechLevel))); // Используем parseNumberInput
+    if (bldCostRdc > 0) {
+      buildCost = Math.floor(buildCost * (1 - bldCostRdc));
+    }
+    return buildCost;
+  }
   // --- ФОРМАТИРОВАНИЕ ЧИСЕЛ С ТОЧКОЙ ---
   function formatWithDotsRaw(inputStr) {
     if (inputStr === null || inputStr === undefined) return '';
@@ -632,35 +703,36 @@
     span.textContent = label ? label[0] : '—';
     return span;
   }
-  // ✅ ИСПРАВЛЕНО: getLevelCost — работает правильно (есть)
+  // ✅ ИСПРАВЛЕНО: getLevelCost — теперь использует level * factor^(level-1) и Math.floor
   function getLevelCost(techId, level) {
     const data = TECH_COSTS[techId];
     if (!data) return { m: 0, c: 0, d: 0, points: 0 };
     const [baseM, baseC, baseD] = data;
     const fM = data[5], fC = data[6], fD = data[7];
-    const m = Math.ceil(baseM * Math.pow(fM, level - 1));
-    const c = Math.ceil(baseC * Math.pow(fC, level - 1));
-    const d = Math.ceil(baseD * Math.pow(fD, level - 1));
+    // Применение новой формулы
+    const m = Math.floor(baseM * level * Math.pow(fM, level - 1));
+    const c = Math.floor(baseC * level * Math.pow(fC, level - 1));
+    const d = Math.floor(baseD * level * Math.pow(fD, level - 1));
     const points = Math.round((m + c + d) / 1000);
     return { m, c, d, points };
   }
-  // ✅ ИСПРАВЛЕНО: getTotalCostLf теперь суммирует по уровням с ceil
+  // ✅ ИСПРАВЛЕНО: getTotalCostLf теперь использует новую getLevelCost
   function getTotalCostLf(techId, from, to) {
     if (from >= to || !TECH_COSTS[techId]) {
       return { m: 0, c: 0, d: 0, points: 0 };
     }
     let tm = 0, tc = 0, td = 0;
     for (let lvl = from + 1; lvl <= to; lvl++) {
-      const cost = getLevelCost(techId, lvl);
-      tm += cost.m;
-      tc += cost.c;
-      td += cost.d;
+        const cost = getLevelCost(techId, lvl); // Используем обновленную функцию
+        tm += cost.m;
+        tc += cost.c;
+        td += cost.d;
     }
     return {
-      m: tm,
-      c: tc,
-      d: td,
-      points: Math.round((tm + tc + td) / 1000)
+        m: tm,
+        c: tc,
+        d: td,
+        points: Math.round((tm + tc + td) / 1000)
     };
   }
   // ❌ УДАЛЕНА: getTotalCostUpToLevel — больше не используется
@@ -695,11 +767,11 @@
         inputEl.value = String(num);
       };
       inp.addEventListener('input', () => restrictTo99(inp));
-      inp.addEventListener('blur', () => {
+      inp.addEventListener('blur', function () {
         restrictTo99(inp);
         inp.dispatchEvent(new Event('change', { bubbles: true }));
       });
-      inp.addEventListener('paste', (e) => {
+      inp.addEventListener('paste', function (e) {
         e.preventDefault();
         const text = (e.clipboardData || window.clipboardData)?.getData('text') || '';
         let num = Number(text.trim().replace(/[^0-9]/g, ''));
@@ -711,8 +783,6 @@
       });
     });
   }
-  // ОСТАЛЬНОЙ КОД БЕЗ ИЗМЕНЕНИЙ (recalcAllLfBuildings, recalcAllLfResearch, и т.д.)
-  // ... (весь остальной код из вашего файла без изменений)
   // ===================================================================
   // ✅ ВСЕ ФУНКЦИИ РАСЧЁТА ОБНОВЛЕНЫ: ИСПОЛЬЗУЮТ formatNumberWithDots()
   // ===================================================================
@@ -741,39 +811,69 @@
         from = 0; to = 0;
       } else if (toInput === '') {
         const level = parseNumberInput(fromInput);
-        from = 1;
-        to = level + 1;
+        from = 0; // или 1? В ogame_life.txt: techLevelTo = 1*row.children[2].children[0].value; techLevelFrom = techLevelTo === 0 ? 0 : techLevelTo - 1;
+        to = level;
       } else {
         from = parseNumberInput(fromInput);
         to = parseNumberInput(toInput);
-        to = Math.max(from, to);
+        to = Math.max(from, to); // Убедимся, что "До" >= "От"
       }
       if (to - from > CONFIG.MAX_LEVEL_SPAN) to = from + CONFIG.MAX_LEVEL_SPAN;
       const planets = Math.max(1, parseNumberInput(tr.querySelector('input[data-type="planets"]').value) || 1);
-      const cost = getTotalCostLf(techId, from, to);
-      let m = Math.round(cost.m * planets);
-      let c = Math.round(cost.c * planets);
-      let d = Math.round(cost.d * planets);
-      let p = Math.round(cost.points * planets);
+      // Подготовим параметры для расчёта
+      let bldCostRdc = 0; // Бонус для зданий
+      let mrcRdc = 0;    // Бонус Центра минералов (только для зданий)
       if (currentLifeformRace === 'rocktal') {
-        let totalDiscount = 0;
-        if (megalithLevel > 0) {
-          totalDiscount += CONFIG.MEGALITH_DISCOUNT_PER_LEVEL * megalithLevel;
-        }
-        if (mineralCenterLevel > 0) {
-          totalDiscount += CONFIG.MINERAL_CENTER_DISCOUNT_PER_LEVEL * mineralCenterLevel;
-        }
-        if (totalDiscount > 0) {
-          m = Math.ceil(m * (1 - totalDiscount));
-          c = Math.ceil(c * (1 - totalDiscount));
-          d = Math.ceil(d * (1 - totalDiscount));
-          p = Math.round((m + c + d) / 1000);
+        // Мегалит: 1% за уровень (0.01 * уровень) на всё (здания и исследования)
+        bldCostRdc = 0.01 * megalithLevel;
+
+        // Центр минералов: 0.5% за уровень (0.005 * уровень) ТОЛЬКО на определённые здания
+        mrcRdc = 0.005 * mineralCenterLevel;
+        if (MRC_REDUCTABLE_IDS.has(techId % 1000)) { // Проверяем по ID базового здания (остаток от деления на 1000)
+          bldCostRdc += mrcRdc;
         }
       }
+      // Определяем, снос это или постройка
+      const isDeconstruct = from > to;
+      const ionTechLevel = isDeconstruct ? parseNumberInput(document.getElementById('ionTechLevel')?.value || '0') : 0; // Используем parseNumberInput
+      let resCost = [0, 0, 0];
+      let energyCost = 0;
+      let points = 0;
+      if (to > from) {
+        // Постройка
+        resCost = getBuildCostLF(techId, from, to, TECH_COSTS, 0 /*ionTechLevel*/, 0 /*rsrCostRdc*/, bldCostRdc);
+        energyCost = getBuildEnergyCostLF(techId, to, TECH_COSTS, 0 /*ionTechLevel*/, bldCostRdc);
+        points = Math.round((resCost[0] + resCost[1] + resCost[2]) / 1000.0);
+      } else if (from > to) {
+        // Снос
+        // Для сноса используем calcDeconstrCostLF для каждого уровня
+        for (let level = from; level > to; level--) {
+          const levelCost = calcDeconstrCostLF(techId, level, TECH_COSTS, ionTechLevel);
+          resCost[0] += levelCost[0];
+          resCost[1] += levelCost[1];
+          resCost[2] += levelCost[2];
+        }
+        // Энергия для сноса обычно не считается или равна 0.
+        energyCost = 0;
+        points = -1 * Math.round((resCost[0] + resCost[1] + resCost[2]) / 1000.0); // Отрицательные очки при сносе
+      } else {
+        // from === to, стоимость 0
+        points = 0;
+      }
+      // Умножаем на количество планет
+      let m = Math.round(resCost[0] * planets);
+      let c = Math.round(resCost[1] * planets);
+      let d = Math.round(resCost[2] * planets);
+      let p = Math.round(points * planets);
+      // Применяем скидку ещё раз, если была рассчитана через цикл (для сноса) или если формула не учитывала её напрямую
+      // В getBuildCostLF скидка уже применяется, для calcDeconstrCostLF (цикл) - тоже.
+      // points рассчитывается после, итоговая скидка для очков уже учтена в стоимости ресурсов.
+      // Обновляем ячейки строки
       tr.querySelector('td.m').innerHTML = formatSpanMetal(m);
       tr.querySelector('td.c').innerHTML = formatSpanCrystal(c);
       tr.querySelector('td.d').innerHTML = formatSpanDeut(d);
       tr.querySelector('td.p').textContent = formatNumberWithDots(p);
+      // Суммируем для итогов
       tm += m;
       tc += c;
       td += d;
@@ -790,10 +890,10 @@
     const tbody = document.getElementById('tbodyLfResearch');
     if (!tbody) return;
     let tm = 0, tc = 0, td = 0, tp = 0;
-    let megalithLevel = 0, mineralCenterLevel = 0;
+    let runoLevel = 0;
+    // Бонус Рунного Техно-ума (только для исследований)
     if (currentLifeformRace === 'rocktal') {
-      megalithLevel = parseNumberInput(document.getElementById('megalithLevel')?.value || '0');
-      mineralCenterLevel = parseNumberInput(document.getElementById('mrcLevel')?.value || '0');
+      runoLevel = parseNumberInput(document.getElementById('runoLevel')?.value || '0');
     }
     tbody.querySelectorAll('tr').forEach(tr => {
       const techId = Number(tr.querySelector('td:first-child')?.textContent) || 0;
@@ -811,39 +911,46 @@
         from = 0; to = 0;
       } else if (toInput === '') {
         const level = parseNumberInput(fromInput);
-        from = 1;
-        to = level + 1;
+        from = 0; // или 1?
+        to = level;
       } else {
         from = parseNumberInput(fromInput);
         to = parseNumberInput(toInput);
-        to = Math.max(from, to);
+        to = Math.max(from, to); // Убедимся, что "До" >= "От"
       }
       if (to - from > CONFIG.MAX_LEVEL_SPAN) to = from + CONFIG.MAX_LEVEL_SPAN;
       const planets = Math.max(1, parseNumberInput(tr.querySelector('input[data-type="planets"]').value) || 1);
-      const cost = getTotalCostLf(techId, from, to);
-      let m = Math.round(cost.m * planets);
-      let c = Math.round(cost.c * planets);
-      let d = Math.round(cost.d * planets);
-      let p = Math.round(cost.points * planets);
+      // Подготовим параметры для расчёта
+      let rsrCostRdc = 0; // Скидка на исследования
       if (currentLifeformRace === 'rocktal') {
-        let totalDiscount = 0;
-        if (megalithLevel > 0) {
-          totalDiscount += CONFIG.MEGALITH_DISCOUNT_PER_LEVEL * megalithLevel;
-        }
-        if (mineralCenterLevel > 0) {
-          totalDiscount += CONFIG.MINERAL_CENTER_DISCOUNT_PER_LEVEL * mineralCenterLevel;
-        }
-        if (totalDiscount > 0) {
-          m = Math.ceil(m * (1 - totalDiscount));
-          c = Math.ceil(c * (1 - totalDiscount));
-          d = Math.ceil(d * (1 - totalDiscount));
-          p = Math.round((m + c + d) / 1000);
-        }
+        // Бонус Мегалита НЕ применяется к исследованиям.
+        // Он применяется только к уникальным зданиям Рок'тал (см. описание в игре).
+        // Поэтому оставляем rsrCostRdc = 0.
+        // Добавляем бонус Рунного Техно-ума (если он есть)
+        rsrCostRdc = CONFIG.RUNO_TECH_DISCOUNT_PER_LEVEL * runoLevel * 100; // Преобразуем долю в проценты (0.0025 * уровень * 100)
       }
+      // Определяем, снос это или постройка (для исследований снос не применяется в обычном смысле, но формула может обрабатывать)
+      const isDeconstruct = from > to;
+      const ionTechLevel = isDeconstruct ? parseNumberInput(document.getElementById('ionTechLevel')?.value || '0') : 0; // Используем parseNumberInput
+      let resCost = [0, 0, 0];
+      let energyCost = 0;
+      let points = 0;
+      // Для исследований bldCostRdc = 0 (здание не сносится/строится)
+      resCost = getBuildCostLF(techId, from, to, TECH_COSTS, ionTechLevel, rsrCostRdc, 0 /*bldCostRdc*/);
+      // Энергия для исследований обычно не считается в этой таблице или равна 0.
+      energyCost = 0;
+      points = Math.round((resCost[0] + resCost[1] + resCost[2]) / 1000.0);
+      // Умножаем на количество планет
+      let m = Math.round(resCost[0] * planets);
+      let c = Math.round(resCost[1] * planets);
+      let d = Math.round(resCost[2] * planets);
+      let p = Math.round(points * planets);
+      // Обновляем ячейки строки
       tr.querySelector('td.m').innerHTML = formatSpanMetal(m);
       tr.querySelector('td.c').innerHTML = formatSpanCrystal(c);
       tr.querySelector('td.d').innerHTML = formatSpanDeut(d);
       tr.querySelector('td.p').textContent = formatNumberWithDots(p);
+      // Суммируем для итогов
       tm += m;
       tc += c;
       td += d;
@@ -881,7 +988,7 @@
       let p = Math.round(sum.points * planets);
       if (currentLifeformRace === 'rocktal') {
         let totalDiscount = 0;
-        const isResourceBuilding = [1, 2, 3, 6, 7, 8].includes(idx + 1);
+        const isResourceBuilding = [1, 2, 3, 6, 7, 8].includes(idx + 1); // Мет, Крист, Дейт, ФабРоб, ФабНано, Склады
         if (mineralCenterLevel > 0 && isResourceBuilding) {
           totalDiscount += 0.005 * mineralCenterLevel;
         }
@@ -1219,7 +1326,9 @@
       tdId.style.display = 'none';
       tdId.textContent = techId;
       tr.appendChild(tdId);
-      const name = getLfBuildingName(techId);
+      // --- ИСПРАВЛЕНО: Прямой вызов функции для получения имени ---
+      const lang = localStorage.getItem(KEYS.LANG) || 'ru';
+      const name = LF_BUILDING_NAMES[lang]?.[techId] || LF_BUILDING_NAMES.ru?.[techId] || `ID ${techId}`;
       const tdName = document.createElement('td');
       tdName.className = 'name-cell';
       const img = document.createElement('img');
@@ -1284,7 +1393,9 @@
       tdId.style.display = 'none';
       tdId.textContent = techId;
       tr.appendChild(tdId);
-      const name = getLfResearchName(techId);
+      // --- ИСПРАВЛЕНО: Прямой вызов функции для получения имени ---
+      const lang = localStorage.getItem(KEYS.LANG) || 'ru';
+      const name = LF_RESEARCH_NAMES[lang]?.[techId] || LF_RESEARCH_NAMES.ru?.[techId] || `ID ${techId}`;
       const tdName = document.createElement('td');
       tdName.className = 'name-cell';
       const img = document.createElement('img');
@@ -1333,71 +1444,71 @@
     attachLvlInputHandlers();
   }
   function attachLiveThousandsFormatting(selector) {
-  const inputs = document.querySelectorAll(selector);
-  inputs.forEach(inp => {
-    if (!inp || inp._thousandsBound) return;
-    inp._thousandsBound = true;
-    const formatAndSetCursor = function() {
-      const el = this;
-      const raw = el.value;
-      const selStart = el.selectionStart || 0;
-      let left = raw.slice(0, selStart).replace(/[^0-9\-]/g, '');
-      const leftDigitsCount = (left[0] === '-' ? left.slice(1) : left).length;
-      const formatted = formatWithDotsRaw(raw);
-      el.value = formatted;
-      let digitsSeen = 0, newPos = 0;
-      for (let i = 0; i < formatted.length; i++) {
-        if (/\d/.test(formatted[i])) digitsSeen++;
-        newPos++;
-        if (digitsSeen >= leftDigitsCount) break;
-      }
-      try {
-        el.setSelectionRange(newPos, newPos);
-      } catch (e) { }
-    };
-    inp.addEventListener('input', formatAndSetCursor);
-    inp.addEventListener('blur', function () {
-      const v = this.value;
-      if (v === '' || v === '-') {
-        this.value = '';
-        return;
-      }
-      const num = parseNumberInput(v);
-      this.value = num === 0 ? '' : formatWithDotsRaw(num);
-      this.dispatchEvent(new Event('change', { bubbles: true }));
+    const inputs = document.querySelectorAll(selector);
+    inputs.forEach(inp => {
+      if (!inp || inp._thousandsBound) return;
+      inp._thousandsBound = true;
+      const formatAndSetCursor = function() {
+        const el = this;
+        const raw = el.value;
+        const selStart = el.selectionStart || 0;
+        let left = raw.slice(0, selStart).replace(/[^0-9\-]/g, '');
+        const leftDigitsCount = (left[0] === '-' ? left.slice(1) : left).length;
+        const formatted = formatWithDotsRaw(raw);
+        el.value = formatted;
+        let newPos = 0;
+        for (let i = 0; i < formatted.length; i++) {
+          if (/\d/.test(formatted[i])) digitsSeen++;
+          newPos++;
+          if (digitsSeen >= leftDigitsCount) break;
+        }
+        try {
+          el.setSelectionRange(newPos, newPos);
+        } catch (e) { }
+      };
+      inp.addEventListener('input', formatAndSetCursor);
+      inp.addEventListener('blur', function () {
+        const v = this.value;
+        if (v === '' || v === '-') {
+          this.value = '';
+          return;
+        }
+        const num = parseNumberInput(v);
+        this.value = num === 0 ? '' : formatWithDotsRaw(num);
+        this.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      inp.addEventListener('keydown', function (e) {
+        const allowed = ['Backspace', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Delete', 'Tab', 'Home', 'End'];
+        if (e.ctrlKey || e.metaKey) return;
+        if (allowed.indexOf(e.key) !== -1) return;
+        if (e.key >= '0' && e.key <= '9') return;
+        if (e.key === '-' || e.key === '.' || e.key === ',') return;
+        e.preventDefault();
+      });
+      inp.addEventListener('paste', function (e) {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData)?.getData('text') || '';
+        const cleanedChunk = formatWithDotsRaw(text);
+        const start = this.selectionStart || 0;
+        const end = this.selectionEnd || start;
+        const before = this.value.slice(0, start);
+        const after = this.value.slice(end);
+        const nextRaw = before + cleanedChunk + after;
+        const next = formatWithDotsRaw(nextRaw);
+        this.value = next;
+        const caretTargetDigits = (before + cleanedChunk).replace(/[^0-9]/g, '').length;
+        let pos = 0, seen = 0;
+        while (pos < next.length && seen < caretTargetDigits) {
+          if (/\d/.test(next[pos])) seen++;
+          pos++;
+        }
+        try {
+          this.setSelectionRange(pos, pos);
+        } catch (e) { }
+        this.dispatchEvent(new Event('change', { bubbles: true }));
+      });
     });
-    inp.addEventListener('keydown', function (e) {
-      const allowed = ['Backspace', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Delete', 'Tab', 'Home', 'End'];
-      if (e.ctrlKey || e.metaKey) return;
-      if (allowed.indexOf(e.key) !== -1) return;
-      if (e.key >= '0' && e.key <= '9') return;
-      if (e.key === '-' || e.key === '.' || e.key === ',') return;
-      e.preventDefault();
-    });
-    inp.addEventListener('paste', function (e) {
-      e.preventDefault();
-      const text = (e.clipboardData || window.clipboardData)?.getData('text') || '';
-      const cleanedChunk = formatWithDotsRaw(text);
-      const start = this.selectionStart || 0;
-      const end = this.selectionEnd || start;
-      const before = this.value.slice(0, start);
-      const after = this.value.slice(end);
-      const nextRaw = before + cleanedChunk + after;
-      const next = formatWithDotsRaw(nextRaw);
-      this.value = next;
-      const caretTargetDigits = (before + cleanedChunk).replace(/[^0-9]/g, '').length;
-      let pos = 0, seen = 0;
-      while (pos < next.length && seen < caretTargetDigits) {
-        if (/\d/.test(next[pos])) seen++;
-        pos++;
-      }
-      try {
-        this.setSelectionRange(pos, pos);
-      } catch (e) { }
-      this.dispatchEvent(new Event('change', { bubbles: true }));
-    });
-  });
-}
+  }
   function saveShipQuantities() {
     try {
       const qtyMap = {};
@@ -1538,6 +1649,7 @@
     }
     const megInput = document.getElementById('megalithLevel');
     const mrcInput = document.getElementById('mrcLevel');
+    const runoInput = document.getElementById('runoLevel');
     if (megInput) {
       const applyMeg = () => {
         try { localStorage.setItem(KEYS.ROCKTAL_MEGALITH_LEVEL, String(parseNumberInput(megInput.value))); } catch (e) { }
@@ -1550,11 +1662,21 @@
     if (mrcInput) {
       const applyMrc = () => {
         try { localStorage.setItem(KEYS.ROCKTAL_MRC_LEVEL, String(parseNumberInput(mrcInput.value))); } catch (e) { }
-        recalcAllLfResearch(); recalcAllBuildings(); updateBoxesNeeded();
+        recalcAllLfBuildings(); recalcAllBuildings(); updateBoxesNeeded();
       };
       mrcInput.addEventListener('input', applyMrc);
       mrcInput.addEventListener('change', applyMrc);
       mrcInput.addEventListener('blur', applyMrc);
+    }
+    if (runoInput) {
+      const applyRuno = () => {
+        // Рунный Техно-ум влияет только на исследования LF, пересчитываем их
+        recalcAllLfResearch();
+        updateBoxesNeeded();
+      };
+      runoInput.addEventListener('input', applyRuno);
+      runoInput.addEventListener('change', applyRuno);
+      runoInput.addEventListener('blur', applyRuno);
     }
     document.getElementById('langRU')?.addEventListener('click', (ev) => {
       ev.stopPropagation();
@@ -1672,8 +1794,10 @@
       if (tmInput !== undefined) localStorage.setItem(KEYS.TM, tmInput);
       const megalithLevel = document.getElementById('megalithLevel')?.value;
       const mrcLevel = document.getElementById('mrcLevel')?.value;
+      const runoLevel = document.getElementById('runoLevel')?.value;
       if (megalithLevel !== undefined) localStorage.setItem(KEYS.ROCKTAL_MEGALITH_LEVEL, megalithLevel);
       if (mrcLevel !== undefined) localStorage.setItem(KEYS.ROCKTAL_MRC_LEVEL, mrcLevel);
+      // runoLevel не сохраняется в отдельный ключ, так как используется только в LF
     } catch (e) { }
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
@@ -1817,9 +1941,6 @@
         window.posY = 0;
       }
       const lang = localStorage.getItem(KEYS.LANG) || 'ru';
-      document.getElementById('langRU')?.classList.toggle('active', lang === 'ru');
-      document.getElementById('langTR')?.classList.toggle('active', lang === 'tr');
-      const savedTheme = localStorage.getItem('og_calc_theme') || 'dark';
       document.body.classList.toggle('theme-light', savedTheme === 'light');
       document.body.classList.toggle('theme-dark', savedTheme === 'dark');
     } catch (e) { }
@@ -1854,7 +1975,7 @@
       isSumAllTabsMode = false;
       document.getElementById('sumAllTabsCheckbox').checked = false;
       document.querySelectorAll("#tbodyBuildings input,#tbodyResearch input,#tbodyLfBuildings input,#tbodyLfResearch input,input[data-id]").forEach(i => { i.value = ''; });
-      ['boxesCount', 'boxValue', 'planetMetal', 'planetCrystal', 'planetDeut', 'tmInput', 'megalithLevel', 'mrcLevel'].forEach(id => {
+      ['boxesCount', 'boxValue', 'planetMetal', 'planetCrystal', 'planetDeut', 'tmInput', 'megalithLevel', 'mrcLevel', 'runoLevel'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
       });

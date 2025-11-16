@@ -43,12 +43,10 @@
             <div class="leftover" aria-live="polite" style="display:flex;gap:4px;align-items:center;">
               <span data-i18n="leftoverLabel">Остаток ТМ</span>
               <span id="leftoverTmValue" class="tm-left">—</span>
-              <!-- НОВЫЙ ЧЕКБОКС С САЛАТОВЫМ КОНТУРОМ -->
-              <!-- ЧЕКБОКС БЕЗ РАМКИ -->
-<label for="sumAllTabsCheckbox" style="display:flex;align-items:center;gap:4px;margin-left:12px;color:#7ad1ff;padding:2px 6px;border-radius:4px;font-size:11px;cursor:pointer;">
-  <input type="checkbox" id="sumAllTabsCheckbox" style="width:14px;height:14px;">
-  <span data-i18n="sumAllTabs">Сумма по всем вкладкам</span>
-</label>
+              <label for="sumAllTabsCheckbox" style="display:flex;align-items:center;gap:4px;margin-left:12px;color:#7ad1ff;padding:2px 6px;border-radius:4px;font-size:11px;cursor:pointer;">
+                <input type="checkbox" id="sumAllTabsCheckbox" style="width:14px;height:14px;">
+                <span data-i18n="sumAllTabs">Сумма по всем вкладкам</span>
+              </label>
             </div>
           </div>
         </div>
@@ -169,12 +167,16 @@
           <button class="lf-subtab-btn" data-subtab="lf-research" aria-selected="false" tabindex="-1" data-i18n="lfTabResearch">Исследования</button>
           <div class="lf-bonuses" id="lfBonuses" aria-live="polite">
             <div class="field">
-              <label for="megalithLevel" data-i18n="lfMegalith">Мегалит (ур.)</label>
+              <label for="megalithLevel" data-i18n="lfMegalith">Мегалит</label>
               <input id="megalithLevel" type="text" inputmode="numeric" min="0" max="100" placeholder="0">
             </div>
             <div class="field">
-              <label for="mrcLevel" data-i18n="lfMineralCenter">Центр минералов (ур.)</label>
+              <label for="mrcLevel" data-i18n="lfMineralCenter">Центр минералов</label>
               <input id="mrcLevel" type="text" inputmode="numeric" min="0" max="100" placeholder="0">
+            </div>
+            <div class="field">
+              <label for="runoLevel" data-i18n="lfRunoTech">Рунный Техно-ум</label>
+              <input id="runoLevel" type="text" inputmode="numeric" min="0" max="100" placeholder="0">
             </div>
           </div>
           <select id="lifeformSelect" class="lifeform-select" aria-label="Lifeform" data-i18n-label="lfSelectLabel">
@@ -255,9 +257,6 @@
     <button id="globalZoomReset" title="Сбросить масштаб и центрировать">⤦</button>
   </div>
   <script src="script.js"></script>
-  <!-- НОВЫЙ ЭЛЕМЕНТ ДЛЯ НОМЕРА РЕВИЗИИ -->
-  <div class="revision-badge">Version 1.03.0a</div>
+  <div class="revision-badge">Version 1.04.0a</div>
 </body>
-
 </html>
-
