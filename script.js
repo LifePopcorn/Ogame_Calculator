@@ -422,7 +422,7 @@
       locale: "tr-TR",
       boxesLabel: "Metal Paketi",
       needOpen: "Açılmalı:",
-      boxes: "kutu",
+      boxes: "Paketi",
       building: "Bina",
       from: "Başlangıч",
       to: "Hedef",
@@ -2194,4 +2194,5 @@
   } else {
     init();
   }
+
 })();
