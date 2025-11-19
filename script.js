@@ -1,51 +1,7 @@
-(function () {
+(function() {
     'use strict';
-    const CONFIG = {
-        TM_PER_BOX: 42000,
-        TM_PACKS: [{ tm: 12500000, priceTRY: 900 }],
-        METAL_EQ_CRYSTAL: 1.5,
-        METAL_EQ_DEUT: 3,
-        MAX_LEVEL_SPAN: 1000,
-        TM_PER_LEVEL_FACTOR: 2,
-        MEGALITH_DISCOUNT_PER_LEVEL: 0.01,
-        MINERAL_CENTER_DISCOUNT_PER_LEVEL: 0.005,
-        RUNO_TECH_DISCOUNT_PER_LEVEL: 0.0025
-    };
-    let isSumAllTabsMode = false;
-    let currentLifeformRace = localStorage.getItem('og_calc_lf_race_v1') || 'humans';
-    const KEYS = {
-        LANG: 'og_calc_lang_v2',
-        TRANSFORM: 'og_calc_transform_v2',
-        INPUTS_BUILD: 'og_calc_inputs_build_v2',
-        INPUTS_RESEARCH: 'og_calc_inputs_research_v2',
-        TM: 'og_calc_tm_v2',
-        BOXES: 'og_calc_boxes_v2',
-        SHIP_QTY: 'og_calc_ship_qty_v2',
-        ACTIVE_TAB: 'og_calc_active_tab_v2',
-        LF_INPUTS_BUILD: 'og_calc_lf_inputs_build_v1',
-        LF_INPUTS_RESEARCH: 'og_calc_lf_inputs_research_v1',
-        LF_RACE: 'og_calc_lf_race_v1',
-        ROCKTAL_MEGALITH_LEVEL: 'og_calc_rocktal_megalith_level',
-        ROCKTAL_MRC_LEVEL: 'og_calc_rocktal_mrc_level',
-        ROCKTAL_RUNO_LEVEL: 'og_calc_rocktal_runo_level',
-        SUM_ALL_TABS: 'og_calc_sum_all_tabs'
-    };
-    const LANGUAGE_NAMES = {
-        'en_GB': 'English (GB)',
-        'en_US': 'English (US)',
-        'ru': 'Русский',
-        'de': 'Deutsch',
-        'pl': 'Polski',
-        'es': 'Español',
-        'fr': 'Français',
-        'it': 'Italiano',
-        'nl': 'Nederlands',
-        'sk': 'Slovenčina',
-        'tr': 'Türkçe',
-        'pt': 'Português',
-        'bs': 'Bosnian'
-    };
-    const MRC_REDUCTABLE_IDS = new Set([1, 2, 3, 4, 12, 2001, 2002]);
+
+    // Стоимости технологий для жизниформ
     const TECH_COSTS_LF = {
         1001: [7, 2, 0, 0, 40, 1.2, 1.2, 0, 0, 1.21],
         1002: [5, 2, 0, 8, 40, 1.23, 1.23, 0, 1.02, 1.25],
@@ -168,11 +124,65 @@
         4117: [500000, 300000, 200000, 0, 13000, 1.5, 1.5, 1.5, 0, 1.3],
         4118: [300000, 180000, 120000, 0, 11000, 1.7, 1.7, 1.7, 0, 1.4]
     };
+
+    const CONFIG = {
+        TM_PER_BOX: 42000,
+        TM_PACKS: [{ tm: 12500000, priceTRY: 900 }],
+        METAL_EQ_CRYSTAL: 1.5,
+        METAL_EQ_DEUT: 3,
+        MAX_LEVEL_SPAN: 1000,
+        TM_PER_LEVEL_FACTOR: 2,
+        MEGALITH_DISCOUNT_PER_LEVEL: 0.01,
+        MINERAL_CENTER_DISCOUNT_PER_LEVEL: 0.005,
+        RUNO_TECH_DISCOUNT_PER_LEVEL: 0.0025
+    };
+
+    let isSumAllTabsMode = false;
+    let currentLifeformRace = localStorage.getItem('og_calc_lf_race_v1') || 'humans';
+
+    const KEYS = {
+        LANG: 'og_calc_lang_v2',
+        TRANSFORM: 'og_calc_transform_v2',
+        INPUTS_BUILD: 'og_calc_inputs_build_v2',
+        INPUTS_RESEARCH: 'og_calc_inputs_research_v2',
+        TM: 'og_calc_tm_v2',
+        BOXES: 'og_calc_boxes_v2',
+        SHIP_QTY: 'og_calc_ship_qty_v2',
+        ACTIVE_TAB: 'og_calc_active_tab_v2',
+        LF_INPUTS_BUILD: 'og_calc_lf_inputs_build_v1',
+        LF_INPUTS_RESEARCH: 'og_calc_lf_inputs_research_v1',
+        LF_RACE: 'og_calc_lf_race_v1',
+        ROCKTAL_MEGALITH_LEVEL: 'og_calc_rocktal_megalith_level',
+        ROCKTAL_MRC_LEVEL: 'og_calc_rocktal_mrc_level',
+        ROCKTAL_RUNO_LEVEL: 'og_calc_rocktal_runo_level',
+        SUM_ALL_TABS: 'og_calc_sum_all_tabs'
+    };
+
+    const LANGUAGE_NAMES = {
+        'en_GB': 'English (GB)',
+        'en_US': 'English (US)',
+        'ru': 'Русский',
+        'de': 'Deutsch',
+        'pl': 'Polski',
+        'es': 'Español',
+        'fr': 'Français',
+        'it': 'Italiano',
+        'nl': 'Nederlands',
+        'sk': 'Slovenčina',
+        'tr': 'Türkçe',
+        'pt': 'Português',
+        'bs': 'Bosnian'
+    };
+
+    const MRC_REDUCTABLE_IDS = new Set([1, 2, 3, 4, 12, 2001, 2002]);
+
+    const TECH_COSTS = TECH_COSTS_LF;
+
     const IMAGES_ROOT_PATH = 'images/';
     const IMAGES_BUILDINGS_PATH = 'images/buildings/';
     const IMAGES_RESEARCH_PATH = 'images/research/';
     const IMAGES_SHIPS_PATH = 'images/ships/';
-    const TECH_COSTS = TECH_COSTS_LF;
+
     const BUILDINGS_DATA = [
         { base: { m: 60, c: 15, d: 0 }, factor: 1.5 },
         { base: { m: 48, c: 24, d: 0 }, factor: 1.6 },
@@ -191,12 +201,14 @@
         { base: { m: 200, c: 0, d: 50 }, factor: 2.0 },
         { base: { m: 20000, c: 20000, d: 0 }, factor: 2.0 }
     ];
+
     const ICONS_BUILDINGS = [
         "metal_mine.png", "crystal_mine.png", "deuterium_synth.png", "solar_plant.png",
         "fusion_plant.png", "robot_factory.png", "nanite_factory.png", "shipyard.png",
         "metal_storage.png", "crystal_storage.png", "deuterium_tank.png", "research_lab.png",
         "terraformer.png", "alliance_depot.png", "dock.png", "missile_silo.png"
     ];
+
     const RESEARCH_DATA = [
         { base: { m: 200, c: 1000, d: 200 }, factor: 2.0 },
         { base: { m: 0, c: 400, d: 600 }, factor: 2.0 },
@@ -215,12 +227,14 @@
         { base: { m: 4000, c: 8000, d: 4000 }, factor: 1.75 },
         { base: { m: 0, c: 0, d: 0 }, factor: 3.0 }
     ];
+
     const ICONS_RESEARCH = [
         "spy.png", "computer.png", "weapons.png", "shield.png",
         "armor.png", "energy.png", "hyperspace.png", "combustion.png",
         "impulse.png", "hyperdrive.png", "laser.png", "ion.png",
         "plasma.png", "irn.png", "astro.png", "graviton.png"
     ];
+
     const shipList = [
         { id: "small_cargo", ru: "Малый транспорт", tr: "Küçük Nakliye", metal: 2000, crystal: 2000, deut: 0, img: "maly_transport.png" },
         { id: "large_cargo", ru: "Большой транспорт", tr: "Büyük Nakliye", metal: 6000, crystal: 6000, deut: 0, img: "bolshoy_transport.png" },
@@ -236,7 +250,9 @@
         { id: "reaper", ru: "Жнец", tr: "Azrail", metal: 85000, crystal: 55000, deut: 20000, img: "reaper.png" },
         { id: "pathfinder", ru: "Первопроходец", tr: "Rehber", metal: 8000, crystal: 15000, deut: 8000, img: "pathfinder.png" }
     ];
+
     const LIFEFORM_RACES = ['humans', 'rocktal', 'mechas', 'kaelesh'];
+
     const LF_BUILDING_FILENAMES = {
         1001: "residential_sector.png", 1002: "biosphere_farm.png", 1003: "research_center.png",
         1004: "science_academy.png", 1005: "nerve_calibration_center.png", 1006: "high_energy_melting.png",
@@ -255,6 +271,7 @@
         4007: "cloning_lab.png", 4008: "chrysalis_accelerator.png", 4009: "biomodifier.png",
         4010: "psionic_modulator.png", 4011: "ship_production_hall.png", 4012: "supra_refractor.png"
     };
+
     const LF_RESEARCH_FILENAMES = {
         1101: "intergalactic_envoys.png", 1102: "high_efficiency_extractors.png", 1103: "fusion_drives.png",
         1104: "stealth_field_generator.png", 1105: "orbital_dock.png", 1106: "research_ai.png",
@@ -281,6 +298,40 @@
         4113: "efficient_swarm_intelligence.png", 4114: "speed_boost_large_cargo.png", 4115: "gravitational_sensors.png",
         4116: "speed_boost_battleship.png", 4117: "psionic_shield_matrix.png", 4118: "kaelesh_explorer_enhancement.png"
     };
+
+    function getLangDict(lang) {
+        const dict = {};
+        if (LANG_OTHER && LANG_OTHER[lang]) {
+            Object.assign(dict, LANG_OTHER[lang]);
+        }
+        if (LANG_BUILDINGS && LANG_BUILDINGS[lang]) {
+            LANG_BUILDINGS[lang].forEach((name, idx) => {
+                dict[`building_${idx}`] = name;
+            });
+        }
+        if (LANG_RESEARCH && LANG_RESEARCH[lang]) {
+            LANG_RESEARCH[lang].forEach((name, idx) => {
+                dict[`research_${idx}`] = name;
+            });
+        }
+        if (LANG_LF_BUILDINGS && LANG_LF_BUILDINGS[lang]) {
+            Object.entries(LANG_LF_BUILDINGS[lang]).forEach(([id, name]) => {
+                dict[`lf_b_${id}`] = name;
+            });
+        }
+        if (LANG_LF_RESEARCH && LANG_LF_RESEARCH[lang]) {
+            Object.entries(LANG_LF_RESEARCH[lang]).forEach(([id, name]) => {
+                dict[`lf_r_${id}`] = name;
+            });
+        }
+        if (LANG_SHIPS && LANG_SHIPS[lang]) {
+            Object.entries(LANG_SHIPS[lang]).forEach(([id, name]) => {
+                dict[`ship_${id}`] = name;
+            });
+        }
+        return dict;
+    }
+
     function calcBuildCostLF(techID, techLevel, techData, costRdc) {
         if (techLevel < 1) return [0, 0, 0];
         const data = techData[techID];
@@ -292,6 +343,7 @@
         }
         return cost;
     }
+
     function getBuildCostLF(techID, techLevelFrom, techLevelTo, techData, ionTechLevel, rsrCostRdc, bldCostRdc = 0) {
         let totalCost = [0, 0, 0];
         const costReduction = Number(techID) % 1000 < 100 ? bldCostRdc : 0.01 * rsrCostRdc;
@@ -313,6 +365,7 @@
         }
         return totalCost;
     }
+
     function calcDeconstrCostLF(techID, techLevel, techData, ionTechLevel) {
         const cost = [0, 0, 0];
         if (techLevel < 0) { return cost; }
@@ -325,6 +378,7 @@
         }
         return cost;
     }
+
     function getBuildEnergyCostLF(techID, techLevel, techData, ionTechLevel, bldCostRdc = 0) {
         if (techLevel < 1) return 0;
         const data = techData[techID];
@@ -335,6 +389,7 @@
         }
         return buildCost;
     }
+
     function formatWithDotsRaw(inputStr) {
         if (inputStr === null || inputStr === undefined) return '';
         const s = String(inputStr);
@@ -348,10 +403,12 @@
         }
         return sign + out;
     }
+
     function formatNumberWithDots(n) {
         if (n === null || n === undefined || isNaN(n)) return '0';
         return formatWithDotsRaw(Math.round(Number(n) || 0));
     }
+
     function parseNumberInput(s) {
         if (s === null || s === undefined) return 0;
         const str = String(s).trim();
@@ -363,27 +420,32 @@
         const safe = Math.min(num, Number.MAX_SAFE_INTEGER);
         return negative ? -safe : safe;
     }
+
     function formatSpanMetal(n) {
         const span = document.createElement('span');
         span.className = 'val-metal';
         span.textContent = formatNumberWithDots(n);
         return span;
     }
+
     function formatSpanCrystal(n) {
         const span = document.createElement('span');
         span.className = 'val-crystal';
         span.textContent = formatNumberWithDots(n);
         return span;
     }
+
     function formatSpanDeut(n) {
         const span = document.createElement('span');
         span.className = 'val-deut';
         span.textContent = formatNumberWithDots(n);
         return span;
     }
+
     function convertToMetal(m, c, d) {
         return (m || 0) + (c || 0) * CONFIG.METAL_EQ_CRYSTAL + (d || 0) * CONFIG.METAL_EQ_DEUT;
     }
+
     function debounce(fn, wait) {
         let t = null;
         return function (...a) {
@@ -391,6 +453,7 @@
             t = setTimeout(() => fn.apply(this, a), wait);
         };
     }
+
     function createImageFallbackEl(label) {
         const span = document.createElement('span');
         span.className = 'icon-fallback';
@@ -398,6 +461,7 @@
         span.textContent = label ? label[0] : '—';
         return span;
     }
+
     function getLevelCost(techId, level) {
         const data = TECH_COSTS[techId];
         if (!data) return { m: 0, c: 0, d: 0, points: 0 };
@@ -409,6 +473,7 @@
         const points = Math.round((m + c + d) / 1000);
         return { m, c, d, points };
     }
+
     function getTotalCostLf(techId, from, to) {
         if (from >= to || !TECH_COSTS[techId]) {
             return { m: 0, c: 0, d: 0, points: 0 };
@@ -427,6 +492,7 @@
             points: Math.round((tm + tc + td) / 1000)
         };
     }
+
     function geomSum(base, factor, from, to) {
         const len = Math.max(0, to - from);
         if (len <= 0) return { m: 0, c: 0, d: 0, points: 0 };
@@ -443,9 +509,11 @@
         const points = Math.round((m + c + d) / 1000);
         return { m, c, d, points, levels: count };
     }
+
     function getActiveTab() {
         return document.querySelector('.tab-btn.active')?.dataset.tab || 'buildings';
     }
+
     function attachLvlInputHandlers() {
         document.querySelectorAll('.lvl-input').forEach(inp => {
             if (inp._lvlBound) return;
@@ -474,6 +542,7 @@
             });
         });
     }
+
     function recalcAllLfBuildings() {
         const tbody = document.getElementById('tbodyLfBuildings');
         if (!tbody) return;
@@ -576,6 +645,7 @@
         document.getElementById('sumTotalMetalLfB').textContent = formatNumberWithDots(Math.round(convertToMetal(tm, tc, td)));
         updateBoxesNeeded();
     }
+
     function recalcAllLfResearch() {
         const tbody = document.getElementById('tbodyLfResearch');
         if (!tbody) return;
@@ -659,6 +729,7 @@
         document.getElementById('sumTotalMetalLfR').textContent = formatNumberWithDots(Math.round(convertToMetal(tm, tc, td)));
         updateBoxesNeeded();
     }
+
     function recalcAllBuildings() {
         const tbodyB = document.getElementById('tbodyBuildings');
         if (!tbodyB) return;
@@ -723,6 +794,7 @@
         document.getElementById('sumTotalMetalB').textContent = formatNumberWithDots(Math.round(convertToMetal(tm, tc, td)));
         updateBoxesNeeded();
     }
+
     function recalcAllResearch() {
         const tbodyR = document.getElementById('tbodyResearch');
         if (!tbodyR) return;
@@ -771,6 +843,7 @@
         document.getElementById('tmTotal').textContent = (dict.totalTMLabel || 'Итого: ') + formatNumberWithDots(totalTM);
         updateBoxesNeeded();
     }
+
     function computeFleet() {
         try {
             const factorC = CONFIG.METAL_EQ_CRYSTAL;
@@ -849,6 +922,7 @@
             updateBoxesNeeded();
         } catch (e) { }
     }
+
     function renderTable() {
         const tableBody = document.querySelector("#shipsTable tbody");
         if (!tableBody) return;
@@ -923,6 +997,7 @@
             inp._qtyBound = true;
         });
     }
+
     function buildRowsBuildings() {
         const tbodyB = document.getElementById('tbodyBuildings');
         if (!tbodyB) return;
@@ -986,6 +1061,7 @@
         tbodyB.appendChild(frag);
         attachLvlInputHandlers();
     }
+
     function buildRowsResearch() {
         const tbodyR = document.getElementById('tbodyResearch');
         if (!tbodyR) return;
@@ -1046,6 +1122,7 @@
         tbodyR.appendChild(frag);
         attachLvlInputHandlers();
     }
+
     function buildRowsLfBuildings() {
         const tbody = document.getElementById('tbodyLfBuildings');
         if (!tbody) return;
@@ -1110,6 +1187,7 @@
         tbody.appendChild(frag);
         attachLvlInputHandlers();
     }
+
     function buildRowsLfResearch() {
         const tbody = document.getElementById('tbodyLfResearch');
         if (!tbody) return;
@@ -1174,6 +1252,7 @@
         tbody.appendChild(frag);
         attachLvlInputHandlers();
     }
+
     function attachLiveThousandsFormatting(selector) {
         const inputs = document.querySelectorAll(selector);
         inputs.forEach(inp => {
@@ -1241,6 +1320,7 @@
             });
         });
     }
+
     function saveShipQuantities() {
         try {
             const qtyMap = {};
@@ -1250,6 +1330,7 @@
             localStorage.setItem(KEYS.SHIP_QTY, JSON.stringify(qtyMap));
         } catch (e) { }
     }
+
     function getSumAllTabsMetalValue() {
         let total = 0;
         try {
@@ -1264,6 +1345,7 @@
         }
         return total;
     }
+
     let __inputsHandlersAttached = false;
     function attachInputsHandlers() {
         if (__inputsHandlersAttached) return;
@@ -1283,11 +1365,13 @@
         const debouncedRecalcLfResearch = debounce(() => {
             if (getActiveTab() === 'lifeforms') recalcAllLfResearch();
         }, 120);
+
         document.getElementById('sumAllTabsCheckbox')?.addEventListener('change', (e) => {
             isSumAllTabsMode = e.target.checked;
             try { localStorage.setItem(KEYS.SUM_ALL_TABS, String(isSumAllTabsMode)); } catch (e) { }
             updateBoxesNeeded();
         });
+
         const tbodyB = document.getElementById('tbodyBuildings');
         if (tbodyB) {
             tbodyB.addEventListener('input', e => {
@@ -1307,6 +1391,7 @@
             });
             tbodyB.addEventListener('change', () => debouncedRecalcBuildings());
         }
+
         const tbodyR = document.getElementById('tbodyResearch');
         if (tbodyR) {
             tbodyR.addEventListener('input', e => {
@@ -1316,6 +1401,7 @@
             });
             tbodyR.addEventListener('change', () => debouncedRecalcResearch());
         }
+
         const tmEl = document.getElementById('tmInput');
         if (tmEl) {
             tmEl.addEventListener('input', () => debouncedRecalcResearch());
@@ -1326,6 +1412,7 @@
                 } catch (e) { }
             });
         }
+
         ['boxesCount', 'boxValue'].forEach(id => {
             const el = document.getElementById(id);
             if (!el) return;
@@ -1337,6 +1424,7 @@
                 debouncedComputeFleet();
             });
         });
+
         const tbodyLfB = document.getElementById('tbodyLfBuildings');
         if (tbodyLfB) {
             tbodyLfB.addEventListener('input', e => {
@@ -1347,6 +1435,7 @@
             });
             tbodyLfB.addEventListener('change', () => { debouncedRecalcLfBuildings(); persistLfInputs(); });
         }
+
         const tbodyLfR = document.getElementById('tbodyLfResearch');
         if (tbodyLfR) {
             tbodyLfR.addEventListener('input', e => {
@@ -1357,6 +1446,7 @@
             });
             tbodyLfR.addEventListener('change', () => { debouncedRecalcLfResearch(); persistLfInputs(); });
         }
+
         const sel = document.getElementById('lifeformSelect');
         if (sel) {
             sel.addEventListener('change', (e) => {
@@ -1374,6 +1464,7 @@
                 updateBoxesNeeded();
             });
         }
+
         const megInput = document.getElementById('megalithLevel');
         const mrcInput = document.getElementById('mrcLevel');
         const runoInput = document.getElementById('runoLevel');
@@ -1404,6 +1495,7 @@
             runoInput.addEventListener('change', applyRuno);
             runoInput.addEventListener('blur', applyRuno);
         }
+
         document.querySelectorAll('#tabsLeft .tab-btn').forEach(btn => {
             btn.addEventListener('click', (ev) => {
                 ev.stopPropagation();
@@ -1417,6 +1509,7 @@
                 ensureProperPositioning();
             });
         });
+
         document.querySelectorAll('.lf-subtab-btn').forEach(btn => {
             btn.addEventListener('click', (ev) => {
                 ev.stopPropagation();
@@ -1433,6 +1526,7 @@
                 } catch (e) { }
             });
         });
+
         const langToggle = document.getElementById('langToggle');
         const langDropdownMenu = document.getElementById('langDropdownMenu');
         const currentLangEl = document.getElementById('currentLang');
@@ -1473,6 +1567,7 @@
             });
         }
     }
+
     function persistLfInputs() {
         try {
             const buildRows = document.querySelectorAll('#tbodyLfBuildings tr');
@@ -1495,6 +1590,7 @@
             localStorage.setItem(KEYS.LF_INPUTS_RESEARCH, JSON.stringify(r));
         } catch (e) { }
     }
+
     function applyLang(lang) {
         if (!lang) return;
         const currentLang = localStorage.getItem(KEYS.LANG) || 'ru';
@@ -1680,6 +1776,7 @@
         updateBoxesNeeded();
         ensureProperPositioning();
     }
+
     function ensureProperPositioning() {
         window.requestAnimationFrame(() => {
             window.requestAnimationFrame(() => {
@@ -1696,6 +1793,7 @@
             });
         });
     }
+
     function restoreFromStorage() {
         try {
             buildRowsBuildings();
@@ -1800,6 +1898,7 @@
             }
         } catch (e) { }
     }
+
     function centerWrapper() {
         const wrapperEl = document.getElementById('tableWrapper');
         if (!wrapperEl) return;
@@ -1814,6 +1913,7 @@
         try { localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale, posX: window.posX, posY: window.posY })); } catch (e) { }
         positionTabs();
     }
+
     function fullResetToZero() {
         try {
             localStorage.removeItem(KEYS.INPUTS_BUILD);
@@ -1874,6 +1974,7 @@
             centerWrapper();
         } catch (e) { }
     }
+
     function positionTabs() {
         try {
             const tabsLeftEl = document.getElementById('tabsLeft');
@@ -1888,6 +1989,7 @@
             tabsLeftEl.style.top = `${Math.max(0, Math.round(offsetWithinWrapper + extra))}px`;
         } catch (e) { }
     }
+
     function updateBoxesNeeded() {
         try {
             const boxesNeededEl = document.getElementById('boxesNeeded');
@@ -1911,6 +2013,7 @@
             updateBoxesCostTL(targetMetal);
         } catch (e) { }
     }
+
     function updateBoxesCostTL(targetMetal = null) {
         try {
             const boxesCostTLEl = document.getElementById('boxesCostTL');
@@ -1956,6 +2059,7 @@
             leftoverTmValueEl && (leftoverTmValueEl.textContent = leftoverTM > 0 ? formatWithDotsRaw(leftoverTM) : '0');
         } catch (e) { }
     }
+
     function getCurrentTotalMetalValue() {
         try {
             const active = document.querySelector('.tab-btn.active')?.dataset.tab;
@@ -1978,6 +2082,7 @@
             return 0;
         }
     }
+
     function setActiveTab(tab) {
         document.querySelectorAll('.tab-btn').forEach(b => {
             const isActive = (b.dataset.tab === tab);
@@ -2041,6 +2146,7 @@
             localStorage.setItem(KEYS.ACTIVE_TAB, tab);
         } catch (e) { }
     }
+
     (function () {
         const dragHandle = document.getElementById('dragHandle');
         const wrapper = document.getElementById('tableWrapper');
@@ -2093,16 +2199,30 @@
             if (e.key === 'ArrowUp') { window.posY = (window.posY || 0) - step; }
             if (e.key === 'ArrowDown') { window.posY = (window.posY || 0) + step; }
             if (!rafId) { rafId = requestAnimationFrame(applyTransform); }
-            try { localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale || 1, posX: window.posX || 0, posY: window.posY || 0 })); } catch (e) { }
+            try { localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale, posX: window.posX, posY: window.posY })); } catch (e) { }
             positionTabs();
         });
     })();
+
     function init() {
+        try {
+            if (document.readyState !== 'loading') {
+                initApplication();
+            } else {
+                document.addEventListener('DOMContentLoaded', initApplication);
+            }
+        } catch (e) {
+            console.error("Ошибка при инициализации приложения:", e);
+        }
+    }
+
+    function initApplication() {
         try {
             attachLiveThousandsFormatting('#boxesCount, #boxValue, #planetMetal, #planetCrystal, #planetDeut, input[data-id]');
             attachLvlInputHandlers();
             attachInputsHandlers();
             restoreFromStorage();
+
             const ZOOM_STEP = 1.08;
             document.getElementById('globalZoomIn')?.addEventListener('click', () => {
                 window.scale = Math.min(3.5, (window.scale || 1) * ZOOM_STEP);
@@ -2111,7 +2231,13 @@
                     wrapper.style.transform = `translate(${window.posX || 0}px, ${window.posY || 0}px) scale(${window.scale || 1})`;
                     wrapper.style.willChange = 'transform';
                 }
-                try { localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale || 1, posX: window.posX || 0, posY: window.posY || 0 })); } catch (e) { }
+                try {
+                    localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({
+                        scale: window.scale || 1,
+                        posX: window.posX || 0,
+                        posY: window.posY || 0
+                    }));
+                } catch (e) { }
                 positionTabs();
             });
             document.getElementById('globalZoomOut')?.addEventListener('click', () => {
@@ -2121,24 +2247,32 @@
                     wrapper.style.transform = `translate(${window.posX || 0}px, ${window.posY || 0}px) scale(${window.scale || 1})`;
                     wrapper.style.willChange = 'transform';
                 }
-                try { localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale || 1, posX: window.posX || 0, posY: window.posY || 0 })); } catch (e) { }
+                try {
+                    localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({
+                        scale: window.scale || 1,
+                        posX: window.posX || 0,
+                        posY: window.posY || 0
+                    }));
+                } catch (e) { }
                 positionTabs();
             });
             document.getElementById('globalZoomReset')?.addEventListener('click', () => {
                 fullResetToZero();
                 positionTabs();
             });
+
             window.addEventListener('resize', positionTabs);
             positionTabs();
+
             const savedTab = localStorage.getItem(KEYS.ACTIVE_TAB) || 'buildings';
             setActiveTab(savedTab);
+
             const currentLang = localStorage.getItem(KEYS.LANG) || 'ru';
             document.getElementById('currentLang').textContent = LANGUAGE_NAMES[currentLang] || currentLang.toUpperCase();
-        } catch (e) { }
+        } catch (e) {
+            console.error("Ошибка при запуске приложения:", e);
+        }
     }
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
+
+    init();
 })();
