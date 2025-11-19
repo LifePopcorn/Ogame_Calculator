@@ -490,7 +490,7 @@ input[type="text"] {
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--border-radius-md);
   box-shadow: var(--shadow-md);
-  min-width: 120px;
+  min-width: 160px;
   z-index: 1001;
   display: none;
   flex-direction: column;
@@ -499,6 +499,9 @@ input[type="text"] {
   padding: 4px;
 }
 .lang-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 6px 12px;
   border-radius: var(--border-radius-sm);
   border: 1px solid transparent;
@@ -520,6 +523,42 @@ input[type="text"] {
 }
 .lang-option.active:hover {
   filter: brightness(1.05);
+}
+.lang-icon-img {
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+    margin-right: 4px; /* или 6px для опций */
+    border-radius: 2px; /* По желанию */
+}
+/* Для опций в выпадающем списке */
+.lang-option .lang-icon-img {
+    margin-right: 6px; /* Убедитесь, что здесь нужный отступ */
+}
+.lang-text {
+  vertical-align: middle;
+}
+#langToggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--accent);
+  background: rgba(30, 144, 255, 0.12);
+  cursor: pointer;
+  color: #cfe0ff;
+  font-weight: 700;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+#langToggle:hover {
+  background: rgba(30, 144, 255, 0.25);
+}
+#currentLang {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 .dropdown-icon {
   font-size: 8px;
