@@ -21,33 +21,59 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
   color: #e6edf3;
-  background-image:
-    url("./images/wallpaper.jpg"),
-    linear-gradient(180deg, #071021, #0b1220);
-  background-size: cover, cover, auto;
-  background-position: center center, center center, center;
-  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-image: url("./images/wallpaper.jpg"), linear-gradient(180deg, #071021, #0b1220);
+  background-size: cover, cover;
+  background-position: center;
+  background-repeat: no-repeat;
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
+
+/* === УСТРАНЕНИЕ РАЗМЫТИЯ === */
+#tableWrapper,
+#tableWrapper *,
+#tableWrapper img,
+#tableWrapper canvas,
+#tableWrapper video {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  -webkit-font-smoothing: none !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: optimizeSpeed !important;
+  transform-origin: 0 0;
+}
+
+.table-wrapper input,
+.table-wrapper button,
+.table-wrapper select,
+.table-wrapper textarea {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ОСНОВНОЙ КОНТЕЙНЕР */
 .table-wrapper {
   position: absolute;
   left: 180px;
   top: 50px;
-  padding: 8px;
+  padding: 0;
   max-width: calc(100vw - 220px);
-  transform-origin: 0 0;
   touch-action: none;
   z-index: 1000;
   background: transparent;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: pixelated;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   backface-visibility: hidden;
   will-change: transform;
+  transition: none !important;
+  backface-visibility: hidden;
+  perspective: 1px;
+  transform-style: preserve-3d;
 }
+
+/* ОСТАЛЬНЫЕ СТИЛИ — БЕЗ ИЗМЕНЕНИЙ */
 .top-controls {
   display: flex;
   align-items: center;
@@ -70,6 +96,10 @@ body {
   cursor: grab;
   color: #cfe0ff;
   user-select: none;
+  transition: all 0.2s ease;
+}
+.drag-handle:active {
+  cursor: grabbing;
 }
 .header-bar {
   display: flex;
@@ -129,8 +159,8 @@ body {
   z-index: 1001;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 6px 6px;
+  gap: 4px;
+  padding: 4px 6px;
   width: 140px;
   border-radius: var(--border-radius-lg);
   background: rgba(20, 24, 32, 0.78);
@@ -142,7 +172,7 @@ body {
 .tab-switch {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   align-items: stretch;
   margin: 0;
 }
@@ -160,6 +190,7 @@ body {
   transition: all 0.2s ease;
   box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.25), inset 0 -1px 1.5px rgba(0, 0, 0, 0.25), var(--shadow-sm);
   -webkit-font-smoothing: antialiased;
+  will-change: transform, filter;
 }
 .tab-btn:hover {
   transform: translateY(-0.5px);
@@ -267,6 +298,7 @@ body {
   color: #e6edf3;
   height: 22px;
   font-size: 12px;
+  font-family: inherit;
   border-radius: 4px;
 }
 #tabBuildings th:last-child,
@@ -331,6 +363,14 @@ input[type="text"] {
   color: #e6edf3;
   height: 22px;
   font-size: 12px;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+.lvl-input:focus,
+.planet-input:focus,
+input[type="text"]:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 .planet-input {
   width: 60px;
@@ -343,7 +383,6 @@ input[type="text"] {
   height: 20px;
   vertical-align: middle;
   margin-right: 6px;
-  image-rendering: auto;
 }
 .icon-dm {
   width: 26px;
@@ -436,12 +475,12 @@ input[type="text"] {
   right: 12px;
   z-index: 10000;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
   background: rgba(18, 22, 30, 0.75);
   border-radius: 8px;
-  padding: 6px;
+  padding: 4px;
   border: 1px solid var(--border-color);
 }
 .zoom-controls button {
@@ -470,13 +509,13 @@ input[type="text"] {
 }
 .language-container {
   position: fixed;
-  top: 12px;
+  top: 48px;
   right: 12px;
   z-index: 10000;
   display: flex;
   align-items: flex-end;
   gap: 8px;
-  margin-top: 40px;
+  margin-top: 4px;
 }
 .lang-dropdown {
   position: relative;
@@ -525,15 +564,13 @@ input[type="text"] {
   filter: brightness(1.05);
 }
 .lang-icon-img {
-    width: 18px;
-    height: 18px;
-    vertical-align: middle;
-    margin-right: 4px; /* или 6px для опций */
-    border-radius: 2px; /* По желанию */
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  margin-right: 4px;
 }
-/* Для опций в выпадающем списке */
 .lang-option .lang-icon-img {
-    margin-right: 6px; /* Убедитесь, что здесь нужный отступ */
+  margin-right: 6px;
 }
 .lang-text {
   vertical-align: middle;
@@ -595,6 +632,7 @@ input[type="text"] {
   box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.25), inset 0 -1px 1.5px rgba(0, 0, 0, 0.25), var(--shadow-sm);
   transition: all 0.2s ease;
   -webkit-font-smoothing: antialiased;
+  will-change: transform, filter;
 }
 .lf-subtab-btn:hover {
   filter: brightness(1.12) saturate(1.08);
@@ -655,6 +693,7 @@ input[type="text"] {
   color: #e6edf3;
   font-size: 12px;
   text-align: right;
+  font-family: inherit;
 }
 .subtab-content {
   display: none;
