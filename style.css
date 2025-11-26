@@ -26,16 +26,10 @@ body {
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-
-/* === УСТРАНЕНИЕ РАЗМЫТИЯ === */
 #tableWrapper,
-#tableWrapper *,
-#tableWrapper img,
-#tableWrapper canvas,
-#tableWrapper video {
+.table-wrapper {
   image-rendering: -webkit-optimize-contrast;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
@@ -44,18 +38,38 @@ body {
   -moz-osx-font-smoothing: grayscale !important;
   text-rendering: optimizeSpeed !important;
   transform-origin: 0 0;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  will-change: transform;
 }
-
+#tableWrapper *,
+.table-wrapper * {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  -webkit-font-smoothing: none !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: optimizeSpeed !important;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
 .table-wrapper input,
 .table-wrapper button,
 .table-wrapper select,
 .table-wrapper textarea {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: optimizeLegibility !important;
 }
-
-/* ОСНОВНОЙ КОНТЕЙНЕР */
+.table-wrapper .icon,
+.table-wrapper .icon-dm,
+.table-wrapper .icon-fallback {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
 .table-wrapper {
   position: absolute;
   left: 180px;
@@ -65,15 +79,8 @@ body {
   touch-action: none;
   z-index: 1000;
   background: transparent;
-  backface-visibility: hidden;
-  will-change: transform;
   transition: none !important;
-  backface-visibility: hidden;
-  perspective: 1px;
-  transform-style: preserve-3d;
 }
-
-/* ОСТАЛЬНЫЕ СТИЛИ — БЕЗ ИЗМЕНЕНИЙ */
 .top-controls {
   display: flex;
   align-items: center;
@@ -189,7 +196,6 @@ body {
   letter-spacing: 0.2px;
   transition: all 0.2s ease;
   box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.25), inset 0 -1px 1.5px rgba(0, 0, 0, 0.25), var(--shadow-sm);
-  -webkit-font-smoothing: antialiased;
   will-change: transform, filter;
 }
 .tab-btn:hover {
@@ -229,7 +235,6 @@ body {
   flex-direction: column;
   border: 2px solid #253041;
   border-top: none;
-  overflow: visible;
   width: 100%;
 }
 #fleetFrame {
@@ -460,15 +465,6 @@ input[type="text"]:focus {
   border-radius: 4px;
   color: #cfe0ff;
 }
-.name-cell,
-.ship-name,
-.icon-fallback,
-.lf-bonuses label {
-  user-select: text;
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
-}
 .zoom-controls {
   position: fixed;
   top: 12px;
@@ -631,7 +627,6 @@ input[type="text"]:focus {
   font-size: 12px;
   box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.25), inset 0 -1px 1.5px rgba(0, 0, 0, 0.25), var(--shadow-sm);
   transition: all 0.2s ease;
-  -webkit-font-smoothing: antialiased;
   will-change: transform, filter;
 }
 .lf-subtab-btn:hover {

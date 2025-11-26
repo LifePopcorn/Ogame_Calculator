@@ -10,36 +10,36 @@
 <div class="table-wrapper" id="tableWrapper" role="region" aria-label="OGame калькулятор" tabindex="-1">
 <header class="top-controls">
 <div class="top-controls-left">
-<div class="drag-handle" id="dragHandle" tabindex="0" role="button" aria-label="Переместить таблицу">Переместить таблицу</div>
+<div class="drag-handle" id="dragHandle" tabindex="0" role="button" aria-label="Переместить таблицу" data-i18n="dragHandleLabel">Переместить таблицу</div>
 </div>
 </header>
 <nav class="tabs-left" id="tabsLeft" aria-label="Навигация по разделам">
 <div class="tab-switch" role="tablist" aria-label="Tabs">
-<button class="tab-btn active" data-tab="buildings" aria-selected="true" role="tab" tabindex="0">Постройки</button>
-<button class="tab-btn" data-tab="research" aria-selected="false" role="tab" tabindex="-1">Исследования</button>
-<button class="tab-btn" data-tab="fleet" aria-selected="false" role="tab" tabindex="-1">Флот</button>
-<button class="tab-btn" data-tab="lifeforms" aria-selected="false" role="tab" tabindex="-1">Формы жизни</button>
+<button class="tab-btn active" data-tab="buildings" aria-selected="true" data-i18n="tabBuildings" role="tab" tabindex="0">Постройки</button>
+<button class="tab-btn" data-tab="research" aria-selected="false" data-i18n="tabResearch" role="tab" tabindex="-1">Исследования</button>
+<button class="tab-btn" data-tab="fleet" aria-selected="false" data-i18n="tabFleet" role="tab" tabindex="-1">Флот</button>
+<button class="tab-btn" data-tab="lifeforms" aria-selected="false" data-i18n="tabLifeforms" role="tab" tabindex="-1">Формы жизни</button>
 </div>
 </nav>
 <div class="header-bar" id="headerBar">
 <div class="header-left">
 <div class="box-row" id="globalBoxRow">
-<label class="label" id="lblBoxes"><img src="images/metal_box.png" class="icon" alt=""> <span>Коробка с металлом</span></label>
-<input id="boxesCount" type="text" inputmode="numeric" placeholder="Кол-во коробок" style="width:120px">
-<input id="boxValue" type="text" inputmode="numeric" placeholder="Металла в 1 коробке" style="width:170px">
+<label class="label" id="lblBoxes"><img src="images/metal_box.png" class="icon" alt=""> <span data-i18n="boxesLabel">Коробка с металлом</span></label>
+<input id="boxesCount" type="text" inputmode="numeric" data-i18n-ph="boxesCountPh" placeholder="Кол-во коробок" style="width:120px">
+<input id="boxValue" type="text" inputmode="numeric" data-i18n-ph="boxValuePh" placeholder="Металла в 1 коробке" style="width:170px">
 <div class="info" aria-live="polite">
 <div class="need-open" style="display:flex;gap:4px;align-items:center;">
-<span>Нужно открыть:</span>
+<span data-i18n="needOpen">Нужно открыть:</span>
 <span id="boxesNeeded">—</span>
-<span>коробок</span>
+<span data-i18n="boxes">коробок</span>
 <div id="boxesCostTL" class="try-value" style="margin-left:6px;">TRY: —</div>
 </div>
 <div class="leftover" aria-live="polite" style="display:flex;gap:4px;align-items:center;">
-<span>Остаток ТМ</span>
+<span data-i18n="leftoverLabel">Остаток ТМ</span>
 <span id="leftoverTmValue" class="tm-left">—</span>
 <label for="sumAllTabsCheckbox" style="display:flex;align-items:center;gap:4px;margin-left:12px;color:#7ad1ff;padding:2px 6px;border-radius:4px;font-size:11px;cursor:pointer;">
 <input type="checkbox" id="sumAllTabsCheckbox" style="width:14px;height:14px;">
-<span>Сумма по всем вкладкам</span>
+<span data-i18n="sumAllTabs">Сумма по всем вкладкам</span>
 </label>
 </div>
 </div>
@@ -51,27 +51,27 @@
 <table class="cost-table" id="buildingsTable" aria-describedby="buildingsDesc">
 <thead>
 <tr>
-<th data-key="building"><span class="data-key-label">Постройка</span></th>
-<th data-key="from"><span class="data-key-label">От</span></th>
-<th data-key="to"><span class="data-key-label">До</span></th>
-<th data-key="planets"><img src="images/planet.png" class="icon" alt=""><span class="data-key-label">Планеты</span></th>
-<th data-key="metal"><img src="images/metal.png" class="icon" alt=""><span class="data-key-label">Металл</span></th>
-<th data-key="crystal"><img src="images/crystal.png" class="icon" alt=""><span class="data-key-label">Кристалл</span></th>
-<th data-key="deut"><img src="images/deuterium.png" class="icon" alt=""><span class="data-key-label">Дейтерий</span></th>
-<th data-key="points"><span class="data-key-label">Очки</span></th>
+<th data-key="building"><span class="data-key-label" data-i18n="building">Постройка</span></th>
+<th data-key="from"><span class="data-key-label" data-i18n="from">От</span></th>
+<th data-key="to"><span class="data-key-label" data-i18n="to">До</span></th>
+<th data-key="planets"><img src="images/planet.png" class="icon" alt=""><span class="data-key-label" data-i18n="planets">Планеты</span></th>
+<th data-key="metal"><img src="images/metal.png" class="icon" alt=""><span class="data-key-label" data-i18n="metal">Металл</span></th>
+<th data-key="crystal"><img src="images/crystal.png" class="icon" alt=""><span class="data-key-label" data-i18n="crystal">Кристалл</span></th>
+<th data-key="deut"><img src="images/deuterium.png" class="icon" alt=""><span class="data-key-label" data-i18n="deut">Дейтерий</span></th>
+<th data-key="points"><span class="data-key-label" data-i18n="points">Очки</span></th>
 </tr>
 </thead>
 <tbody id="tbodyBuildings"></tbody>
 <tfoot>
 <tr>
-<td><span class="data-key-label">Итого</span></td><td></td><td></td><td></td>
+<td><span class="data-key-label" data-i18n="total">Итого</span></td><td></td><td></td><td></td>
 <td id="sumMetalB" aria-live="polite"><span class="val-metal">0</span></td>
 <td id="sumCrystalB" aria-live="polite"><span class="val-crystal">0</span></td>
 <td id="sumDeutB" aria-live="polite"><span class="val-deut">0</span></td>
 <td id="sumPointsB" aria-live="polite">0</td>
 </tr>
 <tr>
-<td colspan="4" class="data-key-label">Всего в металле</td>
+<td colspan="4" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td>
 <td colspan="4" id="sumTotalMetalB" aria-live="polite">0</td>
 </tr>
 </tfoot>
@@ -88,26 +88,26 @@
 <table class="cost-table" id="researchTable" aria-describedby="researchDesc">
 <thead>
 <tr>
-<th data-key="research"><span class="data-key-label">Исследование</span></th>
-<th data-key="from"><span class="data-key-label">От</span></th>
-<th data-key="to"><span class="data-key-label">До</span></th>
-<th data-key="metal"><img src="images/metal.png" class="icon" alt=""><span class="data-key-label">Металл</span></th>
-<th data-key="crystal"><img src="images/crystal.png" class="icon" alt=""><span class="data-key-label">Кристалл</span></th>
-<th data-key="deut"><img src="images/deuterium.png" class="icon" alt=""><span class="data-key-label">Дейтерий</span></th>
-<th data-key="points"><span class="data-key-label">Очки</span></th>
+<th data-key="research"><span class="data-key-label" data-i18n="research">Исследование</span></th>
+<th data-key="from"><span class="data-key-label" data-i18n="from">От</span></th>
+<th data-key="to"><span class="data-key-label" data-i18n="to">До</span></th>
+<th data-key="metal"><img src="images/metal.png" class="icon" alt=""><span class="data-key-label" data-i18n="metal">Металл</span></th>
+<th data-key="crystal"><img src="images/crystal.png" class="icon" alt=""><span class="data-key-label" data-i18n="crystal">Кристалл</span></th>
+<th data-key="deut"><img src="images/deuterium.png" class="icon" alt=""><span class="data-key-label" data-i18n="deut">Дейтерий</span></th>
+<th data-key="points"><span class="data-key-label" data-i18n="points">Очки</span></th>
 </tr>
 </thead>
 <tbody id="tbodyResearch"></tbody>
 <tfoot>
 <tr>
-<td><span class="data-key-label">Итого</span></td><td></td><td></td>
+<td><span class="data-key-label" data-i18n="total">Итого</span></td><td></td><td></td>
 <td id="sumMetalR" aria-live="polite"><span class="val-metal">0</span></td>
 <td id="sumCrystalR" aria-live="polite"><span class="val-crystal">0</span></td>
 <td id="sumDeutR" aria-live="polite"><span class="val-deut">0</span></td>
 <td id="sumPointsR" aria-live="polite">0</td>
 </tr>
 <tr>
-<td colspan="3" class="data-key-label">Всего в металле</td>
+<td colspan="3" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td>
 <td colspan="4" id="sumTotalMetalR" aria-live="polite">0</td>
 </tr>
 </tfoot>
@@ -119,33 +119,33 @@
 <table class="cost-table" id="shipsTable" aria-describedby="fleetDesc">
 <thead>
 <tr>
-<th id="thShip">Корабль</th>
-<th id="thQty">Количество</th>
-<th id="thMetal"><img src="images/metal.png" class="icon" alt=""> <span>Металл</span></th>
-<th id="thCrystal"><img src="images/crystal.png" class="icon" alt=""> <span>Кристалл</span></th>
-<th id="thDeut"><img src="images/deuterium.png" class="icon" alt=""> <span>Дейтерий</span></th>
-<th id="thPoints">Очки</th>
+<th id="thShip" data-i18n="ship">Корабль</th>
+<th id="thQty" data-i18n="qty">Количество</th>
+<th id="thMetal"><img src="images/metal.png" class="icon" alt=""> <span data-i18n="metal">Металл</span></th>
+<th id="thCrystal"><img src="images/crystal.png" class="icon" alt=""> <span data-i18n="crystal">Кристалл</span></th>
+<th id="thDeut"><img src="images/deuterium.png" class="icon" alt=""> <span data-i18n="deut">Дейтерий</span></th>
+<th id="thPoints" data-i18n="points">Очки</th>
 </tr>
 </thead>
 <tbody></tbody>
 </table>
 <div class="planet-single-row" style="margin-top:10px;">
-<div id="planetLabel" style="display:flex;align-items:center;gap:8px;"><img src="images/planet.png" class="icon" alt=""> <span>Ресурсы на планете</span></div>
-<div class="planet-field"><img src="images/metal.png" class="icon" alt=""><input id="planetMetal" class="lvl-input" type="text" inputmode="numeric" placeholder="Металл" style="width:120px"></div>
-<div class="planet-field"><img src="images/crystal.png" class="icon" alt=""><input id="planetCrystal" class="lvl-input" type="text" inputmode="numeric" placeholder="Кристалл" style="width:120px"></div>
-<div class="planet-field"><img src="images/deuterium.png" class="icon" alt=""><input id="planetDeut" class="lvl-input" type="text" inputmode="numeric" placeholder="Дейтерий" style="width:120px"></div>
+<div id="planetLabel" style="display:flex;align-items:center;gap:8px;"><img src="images/planet.png" class="icon" alt=""> <span data-i18n="planetResources">Ресурсы на планете</span></div>
+<div class="planet-field"><img src="images/metal.png" class="icon" alt=""><input id="planetMetal" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="planetMetalPh" placeholder="Металл" style="width:120px"></div>
+<div class="planet-field"><img src="images/crystal.png" class="icon" alt=""><input id="planetCrystal" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="planetCrystalPh" placeholder="Кристалл" style="width:120px"></div>
+<div class="planet-field"><img src="images/deuterium.png" class="icon" alt=""><input id="planetDeut" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="planetDeutPh" placeholder="Дейтерий" style="width:120px"></div>
 </div>
 <div class="delivery" aria-live="polite" id="fleetDelivery" style="display:none;">
 <div class="blk" id="deliveryTotalsBlock" style="display:flex;" aria-live="polite">
-<div style="font-weight:700">Итого по ресурсам:</div>
+<div style="font-weight:700" data-i18n="deliveryTotals">Итого по ресурсам:</div>
 <div style="margin-left:8px;"><span id="totalRes">0 Металл, 0 Кристалл, 0 Дейтерий</span></div>
 </div>
 <div class="blk" id="deliveryMetalEqBlock" style="display:flex;" aria-live="polite">
-<div style="font-weight:700">Эквивалент в металле:</div>
+<div style="font-weight:700" data-i18n="metalEq">Эквивалент в металле:</div>
 <div style="margin-left:8px;"><span id="totalMetalEq">0</span></div>
 </div>
 <div class="blk" id="deliveryGrandBlock" style="display:flex;" aria-live="polite">
-<div style="font-weight:700">Остаток после вычета:</div>
+<div style="font-weight:700" data-i18n="grandAfter">Остаток после вычета:</div>
 <div style="margin-left:8px;"><span id="grandTotal">0</span></div>
 </div>
 </div>
@@ -154,55 +154,57 @@
 <div id="tabLifeforms" class="tab-content" role="tabpanel" aria-hidden="true">
 <div class="table-frame">
 <div class="lf-subtabs" role="tablist" aria-label="LifeformTabs">
-<button class="lf-subtab-btn active" data-subtab="lf-buildings" aria-selected="true" tabindex="0">Постройки</button>
-<button class="lf-subtab-btn" data-subtab="lf-research" aria-selected="false" tabindex="-1">Исследования</button>
+<button class="lf-subtab-btn active" data-subtab="lf-buildings" aria-selected="true" tabindex="0" data-i18n="lfTabBuildings">Постройки</button>
+<button class="lf-subtab-btn" data-subtab="lf-research" aria-selected="false" tabindex="-1" data-i18n="lfTabResearch">Исследования</button>
 <div class="lf-bonuses" id="lfBonuses" aria-live="polite">
+<!-- Поля для Рок'тал (всегда отображаются) -->
 <div class="field">
-<label for="megalithLevel">Мегалит</label>
+<label for="megalithLevel" data-i18n="lfMegalith">Мегалит</label>
 <input id="megalithLevel" type="text" inputmode="numeric" min="0" max="100" placeholder="0">
 </div>
 <div class="field">
-<label for="mrcLevel">Центр минералов</label>
+<label for="mrcLevel" data-i18n="lfMineralCenter">Центр минералов</label>
 <input id="mrcLevel" type="text" inputmode="numeric" min="0" max="100" placeholder="0">
 </div>
 <div class="field">
-<label for="runoLevel">Рунный Техно-ум</label>
+<label for="runoLevel" data-i18n="lfRunoTech">Рунный Техно-ум</label>
 <input id="runoLevel" type="text" inputmode="numeric" min="0" max="100" placeholder="0">
 </div>
+<!-- Динамическое поле для других рас (заполняется JavaScript) -->
 <div class="field" id="lfBonusDynamic"></div>
 </div>
-<select id="lifeformSelect" class="lifeform-select" aria-label="Lifeform">
-<option value="humans">Люди</option>
-<option value="rocktal">Рок'тал</option>
-<option value="mechas">Мехи</option>
-<option value="kaelesh">Кэлиш</option>
+<select id="lifeformSelect" class="lifeform-select" aria-label="Lifeform" data-i18n-label="lfSelectLabel">
+<option value="humans" data-i18n="humans">Люди</option>
+<option value="rocktal" data-i18n="rocktal">Рок'тал</option>
+<option value="mechas" data-i18n="mechas">Мехи</option>
+<option value="kaelesh" data-i18n="kaelesh">Кэлиш</option>
 </select>
 </div>
 <div id="lf-buildings" class="subtab-content active" role="tabpanel" aria-hidden="false">
 <table class="cost-table" id="lfBuildingsTable" aria-describedby="lfBuildingsDesc">
 <thead>
 <tr>
-<th data-key="lfBuilding"><span class="data-key-label">Постройка</span></th>
-<th data-key="from"><span class="data-key-label">От</span></th>
-<th data-key="to"><span class="data-key-label">До</span></th>
-<th data-key="planets"><img src="images/planet.png" class="icon" alt=""><span class="data-key-label">Планеты</span></th>
-<th data-key="metal"><img src="images/metal.png" class="icon" alt=""><span class="data-key-label">Металл</span></th>
-<th data-key="crystal"><img src="images/crystal.png" class="icon" alt=""><span class="data-key-label">Кристалл</span></th>
-<th data-key="deut"><img src="images/deuterium.png" class="icon" alt=""><span class="data-key-label">Дейтерий</span></th>
-<th data-key="points"><span class="data-key-label">Очки</span></th>
+<th data-key="lfBuilding"><span class="data-key-label" data-i18n="lfBuilding">Постройка</span></th>
+<th data-key="from"><span class="data-key-label" data-i18n="from">От</span></th>
+<th data-key="to"><span class="data-key-label" data-i18n="to">До</span></th>
+<th data-key="planets"><img src="images/planet.png" class="icon" alt=""><span class="data-key-label" data-i18n="planets">Планеты</span></th>
+<th data-key="metal"><img src="images/metal.png" class="icon" alt=""><span class="data-key-label" data-i18n="metal">Металл</span></th>
+<th data-key="crystal"><img src="images/crystal.png" class="icon" alt=""><span class="data-key-label" data-i18n="crystal">Кристалл</span></th>
+<th data-key="deut"><img src="images/deuterium.png" class="icon" alt=""><span class="data-key-label" data-i18n="deut">Дейтерий</span></th>
+<th data-key="points"><span class="data-key-label" data-i18n="points">Очки</span></th>
 </tr>
 </thead>
 <tbody id="tbodyLfBuildings"></tbody>
 <tfoot>
 <tr>
-<td><span class="data-key-label">Итого</span></td><td></td><td></td><td></td>
+<td><span class="data-key-label" data-i18n="total">Итого</span></td><td></td><td></td><td></td>
 <td id="sumMetalLfB"><span class="val-metal">0</span></td>
 <td id="sumCrystalLfB"><span class="val-crystal">0</span></td>
 <td id="sumDeutLfB"><span class="val-deut">0</span></td>
 <td id="sumPointsLfB">0</td>
 </tr>
 <tr>
-<td colspan="4" class="data-key-label">Всего в металле</td>
+<td colspan="4" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td>
 <td colspan="4" id="sumTotalMetalLfB">0</td>
 </tr>
 </tfoot>
@@ -212,27 +214,27 @@
 <table class="cost-table" id="lfResearchTable" aria-describedby="lfResearchDesc">
 <thead>
 <tr>
-<th data-key="lfResearch"><span class="data-key-label">Исследование</span></th>
-<th data-key="from"><span class="data-key-label">От</span></th>
-<th data-key="to"><span class="data-key-label">До</span></th>
-<th data-key="planets"><img src="images/planet.png" class="icon" alt=""><span class="data-key-label">Планеты</span></th>
-<th data-key="metal"><img src="images/metal.png" class="icon" alt=""><span class="data-key-label">Металл</span></th>
-<th data-key="crystal"><img src="images/crystal.png" class="icon" alt=""><span class="data-key-label">Кристалл</span></th>
-<th data-key="deut"><img src="images/deuterium.png" class="icon" alt=""><span class="data-key-label">Дейтерий</span></th>
-<th data-key="points"><span class="data-key-label">Очки</span></th>
+<th data-key="lfResearch"><span class="data-key-label" data-i18n="lfResearch">Исследование</span></th>
+<th data-key="from"><span class="data-key-label" data-i18n="from">От</span></th>
+<th data-key="to"><span class="data-key-label" data-i18n="to">До</span></th>
+<th data-key="planets"><img src="images/planet.png" class="icon" alt=""><span class="data-key-label" data-i18n="planets">Планеты</span></th>
+<th data-key="metal"><img src="images/metal.png" class="icon" alt=""><span class="data-key-label" data-i18n="metal">Металл</span></th>
+<th data-key="crystal"><img src="images/crystal.png" class="icon" alt=""><span class="data-key-label" data-i18n="crystal">Кристалл</span></th>
+<th data-key="deut"><img src="images/deuterium.png" class="icon" alt=""><span class="data-key-label" data-i18n="deut">Дейтерий</span></th>
+<th data-key="points"><span class="data-key-label" data-i18n="points">Очки</span></th>
 </tr>
 </thead>
 <tbody id="tbodyLfResearch"></tbody>
 <tfoot>
 <tr>
-<td><span class="data-key-label">Итого</span></td><td></td><td></td><td></td>
+<td><span class="data-key-label" data-i18n="total">Итого</span></td><td></td><td></td><td></td>
 <td id="sumMetalLfR"><span class="val-metal">0</span></td>
 <td id="sumCrystalLfR"><span class="val-crystal">0</span></td>
 <td id="sumDeutLfR"><span class="val-deut">0</span></td>
 <td id="sumPointsLfR">0</td>
 </tr>
 <tr>
-<td colspan="4" class="data-key-label">Всего в металле</td>
+<td colspan="4" class="data-key-label" data-i18n="totalInMetal">Всего в металле</td>
 <td colspan="4" id="sumTotalMetalLfR">0</td>
 </tr>
 </tfoot>
@@ -241,10 +243,10 @@
 </div>
 </div>
 </div>
-<div class="zoom-controls">
-<button id="globalZoomIn" title="Приблизить">+</button>
-<button id="globalZoomOut" title="Отдалить">−</button>
-<button id="globalZoomReset" title="Сброс">⤺</button>
+<div style="display: flex; gap: 8px; position: fixed; top: 12px; right: 12px; z-index: 10000;">
+<button id="globalZoomIn" title="Приблизить" style="padding: 3px 8px; border-radius: 4px; background: #0f1217; color: #e6edf3; border: 1px solid #4a5562; cursor: pointer; font-weight: 700; font-size: 14px; min-width: 28px; height: 24px;">+</button>
+<button id="globalZoomOut" title="Отдалить" style="padding: 3px 8px; border-radius: 4px; background: #0f1217; color: #e6edf3; border: 1px solid #4a5562; cursor: pointer; font-weight: 700; font-size: 14px; min-width: 28px; height: 24px;">−</button>
+<button id="globalZoomReset" title="Сброс" style="padding: 3px 8px; border-radius: 4px; background: #0f1217; color: #e6edf3; border: 1px solid #4a5562; cursor: pointer; font-weight: 700; font-size: 14px; min-width: 28px; height: 24px;">⤺</button>
 </div>
 <div class="language-container" aria-hidden="false">
 <div class="lang-dropdown">
@@ -255,9 +257,8 @@
 <div id="langDropdownMenu" class="dropdown-menu"></div>
 </div>
 </div>
-<div class="revision-badge">Version 1.06.0a</div>
+<div class="revision-badge">Version 1.07.0a</div>
 <script src="languages.js"></script>
 <script src="script.js"></script>
 </body>
-
 </html>
