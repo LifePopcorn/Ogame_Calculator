@@ -1,8 +1,8 @@
 (function () {
     'use strict';
     const LANGUAGE_ICONS = {
-        'en_GB': 'images/languages/en_GB.png',
-        'en_US': 'images/languages/en_US.png',
+        'en_GB': 'images/languages/en_gb.png',
+        'en_US': 'images/languages/en_us.png',
         'ru': 'images/languages/ru.png',
         'de': 'images/languages/de.png',
         'pl': 'images/languages/pl.png',
@@ -2059,4 +2059,5 @@
     }
     if (document.readyState !== 'loading') initApp();
     else document.addEventListener('DOMContentLoaded', initApp);
+
 })();
