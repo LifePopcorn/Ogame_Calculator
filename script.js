@@ -297,18 +297,13 @@
         4116: "speed_boost_battleship.png", 4117: "psionic_shield_matrix.png", 4118: "kaelesh_explorer_enhancement.png"
     };
     const BONUS_INPUT_IDS = ['megalithLevel', 'mrcLevel', 'runoLevel', 'humansLevel', 'mechasLevel', 'kaeleshLevel'];
-
-    // === ИСПРАВЛЕННАЯ ФУНКЦИЯ ОБНОВЛЕНИЯ БОНУСНЫХ ПОЛЕЙ ===
     function updateLfBonusesVisibility(race) {
     const bonusesEl = document.getElementById('lfBonuses');
     if (!bonusesEl) return;
-
     const lang = localStorage.getItem(KEYS.LANG) || 'ru';
     const dict = getLangDict(lang);
     bonusesEl.innerHTML = '';
-
     let fieldsToCreate = [];
-
     if (race === 'rocktal') {
         fieldsToCreate = [
             { labelKey: 'lfMegalith', inputId: 'megalithLevel', placeholder: '0' },
@@ -322,7 +317,6 @@
     } else if (race === 'kaelesh') {
         fieldsToCreate = [{ labelKey: 'lf_b_4003', inputId: 'kaeleshLevel', placeholder: '0' }];
     }
-
     fieldsToCreate.forEach(field => {
         const fieldDiv = document.createElement('div');
         fieldDiv.className = 'field';
@@ -336,15 +330,19 @@
         input.min = '0';
         input.max = '100';
         input.placeholder = field.placeholder;
+
+        // 🔁 ВОССТАНАВЛИВАЕМ ЗНАЧЕНИЕ ИЗ localStorage
+        const savedValue = localStorage.getItem(`og_calc_${field.inputId}`);
+        if (savedValue !== null) {
+            input.value = formatWithDotsRaw(parseNumberInput(savedValue));
+        }
+
         fieldDiv.appendChild(label);
         fieldDiv.appendChild(input);
         bonusesEl.appendChild(fieldDiv);
     });
-
     attachBonusInputHandlers();
 }
-
-    // === ГЛОБАЛЬНАЯ ФУНКЦИЯ ПОЛУЧЕНИЯ СЛОВАРЯ ===
     function getLangDict(lang) {
         const dict = {};
         if (LANG_OTHER && LANG_OTHER[lang]) Object.assign(dict, LANG_OTHER[lang]);
@@ -365,10 +363,6 @@
         }
         return dict;
     }
-
-    // === ОСТАЛЬНЫЕ ФУНКЦИИ ===
-    // (далее идёт полный оригинальный код из script.txt без изменений, кроме updateLfBonusesVisibility и getLangDict)
-
     function calcBuildCostLF(techID, techLevel, techData, costRdc) {
         if (techLevel < 1) return [0, 0, 0];
         const data = techData[techID];
@@ -774,81 +768,79 @@
         updateBoxesNeeded();
     }
     function computeFleet() {
-        try {
-            const factorC = CONFIG.METAL_EQ_CRYSTAL;
-            const factorD = CONFIG.METAL_EQ_DEUT;
-            let totalM = 0, totalC = 0, totalD = 0;
-            document.querySelectorAll("input[data-id]").forEach(inp => {
-                const qty = parseNumberInput(inp.value);
-                const row = inp.closest('tr');
-                const pointsCell = row.querySelector('.p');
-                if (qty <= 0) {
-                    inp.value = '';
-                    pointsCell.textContent = '0';
-                    return;
-                }
-                const ship = shipList.find(s => s.id === inp.dataset.id);
-                if (!ship) return;
-                totalM += qty * ship.metal;
-                totalC += qty * ship.crystal;
-                totalD += qty * ship.deut;
-                inp.value = formatWithDotsRaw(qty);
-                const shipPoints = Math.round((ship.metal + ship.crystal + ship.deut) / 1000) * qty;
-                pointsCell.textContent = formatNumberWithDots(shipPoints);
-            });
-            const totalResEl = document.getElementById('totalRes');
-            const totalMetalEqEl = document.getElementById('totalMetalEq');
-            const grandTotalEl = document.getElementById('grandTotal');
-            const lang = localStorage.getItem(KEYS.LANG) || 'ru';
-            const dict = getLangDict(lang);
-            if (totalResEl) {
-                totalResEl.innerHTML = '';
-                totalResEl.appendChild(formatSpanMetal(totalM));
-                totalResEl.appendChild(document.createTextNode(` ${dict.metal}, `));
-                totalResEl.appendChild(formatSpanCrystal(totalC));
-                totalResEl.appendChild(document.createTextNode(` ${dict.crystal}, `));
-                totalResEl.appendChild(formatSpanDeut(totalD));
-                totalResEl.appendChild(document.createTextNode(` ${dict.deut}`));
+    try {
+        const factorC = CONFIG.METAL_EQ_CRYSTAL;
+        const factorD = CONFIG.METAL_EQ_DEUT;
+        let fleetM = 0, fleetC = 0, fleetD = 0;
+        document.querySelectorAll("input[data-id]").forEach(inp => {
+            const qty = parseNumberInput(inp.value);
+            const row = inp.closest('tr');
+            const pointsCell = row.querySelector('.p');
+            if (qty <= 0) {
+                inp.value = '';
+                pointsCell.textContent = '0';
+                return;
             }
-            const metalEq = Math.round(totalM + totalC * factorC + totalD * factorD);
-            if (totalMetalEqEl) totalMetalEqEl.textContent = formatNumberWithDots(metalEq);
-            const boxesCount = parseNumberInput(document.getElementById('boxesCount')?.value);
-            const boxValue = parseNumberInput(document.getElementById('boxValue')?.value);
-            const boxesMetal = boxesCount * boxValue;
-            const planetM = parseNumberInput(document.getElementById('planetMetal')?.value);
-            const planetC = parseNumberInput(document.getElementById('planetCrystal')?.value);
-            const planetD = parseNumberInput(document.getElementById('planetDeut')?.value);
-            const planetMetalEq = planetM + planetC * factorC + planetD * factorD;
-            const grand = boxesMetal + planetMetalEq - metalEq;
-            if (grandTotalEl) {
-                grandTotalEl.textContent = formatNumberWithDots(Math.round(grand));
-                grandTotalEl.style.color = grand >= 0 ? "#41c879" : "#ff4d4d";
-            }
-            const availableMetalPool = boxesMetal + planetMetalEq;
-            let cumulativeEq = 0;
-            document.querySelectorAll("#shipsTable tbody tr[data-row-id]").forEach(row => {
-                const id = row.getAttribute('data-row-id');
-                const inp = row.querySelector('input[data-id]');
-                const qty = parseNumberInput(inp?.value);
-                const ship = shipList.find(s => s.id === id);
-                let rowEq = 0;
-                if (ship && qty > 0) {
-                    const m = ship.metal * qty, c = ship.crystal * qty, d = ship.deut * qty;
-                    rowEq = m + c * factorC + d * factorD;
-                }
-                cumulativeEq += rowEq;
-                if (availableMetalPool > 0 && rowEq > 0 && cumulativeEq > availableMetalPool) row.classList.add('row-deficit');
-                else row.classList.remove('row-deficit');
-            });
-            const boxesData = {
-                boxesCount,
-                boxValue,
-                planetMetal, planetCrystal, planetDeut
-            };
-            try { localStorage.setItem(KEYS.BOXES, JSON.stringify(boxesData)); } catch (e) { }
-            updateBoxesNeeded();
-        } catch (e) { }
-    }
+            const ship = shipList.find(s => s.id === inp.dataset.id);
+            if (!ship) return;
+            fleetM += qty * ship.metal;
+            fleetC += qty * ship.crystal;
+            fleetD += qty * ship.deut;
+            inp.value = formatWithDotsRaw(qty);
+            const shipPoints = Math.round((ship.metal + ship.crystal + ship.deut) / 1000) * qty;
+            pointsCell.textContent = formatNumberWithDots(shipPoints);
+        });
+        const planetM = parseNumberInput(document.getElementById('planetMetal')?.value);
+        const planetC = parseNumberInput(document.getElementById('planetCrystal')?.value);
+        const planetD = parseNumberInput(document.getElementById('planetDeut')?.value);
+
+        // ✅ ВЫЧИТАЕМ ресурсы планеты из стоимости флота
+        const totalM = Math.max(0, fleetM - planetM);
+        const totalC = Math.max(0, fleetC - planetC);
+        const totalD = Math.max(0, fleetD - planetD);
+
+        const totalResEl = document.getElementById('totalRes');
+        const lang = localStorage.getItem(KEYS.LANG) || 'ru';
+        const dict = getLangDict(lang);
+        if (totalResEl) {
+            totalResEl.innerHTML = '';
+            totalResEl.appendChild(formatSpanMetal(totalM));
+            totalResEl.appendChild(document.createTextNode(` ${dict.metal}, `));
+            totalResEl.appendChild(formatSpanCrystal(totalC));
+            totalResEl.appendChild(document.createTextNode(` ${dict.crystal}, `));
+            totalResEl.appendChild(formatSpanDeut(totalD));
+            totalResEl.appendChild(document.createTextNode(` ${dict.deut}`));
+        }
+
+        // ✅ metalEq от недостающих ресурсов
+        const totalMetalEq = Math.round(totalM + totalC * factorC + totalD * factorD);
+        const totalMetalEqEl = document.getElementById('totalMetalEq');
+        if (totalMetalEqEl) totalMetalEqEl.textContent = formatNumberWithDots(totalMetalEq);
+
+        const boxesCount = parseNumberInput(document.getElementById('boxesCount')?.value);
+        const boxValue = parseNumberInput(document.getElementById('boxValue')?.value);
+        const boxesMetal = boxesCount * boxValue;
+
+        // ✅ Остаток = ящики - НЕДОСТАЮЩИЕ ресурсы (а не полная стоимость флота)
+        const grand = boxesMetal - totalMetalEq;
+
+        const grandTotalEl = document.getElementById('grandTotal');
+        if (grandTotalEl) {
+            grandTotalEl.textContent = formatNumberWithDots(Math.round(grand));
+            grandTotalEl.style.color = grand >= 0 ? "#41c879" : "#ff4d4d";
+        }
+
+        const boxesData = {
+            boxesCount,
+            boxValue,
+            planetMetal: planetM,
+            planetCrystal: planetC,
+            planetDeut: planetD
+        };
+        try { localStorage.setItem(KEYS.BOXES, JSON.stringify(boxesData)); } catch (e) { }
+        updateBoxesNeeded();
+    } catch (e) { }
+}
     function renderTable() {
         try {
             const tableBody = document.querySelector("#shipsTable tbody");
@@ -1329,13 +1321,15 @@
                 try { localStorage.setItem(KEYS.TM, tmEl.value); } catch (e) { }
             });
         }
-        ['boxesCount', 'boxValue'].forEach(id => {
+        const fleetInputs = ['boxesCount', 'boxValue', 'planetMetal', 'planetCrystal', 'planetDeut'];
+        fleetInputs.forEach(id => {
             const el = document.getElementById(id);
-            if (!el) return;
-            el.addEventListener('input', () => {
-                debouncedComputeFleet();
-                updateBoxesNeeded();
-            });
+            if (el) {
+                el.addEventListener('input', () => {
+                    if (getActiveTab() === 'fleet') computeFleet();
+                    updateBoxesNeeded();
+                });
+            }
         });
         ['tbodyLfBuildings', 'tbodyLfResearch'].forEach(id => {
             const tbody = document.getElementById(id);
@@ -1532,8 +1526,6 @@
             localStorage.setItem(KEYS.LF_INPUTS_RESEARCH, JSON.stringify(r));
         } catch (e) { }
     }
-
-    // === ОСНОВНАЯ ФУНКЦИЯ ПЕРЕКЛЮЧЕНИЯ ЯЗЫКА С ВЫЗОВОМ ОБНОВЛЕНИЯ БОНУСНЫХ ПОЛЕЙ ===
     function applyLang(lang) {
         if (!lang) return;
         const currentLang = localStorage.getItem(KEYS.LANG) || 'ru';
@@ -1573,7 +1565,8 @@
             document.getElementById('lf-buildings').classList.toggle('active', activeLfSubtab === 'lf-buildings');
             document.getElementById('lf-research').classList.toggle('active', activeLfSubtab === 'lf-research');
         }
-        attachLiveThousandsFormatting('#boxesCount, #boxValue, #planetMetal, #planetCrystal, #planetDeut, input[data-id]');
+        attachLiveThousandsFormatting('#boxesCount, #boxValue, input[data-id]');
+        attachLiveThousandsFormatting('#planetMetal, #planetCrystal, #planetDeut');
         attachInputsHandlers();
         recalcAllBuildings();
         recalcAllResearch();
@@ -1581,11 +1574,9 @@
         recalcAllLfResearch();
         computeFleet();
         updateBoxesNeeded();
-        // === КРИТИЧЕСКИ ВАЖНО: ОБНОВЛЯЕМ БОНУСНЫЕ ПОЛЯ ПОСЛЕ СМЕНЫ ЯЗЫКА ===
         updateLfBonusesVisibility(currentLifeformRace);
         ensureProperPositioning();
     }
-
     function saveAllInputsBeforeSwitch() {
         try {
             const saveInputRows = (selector, key) => {
@@ -1775,7 +1766,6 @@
         } catch (e) { }
     }
     function centerWrapper() {
-        fullResetToZero();
         const wrapperEl = document.getElementById('tableWrapper');
         if (!wrapperEl) return;
         window.scale = 1;
@@ -1795,6 +1785,10 @@
             }));
         } catch (e) { }
         positionTabs();
+    }
+    function resetAndCenter() {
+        fullResetToZero();
+        centerWrapper();
     }
     function fullResetToZero() {
         try {
@@ -2011,7 +2005,24 @@
     })();
     function initApp() {
         try {
-            attachLiveThousandsFormatting('#boxesCount, #boxValue, #planetMetal, #planetCrystal, #planetDeut, input[data-id]');
+            attachLiveThousandsFormatting('#boxesCount, #boxValue, input[data-id]');
+            attachLiveThousandsFormatting('#planetMetal, #planetCrystal, #planetDeut');
+            ['planetMetal', 'planetCrystal', 'planetDeut'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    const handler = () => {
+                        computeFleet();
+                        try {
+                            const boxes = JSON.parse(localStorage.getItem(KEYS.BOXES) || '{}');
+                            boxes[id] = parseNumberInput(el.value);
+                            localStorage.setItem(KEYS.BOXES, JSON.stringify(boxes));
+                        } catch (e) { }
+                    };
+                    el.addEventListener('input', handler);
+                    el.addEventListener('change', handler);
+                    el.addEventListener('blur', handler);
+                }
+            });
             attachLvlInputHandlers();
             attachInputsHandlers();
             restoreFromStorage();
@@ -2029,8 +2040,7 @@
                 try { localStorage.setItem(KEYS.TRANSFORM, JSON.stringify({ scale: window.scale, posX: window.posX, posY: window.posY })); } catch (e) { }
                 positionTabs();
             });
-            document.getElementById('globalZoomReset')?.addEventListener('click', centerWrapper);
-            document.getElementById('tableWrapper')?.addEventListener('dblclick', centerWrapper);
+            document.getElementById('globalZoomReset')?.addEventListener('click', resetAndCenter);
             window.addEventListener('resize', () => {
                 positionTabs();
                 ensureProperPositioning();
@@ -2059,5 +2069,4 @@
     }
     if (document.readyState !== 'loading') initApp();
     else document.addEventListener('DOMContentLoaded', initApp);
-
 })();

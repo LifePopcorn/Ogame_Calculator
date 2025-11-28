@@ -131,9 +131,9 @@
 </table>
 <div class="planet-single-row" style="margin-top:10px;">
 <div id="planetLabel" style="display:flex;align-items:center;gap:8px;"><img src="images/planet.png" class="icon" alt=""> <span data-i18n="planetResources">Ресурсы на планете</span></div>
-<div class="planet-field"><img src="images/metal.png" class="icon" alt=""><input id="planetMetal" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="planetMetalPh" placeholder="Металл" style="width:120px"></div>
-<div class="planet-field"><img src="images/crystal.png" class="icon" alt=""><input id="planetCrystal" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="planetCrystalPh" placeholder="Кристалл" style="width:120px"></div>
-<div class="planet-field"><img src="images/deuterium.png" class="icon" alt=""><input id="planetDeut" class="lvl-input" type="text" inputmode="numeric" data-i18n-ph="planetDeutPh" placeholder="Дейтерий" style="width:120px"></div>
+<div class="planet-field"><img src="images/metal.png" class="icon" alt=""><input id="planetMetal" type="text" inputmode="numeric" data-i18n-ph="planetMetalPh" placeholder="Металл" style="width:120px"></div>
+<div class="planet-field"><img src="images/crystal.png" class="icon" alt=""><input id="planetCrystal" type="text" inputmode="numeric" data-i18n-ph="planetCrystalPh" placeholder="Кристалл" style="width:120px"></div>
+<div class="planet-field"><img src="images/deuterium.png" class="icon" alt=""><input id="planetDeut" type="text" inputmode="numeric" data-i18n-ph="planetDeutPh" placeholder="Дейтерий" style="width:120px"></div>
 </div>
 <div class="delivery" aria-live="polite" id="fleetDelivery" style="display:none;">
 <div class="blk" id="deliveryTotalsBlock" style="display:flex;" aria-live="polite">
@@ -246,7 +246,7 @@
 <div style="display: flex; gap: 8px; position: fixed; top: 12px; right: 12px; z-index: 10000;">
 <button id="globalZoomIn" title="Приблизить" style="padding: 3px 8px; border-radius: 4px; background: #0f1217; color: #e6edf3; border: 1px solid #4a5562; cursor: pointer; font-weight: 700; font-size: 14px; min-width: 28px; height: 24px;">+</button>
 <button id="globalZoomOut" title="Отдалить" style="padding: 3px 8px; border-radius: 4px; background: #0f1217; color: #e6edf3; border: 1px solid #4a5562; cursor: pointer; font-weight: 700; font-size: 14px; min-width: 28px; height: 24px;">−</button>
-<button id="globalZoomReset" title="Сброс" style="padding: 3px 8px; border-radius: 4px; background: #0f1217; color: #e6edf3; border: 1px solid #4a5562; cursor: pointer; font-weight: 700; font-size: 14px; min-width: 28px; height: 24px;">⤺</button>
+<button id="globalZoomReset" title="Сброс" style="padding: 3px 8px; border-radius: 4px; background: #0f1217; color: #e6edf3; border: 1px solid #4a5562; cursor: pointer; font-weight: 700; font-size: 14px; min-width: 28px; height: 24px;"><tool_call></button>
 </div>
 <div class="language-container" aria-hidden="false">
 <div class="lang-dropdown">
@@ -257,7 +257,7 @@
 <div id="langDropdownMenu" class="dropdown-menu"></div>
 </div>
 </div>
-<div class="revision-badge">Version 1.07.0a</div>
+<div class="revision-badge">Version 1.07.3a</div>
 <script src="languages.js"></script>
 <script src="script.js"></script>
 </body>
