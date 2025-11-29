@@ -143,10 +143,7 @@
         METAL_EQ_CRYSTAL: 1.5,
         METAL_EQ_DEUT: 3,
         MAX_LEVEL_SPAN: 1000,
-        TM_PER_LEVEL_FACTOR: 2,
-        MEGALITH_DISCOUNT_PER_LEVEL: 0.01,
-        MINERAL_CENTER_DISCOUNT_PER_LEVEL: 0.005,
-        RUNO_TECH_DISCOUNT_PER_LEVEL: 0.0025
+        TM_PER_LEVEL_FACTOR: 2
     };
     let isSumAllTabsMode = false;
     let currentLifeformRace = localStorage.getItem('og_calc_lf_race_v1') || 'humans';
@@ -330,36 +327,52 @@
         input.min = '0';
         input.max = '100';
         input.placeholder = field.placeholder;
-
-        // 🔁 ВОССТАНАВЛИВАЕМ ЗНАЧЕНИЕ ИЗ localStorage
-        const savedValue = localStorage.getItem(`og_calc_${field.inputId}`);
-        if (savedValue !== null) {
-            input.value = formatWithDotsRaw(parseNumberInput(savedValue));
+        
+        // СОХРАНЯЕМ СУЩЕСТВУЮЩЕЕ ЗНАЧЕНИЕ ПЕРЕД ПЕРЕСОЗДАНИЕМ
+        const existingValue = document.getElementById(field.inputId)?.value;
+        if (existingValue && existingValue !== '') {
+            input.value = existingValue;
+        } else {
+            // Пытаемся восстановить из localStorage
+            const savedValue = localStorage.getItem(`og_calc_${field.inputId}`);
+            if (savedValue !== null) {
+                input.value = formatWithDotsRaw(parseNumberInput(savedValue));
+            }
         }
-
+        
         fieldDiv.appendChild(label);
         fieldDiv.appendChild(input);
         bonusesEl.appendChild(fieldDiv);
     });
     attachBonusInputHandlers();
+    
+    // ДОПОЛНИТЕЛЬНОЕ ВОССТАНОВЛЕНИЕ ЗНАЧЕНИЙ
+    BONUS_INPUT_IDS.forEach(id => {
+        const savedValue = localStorage.getItem(`og_calc_${id}`);
+        const input = document.getElementById(id);
+        if (savedValue !== null && input && !input.value) {
+            input.value = formatWithDotsRaw(parseNumberInput(savedValue));
+        }
+    });
 }
     function getLangDict(lang) {
         const dict = {};
-        if (LANG_OTHER && LANG_OTHER[lang]) Object.assign(dict, LANG_OTHER[lang]);
-        if (LANG_BUILDINGS && LANG_BUILDINGS[lang]) {
-            LANG_BUILDINGS[lang].forEach((name, idx) => dict[`building_${idx}`] = name);
+        const safeLang = lang && LANG_OTHER[lang] ? lang : 'ru';
+        if (LANG_OTHER && LANG_OTHER[safeLang]) Object.assign(dict, LANG_OTHER[safeLang]);
+        if (LANG_BUILDINGS && LANG_BUILDINGS[safeLang]) {
+            LANG_BUILDINGS[safeLang].forEach((name, idx) => dict[`building${idx}`] = name);
         }
-        if (LANG_RESEARCH && LANG_RESEARCH[lang]) {
-            LANG_RESEARCH[lang].forEach((name, idx) => dict[`research_${idx}`] = name);
+        if (LANG_RESEARCH && LANG_RESEARCH[safeLang]) {
+            LANG_RESEARCH[safeLang].forEach((name, idx) => dict[`research${idx}`] = name);
         }
-        if (LANG_LF_BUILDINGS && LANG_LF_BUILDINGS[lang]) {
-            Object.entries(LANG_LF_BUILDINGS[lang]).forEach(([id, name]) => dict[`lf_b_${id}`] = name);
+        if (LANG_LF_BUILDINGS && LANG_LF_BUILDINGS[safeLang]) {
+            Object.entries(LANG_LF_BUILDINGS[safeLang]).forEach(([id, name]) => dict[`lf_b_${id}`] = name);
         }
-        if (LANG_LF_RESEARCH && LANG_LF_RESEARCH[lang]) {
-            Object.entries(LANG_LF_RESEARCH[lang]).forEach(([id, name]) => dict[`lf_r_${id}`] = name);
+        if (LANG_LF_RESEARCH && LANG_LF_RESEARCH[safeLang]) {
+            Object.entries(LANG_LF_RESEARCH[safeLang]).forEach(([id, name]) => dict[`lf_r_${id}`] = name);
         }
-        if (LANG_SHIPS && LANG_SHIPS[lang]) {
-            Object.entries(LANG_SHIPS[lang]).forEach(([id, name]) => dict[`ship_${id}`] = name);
+        if (LANG_SHIPS && LANG_SHIPS[safeLang]) {
+            Object.entries(LANG_SHIPS[safeLang]).forEach(([id, name]) => dict[`ship_${id}`] = name);
         }
         return dict;
     }
@@ -376,7 +389,7 @@
     }
     function getBuildCostLF(techID, techLevelFrom, techLevelTo, techData, ionTechLevel, rsrCostRdc, bldCostRdc = 0) {
         let totalCost = [0, 0, 0];
-        const costReduction = Number(techID) % 1000 < 100 ? bldCostRdc : 0.01 * rsrCostRdc;
+        const costReduction = Number(techID) % 1000 < 100 ? bldCostRdc : rsrCostRdc;
         if (Number(techLevelFrom) > Number(techLevelTo)) {
             for (let i = Number(techLevelFrom) - 1; i >= Math.max(Number(techLevelTo), 0); i--) {
                 const levelToUse = i === 0 ? 1 : i;
@@ -476,28 +489,6 @@
         span.setAttribute('aria-hidden', 'true');
         span.textContent = label ? label[0] : '—';
         return span;
-    }
-    function getLevelCost(techId, level) {
-        const data = TECH_COSTS[techId];
-        if (!data) return { m: 0, c: 0, d: 0, points: 0 };
-        const [baseM, baseC, baseD] = data;
-        const fM = data[5], fC = data[6], fD = data[7];
-        const m = Math.floor(baseM * level * Math.pow(fM, level - 1));
-        const c = Math.floor(baseC * level * Math.pow(fC, level - 1));
-        const d = Math.floor(baseD * level * Math.pow(fD, level - 1));
-        const points = Math.round((m + c + d) / 1000);
-        return { m, c, d, points };
-    }
-    function getTotalCostLf(techId, from, to) {
-        if (from >= to || !TECH_COSTS[techId]) return { m: 0, c: 0, d: 0, points: 0 };
-        let tm = 0, tc = 0, td = 0;
-        for (let lvl = from + 1; lvl <= to; lvl++) {
-            const cost = getLevelCost(techId, lvl);
-            tm += cost.m;
-            tc += cost.c;
-            td += cost.d;
-        }
-        return { m: tm, c: tc, d: td, points: Math.round((tm + tc + td) / 1000) };
     }
     function geomSum(base, factor, from, to) {
         const len = Math.max(0, to - from);
@@ -624,7 +615,7 @@
         let tm = 0, tc = 0, td = 0, tp = 0;
         let rsrCostRdc = 0;
         if (currentLifeformRace === 'rocktal') {
-            rsrCostRdc = CONFIG.RUNO_TECH_DISCOUNT_PER_LEVEL * parseNumberInput(document.getElementById('runoLevel')?.value || '0') * 100;
+            rsrCostRdc = 0.0025 * parseNumberInput(document.getElementById('runoLevel')?.value || '0') * 100;
         } else if (currentLifeformRace === 'humans') {
             rsrCostRdc = 0.25 * parseNumberInput(document.getElementById('humansLevel')?.value || '0');
         } else if (currentLifeformRace === 'mechas') {
@@ -768,79 +759,69 @@
         updateBoxesNeeded();
     }
     function computeFleet() {
-    try {
-        const factorC = CONFIG.METAL_EQ_CRYSTAL;
-        const factorD = CONFIG.METAL_EQ_DEUT;
-        let fleetM = 0, fleetC = 0, fleetD = 0;
-        document.querySelectorAll("input[data-id]").forEach(inp => {
-            const qty = parseNumberInput(inp.value);
-            const row = inp.closest('tr');
-            const pointsCell = row.querySelector('.p');
-            if (qty <= 0) {
-                inp.value = '';
-                pointsCell.textContent = '0';
-                return;
+        try {
+            const factorC = CONFIG.METAL_EQ_CRYSTAL;
+            const factorD = CONFIG.METAL_EQ_DEUT;
+            let fleetM = 0, fleetC = 0, fleetD = 0;
+            document.querySelectorAll("input[data-id]").forEach(inp => {
+                const qty = parseNumberInput(inp.value);
+                const row = inp.closest('tr');
+                const pointsCell = row.querySelector('.p');
+                if (qty <= 0) {
+                    inp.value = '';
+                    pointsCell.textContent = '0';
+                    return;
+                }
+                const ship = shipList.find(s => s.id === inp.dataset.id);
+                if (!ship) return;
+                fleetM += qty * ship.metal;
+                fleetC += qty * ship.crystal;
+                fleetD += qty * ship.deut;
+                inp.value = formatWithDotsRaw(qty);
+                const shipPoints = Math.round((ship.metal + ship.crystal + ship.deut) / 1000) * qty;
+                pointsCell.textContent = formatNumberWithDots(shipPoints);
+            });
+            const planetM = parseNumberInput(document.getElementById('planetMetal')?.value);
+            const planetC = parseNumberInput(document.getElementById('planetCrystal')?.value);
+            const planetD = parseNumberInput(document.getElementById('planetDeut')?.value);
+            const totalM = Math.max(0, fleetM - planetM);
+            const totalC = Math.max(0, fleetC - planetC);
+            const totalD = Math.max(0, fleetD - planetD);
+            const totalResEl = document.getElementById('totalRes');
+            const lang = localStorage.getItem(KEYS.LANG) || 'ru';
+            const dict = getLangDict(lang);
+            if (totalResEl) {
+                totalResEl.innerHTML = '';
+                totalResEl.appendChild(formatSpanMetal(totalM));
+                totalResEl.appendChild(document.createTextNode(` ${dict.metal}, `));
+                totalResEl.appendChild(formatSpanCrystal(totalC));
+                totalResEl.appendChild(document.createTextNode(` ${dict.crystal}, `));
+                totalResEl.appendChild(formatSpanDeut(totalD));
+                totalResEl.appendChild(document.createTextNode(` ${dict.deut}`));
             }
-            const ship = shipList.find(s => s.id === inp.dataset.id);
-            if (!ship) return;
-            fleetM += qty * ship.metal;
-            fleetC += qty * ship.crystal;
-            fleetD += qty * ship.deut;
-            inp.value = formatWithDotsRaw(qty);
-            const shipPoints = Math.round((ship.metal + ship.crystal + ship.deut) / 1000) * qty;
-            pointsCell.textContent = formatNumberWithDots(shipPoints);
-        });
-        const planetM = parseNumberInput(document.getElementById('planetMetal')?.value);
-        const planetC = parseNumberInput(document.getElementById('planetCrystal')?.value);
-        const planetD = parseNumberInput(document.getElementById('planetDeut')?.value);
-
-        // ✅ ВЫЧИТАЕМ ресурсы планеты из стоимости флота
-        const totalM = Math.max(0, fleetM - planetM);
-        const totalC = Math.max(0, fleetC - planetC);
-        const totalD = Math.max(0, fleetD - planetD);
-
-        const totalResEl = document.getElementById('totalRes');
-        const lang = localStorage.getItem(KEYS.LANG) || 'ru';
-        const dict = getLangDict(lang);
-        if (totalResEl) {
-            totalResEl.innerHTML = '';
-            totalResEl.appendChild(formatSpanMetal(totalM));
-            totalResEl.appendChild(document.createTextNode(` ${dict.metal}, `));
-            totalResEl.appendChild(formatSpanCrystal(totalC));
-            totalResEl.appendChild(document.createTextNode(` ${dict.crystal}, `));
-            totalResEl.appendChild(formatSpanDeut(totalD));
-            totalResEl.appendChild(document.createTextNode(` ${dict.deut}`));
-        }
-
-        // ✅ metalEq от недостающих ресурсов
-        const totalMetalEq = Math.round(totalM + totalC * factorC + totalD * factorD);
-        const totalMetalEqEl = document.getElementById('totalMetalEq');
-        if (totalMetalEqEl) totalMetalEqEl.textContent = formatNumberWithDots(totalMetalEq);
-
-        const boxesCount = parseNumberInput(document.getElementById('boxesCount')?.value);
-        const boxValue = parseNumberInput(document.getElementById('boxValue')?.value);
-        const boxesMetal = boxesCount * boxValue;
-
-        // ✅ Остаток = ящики - НЕДОСТАЮЩИЕ ресурсы (а не полная стоимость флота)
-        const grand = boxesMetal - totalMetalEq;
-
-        const grandTotalEl = document.getElementById('grandTotal');
-        if (grandTotalEl) {
-            grandTotalEl.textContent = formatNumberWithDots(Math.round(grand));
-            grandTotalEl.style.color = grand >= 0 ? "#41c879" : "#ff4d4d";
-        }
-
-        const boxesData = {
-            boxesCount,
-            boxValue,
-            planetMetal: planetM,
-            planetCrystal: planetC,
-            planetDeut: planetD
-        };
-        try { localStorage.setItem(KEYS.BOXES, JSON.stringify(boxesData)); } catch (e) { }
-        updateBoxesNeeded();
-    } catch (e) { }
-}
+            const totalMetalEq = Math.round(totalM + totalC * factorC + totalD * factorD);
+            const totalMetalEqEl = document.getElementById('totalMetalEq');
+            if (totalMetalEqEl) totalMetalEqEl.textContent = formatNumberWithDots(totalMetalEq);
+            const boxesCount = parseNumberInput(document.getElementById('boxesCount')?.value);
+            const boxValue = parseNumberInput(document.getElementById('boxValue')?.value);
+            const boxesMetal = boxesCount * boxValue;
+            const grand = boxesMetal - totalMetalEq;
+            const grandTotalEl = document.getElementById('grandTotal');
+            if (grandTotalEl) {
+                grandTotalEl.textContent = formatNumberWithDots(Math.round(grand));
+                grandTotalEl.style.color = grand >= 0 ? "#41c879" : "#ff4d4d";
+            }
+            const boxesData = {
+                boxesCount,
+                boxValue,
+                planetMetal: planetM,
+                planetCrystal: planetC,
+                planetDeut: planetD
+            };
+            try { localStorage.setItem(KEYS.BOXES, JSON.stringify(boxesData)); } catch (e) { }
+            updateBoxesNeeded();
+        } catch (e) { }
+    }
     function renderTable() {
         try {
             const tableBody = document.querySelector("#shipsTable tbody");
