@@ -1,5 +1,3 @@
-// languages.js - Файл с языковыми данными
-// Словари для каждого типа данных
 const LANG_BUILDINGS = {
   en_GB: [
     "Metal Mine", "Crystal Mine", "Deuterium Synthesizer", "Solar Plant",
@@ -1598,27 +1596,19 @@ const LANG_OTHER = {
     languageSelectLabel: "Jezik interfejsa"
   }
 };
-// Функция для получения объединенного словаря для указанного языка
 function getLangDict(lang) {
-  if (!lang) return {};
   const buildings = LANG_BUILDINGS[lang] || LANG_BUILDINGS.ru;
   const research = LANG_RESEARCH[lang] || LANG_RESEARCH.ru;
   const lfBuildings = LANG_LF_BUILDINGS[lang] || LANG_LF_BUILDINGS.ru;
   const lfResearch = LANG_LF_RESEARCH[lang] || LANG_LF_RESEARCH.ru;
   const ships = LANG_SHIPS[lang] || LANG_SHIPS.ru;
   const other = LANG_OTHER[lang] || LANG_OTHER.ru;
-  // Объединяем все словари в один
   const combinedDict = {
-    ...other, // Основные переводы (кнопки, лейблы)
-    // Добавляем переводы для построек по индексу (предполагаем, что индексы 0-15 соответствуют BUILDING_NAMES)
+    ...other,
     ...Object.fromEntries(buildings.map((name, idx) => [idx, name])),
-    // Добавляем переводы для исследований по индексу (предполагаем, что индексы 0-15 соответствуют RESEARCH_NAMES)
-    ...Object.fromEntries(research.map((name, idx) => [100 + idx, name])), // Используем 100+ чтобы не пересекались
-    // Добавляем переводы для LF построек по их ID
+    ...Object.fromEntries(research.map((name, idx) => [100 + idx, name])),
     ...Object.fromEntries(Object.entries(lfBuildings).map(([id, name]) => [`lf_b_${id}`, name])),
-    // Добавляем переводы для LF исследований по их ID
     ...Object.fromEntries(Object.entries(lfResearch).map(([id, name]) => [`lf_r_${id}`, name])),
-    // Добавляем переводы для кораблей по их ID
     ...Object.fromEntries(Object.entries(ships).map(([id, name]) => [`ship_${id}`, name]))
   };
   return combinedDict;

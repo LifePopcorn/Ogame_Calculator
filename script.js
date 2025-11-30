@@ -295,66 +295,60 @@
     };
     const BONUS_INPUT_IDS = ['megalithLevel', 'mrcLevel', 'runoLevel', 'humansLevel', 'mechasLevel', 'kaeleshLevel'];
     function updateLfBonusesVisibility(race) {
-    const bonusesEl = document.getElementById('lfBonuses');
-    if (!bonusesEl) return;
-    const lang = localStorage.getItem(KEYS.LANG) || 'ru';
-    const dict = getLangDict(lang);
-    bonusesEl.innerHTML = '';
-    let fieldsToCreate = [];
-    if (race === 'rocktal') {
-        fieldsToCreate = [
-            { labelKey: 'lfMegalith', inputId: 'megalithLevel', placeholder: '0' },
-            { labelKey: 'lfMineralCenter', inputId: 'mrcLevel', placeholder: '0' },
-            { labelKey: 'lfRunoTech', inputId: 'runoLevel', placeholder: '0' }
-        ];
-    } else if (race === 'humans') {
-        fieldsToCreate = [{ labelKey: 'lf_b_1003', inputId: 'humansLevel', placeholder: '0' }];
-    } else if (race === 'mechas') {
-        fieldsToCreate = [{ labelKey: 'lf_b_3003', inputId: 'mechasLevel', placeholder: '0' }];
-    } else if (race === 'kaelesh') {
-        fieldsToCreate = [{ labelKey: 'lf_b_4003', inputId: 'kaeleshLevel', placeholder: '0' }];
-    }
-    fieldsToCreate.forEach(field => {
-        const fieldDiv = document.createElement('div');
-        fieldDiv.className = 'field';
-        const label = document.createElement('label');
-        label.setAttribute('for', field.inputId);
-        label.textContent = dict[field.labelKey] || field.labelKey;
-        const input = document.createElement('input');
-        input.id = field.inputId;
-        input.type = 'text';
-        input.inputmode = 'numeric';
-        input.min = '0';
-        input.max = '100';
-        input.placeholder = field.placeholder;
-        
-        // СОХРАНЯЕМ СУЩЕСТВУЮЩЕЕ ЗНАЧЕНИЕ ПЕРЕД ПЕРЕСОЗДАНИЕМ
-        const existingValue = document.getElementById(field.inputId)?.value;
-        if (existingValue && existingValue !== '') {
-            input.value = existingValue;
-        } else {
-            // Пытаемся восстановить из localStorage
-            const savedValue = localStorage.getItem(`og_calc_${field.inputId}`);
-            if (savedValue !== null) {
+        const bonusesEl = document.getElementById('lfBonuses');
+        if (!bonusesEl) return;
+        const lang = localStorage.getItem(KEYS.LANG) || 'ru';
+        const dict = getLangDict(lang);
+        bonusesEl.innerHTML = '';
+        let fieldsToCreate = [];
+        if (race === 'rocktal') {
+            fieldsToCreate = [
+                { labelKey: 'lfMegalith', inputId: 'megalithLevel', placeholder: '0' },
+                { labelKey: 'lfMineralCenter', inputId: 'mrcLevel', placeholder: '0' },
+                { labelKey: 'lfRunoTech', inputId: 'runoLevel', placeholder: '0' }
+            ];
+        } else if (race === 'humans') {
+            fieldsToCreate = [{ labelKey: 'lf_b_1003', inputId: 'humansLevel', placeholder: '0' }];
+        } else if (race === 'mechas') {
+            fieldsToCreate = [{ labelKey: 'lf_b_3003', inputId: 'mechasLevel', placeholder: '0' }];
+        } else if (race === 'kaelesh') {
+            fieldsToCreate = [{ labelKey: 'lf_b_4003', inputId: 'kaeleshLevel', placeholder: '0' }];
+        }
+        fieldsToCreate.forEach(field => {
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'field';
+            const label = document.createElement('label');
+            label.setAttribute('for', field.inputId);
+            label.textContent = dict[field.labelKey] || field.labelKey;
+            const input = document.createElement('input');
+            input.id = field.inputId;
+            input.type = 'text';
+            input.inputmode = 'numeric';
+            input.min = '0';
+            input.max = '100';
+            input.placeholder = field.placeholder;
+            const existingValue = document.getElementById(field.inputId)?.value;
+            if (existingValue && existingValue !== '') {
+                input.value = existingValue;
+            } else {
+                const savedValue = localStorage.getItem(`og_calc_${field.inputId}`);
+                if (savedValue !== null) {
+                    input.value = formatWithDotsRaw(parseNumberInput(savedValue));
+                }
+            }
+            fieldDiv.appendChild(label);
+            fieldDiv.appendChild(input);
+            bonusesEl.appendChild(fieldDiv);
+        });
+        attachBonusInputHandlers();
+        BONUS_INPUT_IDS.forEach(id => {
+            const savedValue = localStorage.getItem(`og_calc_${id}`);
+            const input = document.getElementById(id);
+            if (savedValue !== null && input && !input.value) {
                 input.value = formatWithDotsRaw(parseNumberInput(savedValue));
             }
-        }
-        
-        fieldDiv.appendChild(label);
-        fieldDiv.appendChild(input);
-        bonusesEl.appendChild(fieldDiv);
-    });
-    attachBonusInputHandlers();
-    
-    // ДОПОЛНИТЕЛЬНОЕ ВОССТАНОВЛЕНИЕ ЗНАЧЕНИЙ
-    BONUS_INPUT_IDS.forEach(id => {
-        const savedValue = localStorage.getItem(`og_calc_${id}`);
-        const input = document.getElementById(id);
-        if (savedValue !== null && input && !input.value) {
-            input.value = formatWithDotsRaw(parseNumberInput(savedValue));
-        }
-    });
-}
+        });
+    }
     function getLangDict(lang) {
         const dict = {};
         const safeLang = lang && LANG_OTHER[lang] ? lang : 'ru';
