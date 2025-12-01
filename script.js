@@ -604,63 +604,61 @@
         updateBoxesNeeded();
     }
     function recalcAllLfResearch() {
-        const tbody = document.getElementById('tbodyLfResearch');
-        if (!tbody) return;
-        let tm = 0, tc = 0, td = 0, tp = 0;
-        let rsrCostRdc = 0;
-        if (currentLifeformRace === 'rocktal') {
-            rsrCostRdc = 0.0025 * parseNumberInput(document.getElementById('runoLevel')?.value || '0') * 100;
-        } else if (currentLifeformRace === 'humans') {
-            rsrCostRdc = 0.25 * parseNumberInput(document.getElementById('humansLevel')?.value || '0');
-        } else if (currentLifeformRace === 'mechas') {
-            rsrCostRdc = 0.25 * parseNumberInput(document.getElementById('mechasLevel')?.value || '0');
-        } else if (currentLifeformRace === 'kaelesh') {
-            rsrCostRdc = 0.25 * parseNumberInput(document.getElementById('kaeleshLevel')?.value || '0');
-        }
-        tbody.querySelectorAll('tr').forEach(tr => {
-            const techId = Number(tr.querySelector('td:first-child')?.textContent) || 0;
-            if (!techId || !TECH_COSTS[techId]) {
-                const mCell = tr.querySelector('td.m');
-                mCell.innerHTML = ''; mCell.appendChild(formatSpanMetal(0));
-                const cCell = tr.querySelector('td.c');
-                cCell.innerHTML = ''; cCell.appendChild(formatSpanCrystal(0));
-                const dCell = tr.querySelector('td.d');
-                dCell.innerHTML = ''; dCell.appendChild(formatSpanDeut(0));
-                tr.querySelector('td.p').textContent = '0';
-                return;
-            }
-            const fromInput = tr.querySelector('input[data-type="from"]').value.trim();
-            const toInput = tr.querySelector('input[data-type="to"]').value.trim();
-            let from = 0, to = 0;
-            if (fromInput === '' && toInput === '') { from = to = 0; }
-            else if (toInput === '') { const level = parseNumberInput(fromInput); from = 0; to = level; }
-            else { from = parseNumberInput(fromInput); to = Math.max(from, parseNumberInput(toInput)); }
-            if (to - from > CONFIG.MAX_LEVEL_SPAN) to = from + CONFIG.MAX_LEVEL_SPAN;
-            const planets = Math.max(1, parseNumberInput(tr.querySelector('input[data-type="planets"]')?.value) || 1);
-            let resCost = getBuildCostLF(techId, from, to, TECH_COSTS, 0, rsrCostRdc, 0);
-            let p = Math.round((resCost[0] + resCost[1] + resCost[2]) / 1000.0);
-            let m = Math.round(resCost[0] * planets);
-            let c = Math.round(resCost[1] * planets);
-            let d = Math.round(resCost[2] * planets);
+    const tbody = document.getElementById('tbodyLfResearch');
+    if (!tbody) return;
+    let tm = 0, tc = 0, td = 0, tp = 0;
+    const levelInputId = {
+        'humans': 'humansLevel',
+        'mechas': 'mechasLevel',
+        'kaelesh': 'kaeleshLevel',
+        'rocktal': 'runoLevel'
+    }[currentLifeformRace];
+    const levelValue = parseNumberInput(document.getElementById(levelInputId)?.value || '0');
+    const rsrCostRdc = 0.0025 * levelValue; // Исправлено: 0.0025 вместо 0.025
+    tbody.querySelectorAll('tr').forEach(tr => {
+        const techId = Number(tr.querySelector('td:first-child')?.textContent) || 0;
+        if (!techId || !TECH_COSTS[techId]) {
             const mCell = tr.querySelector('td.m');
-            mCell.innerHTML = ''; mCell.appendChild(formatSpanMetal(m));
+            mCell.innerHTML = ''; mCell.appendChild(formatSpanMetal(0));
             const cCell = tr.querySelector('td.c');
-            cCell.innerHTML = ''; cCell.appendChild(formatSpanCrystal(c));
+            cCell.innerHTML = ''; cCell.appendChild(formatSpanCrystal(0));
             const dCell = tr.querySelector('td.d');
-            dCell.innerHTML = ''; dCell.appendChild(formatSpanDeut(d));
-            tr.querySelector('td.p').textContent = formatNumberWithDots(p);
-            tm += m; tc += c; td += d; tp += p;
-        });
-        const sumMetalEl = document.getElementById('sumMetalLfR');
-        sumMetalEl.innerHTML = ''; sumMetalEl.appendChild(formatSpanMetal(tm));
-        const sumCrystalEl = document.getElementById('sumCrystalLfR');
-        sumCrystalEl.innerHTML = ''; sumCrystalEl.appendChild(formatSpanCrystal(tc));
-        const sumDeutEl = document.getElementById('sumDeutLfR');
-        sumDeutEl.innerHTML = ''; sumDeutEl.appendChild(formatSpanDeut(td));
-        document.getElementById('sumPointsLfR').textContent = formatNumberWithDots(tp);
-        document.getElementById('sumTotalMetalLfR').textContent = formatNumberWithDots(Math.round(convertToMetal(tm, tc, td)));
-        updateBoxesNeeded();
-    }
+            dCell.innerHTML = ''; dCell.appendChild(formatSpanDeut(0));
+            tr.querySelector('td.p').textContent = '0';
+            return;
+        }
+        const fromInput = tr.querySelector('input[data-type="from"]').value.trim();
+        const toInput = tr.querySelector('input[data-type="to"]').value.trim();
+        let from = 0, to = 0;
+        if (fromInput === '' && toInput === '') { from = to = 0; }
+        else if (toInput === '') { const level = parseNumberInput(fromInput); from = 0; to = level; }
+        else { from = parseNumberInput(fromInput); to = Math.max(from, parseNumberInput(toInput)); }
+        if (to - from > CONFIG.MAX_LEVEL_SPAN) to = from + CONFIG.MAX_LEVEL_SPAN;
+        const planets = Math.max(1, parseNumberInput(tr.querySelector('input[data-type="planets"]')?.value) || 1);
+        let resCost = getBuildCostLF(techId, from, to, TECH_COSTS, 0, rsrCostRdc, 0);
+        let p = Math.round((resCost[0] + resCost[1] + resCost[2]) / 1000.0);
+        let m = Math.round(resCost[0] * planets);
+        let c = Math.round(resCost[1] * planets);
+        let d = Math.round(resCost[2] * planets);
+        const mCell = tr.querySelector('td.m');
+        mCell.innerHTML = ''; mCell.appendChild(formatSpanMetal(m));
+        const cCell = tr.querySelector('td.c');
+        cCell.innerHTML = ''; cCell.appendChild(formatSpanCrystal(c));
+        const dCell = tr.querySelector('td.d');
+        dCell.innerHTML = ''; dCell.appendChild(formatSpanDeut(d));
+        tr.querySelector('td.p').textContent = formatNumberWithDots(p);
+        tm += m; tc += c; td += d; tp += p;
+    });
+    const sumMetalEl = document.getElementById('sumMetalLfR');
+    sumMetalEl.innerHTML = ''; sumMetalEl.appendChild(formatSpanMetal(tm));
+    const sumCrystalEl = document.getElementById('sumCrystalLfR');
+    sumCrystalEl.innerHTML = ''; sumCrystalEl.appendChild(formatSpanCrystal(tc));
+    const sumDeutEl = document.getElementById('sumDeutLfR');
+    sumDeutEl.innerHTML = ''; sumDeutEl.appendChild(formatSpanDeut(td));
+    document.getElementById('sumPointsLfR').textContent = formatNumberWithDots(tp);
+    document.getElementById('sumTotalMetalLfR').textContent = formatNumberWithDots(Math.round(convertToMetal(tm, tc, td)));
+    updateBoxesNeeded();
+}
     function recalcAllBuildings() {
         const tbodyB = document.getElementById('tbodyBuildings');
         if (!tbodyB) return;
