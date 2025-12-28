@@ -167,7 +167,7 @@
     const LANGUAGE_NAMES = {
         'en_GB': 'English (GB)',
         'en_US': 'English (US)',
-        'ru': 'Русский',
+        'ru': 'Russian',
         'de': 'Deutsch',
         'pl': 'Polski',
         'es': 'Español',
@@ -2072,3 +2072,4 @@ ensureProperPositioning();
     else document.addEventListener('DOMContentLoaded', initApp);
 
 })();
+
