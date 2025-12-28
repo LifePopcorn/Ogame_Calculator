@@ -139,7 +139,7 @@
     };
     const CONFIG = {
         TM_PER_BOX: 42000,
-        TM_PACKS: [{ tm: 14375000, priceTRY: 900 }],
+        TM_PACKS: [{ tm: 12500000, priceTRY: 900 }],
         METAL_EQ_CRYSTAL: 1.5,
         METAL_EQ_DEUT: 3,
         MAX_LEVEL_SPAN: 1000,
@@ -2070,4 +2070,5 @@ ensureProperPositioning();
     }
     if (document.readyState !== 'loading') initApp();
     else document.addEventListener('DOMContentLoaded', initApp);
+
 })();
