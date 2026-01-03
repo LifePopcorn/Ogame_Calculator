@@ -1,24 +1,22 @@
 (function() {
 'use strict';
-// --- ИСПРАВЛЕННЫЙ МАССИВ shipsData: Корабли в нужном порядке ---
 const shipsData = [
-['small-cargo', 5000, 0, 10, 5000, 'SC'], // Малый транспорт
-['large-cargo', 7500, 0, 50, 25000, 'LC'], // Большой транспорт
-['light-fighter', 12500, 0, 20, 50, 'LF'], // Лёгкий истребитель
-['heavy-fighter', 10000, 1, 75, 100, 'HF'], // Тяжёлый истребитель
-['pathfinder', 12000, 2, 300, 10000, 'PA'], // Первопроходец
-['cruiser', 15000, 1, 300, 800, 'CR'], // Крейсер
-['battleship', 10000, 2, 500, 1500, 'BS'], // Линкор
-['battlecruiser', 10000, 2, 250, 750, 'BC'], // Линейный крейсер
-['colony-ship', 2500, 1, 1000, 7500, 'CS'], // Колонизатор
-['recycler', 2000, 0, 300, 20000, 'RC'], // Переработчик
-['esp-probe', 100000000, 0, 1, 0, 'EP'], // Шпионский зонд
-['bomber', 4000, 1, 700, 500, 'BM'], // Бомбардировщик
-['destroyer', 5000, 2, 1000, 2000, 'DR'], // Уничтожитель
-['death-star', 100, 2, 1, 1000000, 'DS'], // Звезда смерти
-['reaper', 7000, 2, 1100, 10000, 'RE'] // Жнец
+['small-cargo', 5000, 0, 10, 5000, 'SC'],
+['large-cargo', 7500, 0, 50, 25000, 'LC'],
+['light-fighter', 12500, 0, 20, 50, 'LF'],
+['heavy-fighter', 10000, 1, 75, 100, 'HF'],
+['pathfinder', 12000, 2, 300, 10000, 'PA'],
+['cruiser', 15000, 1, 300, 800, 'CR'],
+['battleship', 10000, 2, 500, 1500, 'BS'],
+['battlecruiser', 10000, 2, 250, 750, 'BC'],
+['colony-ship', 2500, 1, 1000, 7500, 'CS'],
+['recycler', 2000, 0, 300, 20000, 'RC'],
+['esp-probe', 100000000, 0, 1, 0, 'EP'],
+['bomber', 4000, 1, 700, 500, 'BM'],
+['destroyer', 5000, 2, 1000, 2000, 'DR'],
+['death-star', 100, 2, 1, 1000000, 'DS'],
+['reaper', 7000, 2, 1100, 10000, 'RE']
 ];
-// --- ИСПРАВЛЕННЫЙ МАППИНГ: Сопоставление внутреннего ключа корабля с именем файла изображения ---
 const shipImageMap = {
 'small-cargo': 'maly_transport.png',
 'large-cargo': 'bolshoy_transport.png',
@@ -36,31 +34,11 @@ const shipImageMap = {
 'death-star': 'death_star.png',
 'reaper': 'reaper.png'
 };
-// --- ИСПRAВЛЕННЫЙ МАППИНГ: Сопоставление внутреннего ключа корабля с локализованным названием ---
-const shipNameMap = {
-'small-cargo': 'Малый транспорт',
-'large-cargo': 'Большой транспорт',
-'light-fighter': 'Лёгкий истребитель',
-'heavy-fighter': 'Тяжёлый истребитель',
-'pathfinder': 'Первопроходец',
-'cruiser': 'Крейсер',
-'battleship': 'Линкор',
-'battlecruiser': 'Линейный крейсер',
-'colony-ship': 'Колонизатор',
-'recycler': 'Переработчик',
-'esp-probe': 'Шпионский зонд',
-'bomber': 'Бомбардировщик',
-'destroyer': 'Уничтожитель',
-'death-star': 'Звезда смерти',
-'reaper': 'Жнец'
-};
-// --- ИСПРАВЛЕННЫЙ МАССИВ shipProperties: Соответствует новому порядку shipsData ---
 const shipProperties = [
 ["SC", 16e3], ["LC", 3e4], ["LF", 4e3], ["HF", 1e4], ["PA", 23e3],
 ["CR", 27e3], ["BS", 6e4], ["BC", 7e4], ["CS", 3e4], ["RC", 16e3],
 ["EP", 1e3], ["BM", 75e3], ["DR", 11e4], ["DS", 9e6], ["RE", 14e4]
 ];
-// --- ИСПРАВЛЕННЫЙ МАППИНГ fleetCodeMapping: Соответствует новому порядку ---
 const fleetCodeMapping = {
 "SC": "202", "LC": "203", "LF": "204", "HF": "205", "PA": "219",
 "CR": "206", "BS": "207", "BC": "215", "CS": "208", "RC": "209",
@@ -85,7 +63,7 @@ resourceDiscoveryBooster: 0,
 fleet: '{}',
 lfShipsBonuses: Array(15).fill(0)
 },
-load: function () {
+load: function() {
 try {
 const saved = localStorage.getItem('options_expeditions');
 if (saved) {
@@ -99,7 +77,7 @@ this.prm.lfShipsBonuses = Array(15).fill(0);
 console.error("Error loading expedition options:", e);
 }
 },
-save: function () {
+save: function() {
 try {
 localStorage.setItem('options_expeditions', JSON.stringify(this.prm));
 } catch (e) {
@@ -120,6 +98,11 @@ return clean ? parseInt(clean, 10) : 0;
 function validateAndFormatInput(input) {
 const num = parseInput(input);
 input.value = num > 0 ? numToOGame(num) : '';
+}
+function getShipName(shipKey) {
+const lang = localStorage.getItem('og_calc_lang_v2') || 'ru';
+const dict = window.getLangDict ? window.getLangDict(lang) : {};
+return dict[`ship_${shipKey.replace(/-/g, '_')}`] || shipKey.replace(/-/g, ' ');
 }
 function getCargoCapacity(abbrev) {
 let base = 0;
@@ -291,11 +274,10 @@ nameCell.style.padding = '2px 4px';
 nameCell.style.display = 'flex';
 nameCell.style.alignItems = 'center';
 nameCell.style.gap = '8px';
-// Изображение корабля
-const shipKey = ship[0]; // Используем ключ из shipsData
+const shipKey = ship[0];
 const img = document.createElement('img');
 img.src = `images/ships/${shipImageMap[shipKey]}`;
-img.alt = shipNameMap[shipKey];
+img.alt = getShipName(shipKey);
 img.className = 'icon';
 img.width = 20;
 img.height = 20;
@@ -306,7 +288,7 @@ img.addEventListener('error', () => {
 if (!img._fallback) {
 const fb = document.createElement('span');
 fb.className = 'icon-fallback';
-fb.textContent = shipNameMap[shipKey].charAt(0);
+fb.textContent = getShipName(shipKey).charAt(0);
 fb.style.marginRight = '6px';
 fb.style.display = 'inline-block';
 fb.style.width = '20px';
@@ -318,8 +300,7 @@ img.parentNode && img.parentNode.insertBefore(fb, img.nextSibling);
 img._fallback = true;
 }
 });
-// Локализованное название
-const localized = shipNameMap[shipKey];
+const localized = getShipName(shipKey);
 nameCell.appendChild(img);
 nameCell.appendChild(document.createTextNode(localized));
 const bonusCell = document.createElement('td');
@@ -334,7 +315,7 @@ input.className = 'lf-bonus-input quantity-input';
 input.addEventListener('input', (e) => {
 e.target.value = e.target.value.replace(/[^0-9.]/g, '');
 });
-input.addEventListener('blur', function () {
+input.addEventListener('blur', function() {
 const index = parseInt(this.dataset.index);
 if (!isNaN(index) && index >= 0 && index < 15) {
 const value = parseFloat(this.value) || 0;
@@ -365,11 +346,10 @@ nameCell.className = 'first-column';
 nameCell.style.display = 'flex';
 nameCell.style.alignItems = 'center';
 nameCell.style.gap = '8px';
-// Изображение корабля
-const shipKey = ship[0]; // Используем ключ из shipsData
+const shipKey = ship[0];
 const img = document.createElement('img');
 img.src = `images/ships/${shipImageMap[shipKey]}`;
-img.alt = shipNameMap[shipKey];
+img.alt = getShipName(shipKey);
 img.className = 'icon';
 img.width = 28;
 img.height = 28;
@@ -380,7 +360,7 @@ img.addEventListener('error', () => {
 if (!img._fallback) {
 const fb = document.createElement('span');
 fb.className = 'icon-fallback';
-fb.textContent = shipNameMap[shipKey].charAt(0);
+fb.textContent = getShipName(shipKey).charAt(0);
 fb.style.marginRight = '6px';
 fb.style.display = 'inline-block';
 fb.style.width = '28px';
@@ -392,8 +372,7 @@ img.parentNode && img.parentNode.insertBefore(fb, img.nextSibling);
 img._fallback = true;
 }
 });
-// Локализованное название
-const localized = shipNameMap[shipKey];
+const localized = getShipName(shipKey);
 nameCell.appendChild(img);
 nameCell.appendChild(document.createTextNode(localized));
 const qtyCell = document.createElement('td');
@@ -461,7 +440,7 @@ const content = document.getElementById('accordion-lf-prm');
 if (!header || !content) return;
 const newHeader = header.cloneNode(true);
 header.parentNode.replaceChild(newHeader, header);
-newHeader.addEventListener('click', function (e) {
+newHeader.addEventListener('click', function(e) {
 e.preventDefault();
 e.stopPropagation();
 const isVisible = content.style.display === 'block';
@@ -526,7 +505,7 @@ const pos = getCurrentPosition();
 startWrapperX = pos.x; startWrapperY = pos.y;
 handle.style.cursor = 'grabbing';
 wrapper.style.zIndex = '2000';
-try { handle.setPointerCapture(e.pointerId); } catch{}
+try { handle.setPointerCapture(e.pointerId); } catch {}
 });
 document.addEventListener('pointermove', (e) => {
 if (!isDragging) return;
@@ -540,7 +519,7 @@ if (!isDragging) return;
 isDragging = false;
 handle.style.cursor = 'grab';
 wrapper.style.zIndex = '1000';
-try { handle.releasePointerCapture(event?.pointerId); } catch{}
+try { handle.releasePointerCapture(event?.pointerId); } catch {}
 const rect = wrapper.getBoundingClientRect();
 const posX = Math.round(rect.left);
 const posY = Math.round(rect.top);
@@ -582,7 +561,7 @@ const pos = getCurrentPosition();
 startWrapperX = pos.x; startWrapperY = pos.y;
 handle.style.cursor = 'grabbing';
 wrapper.style.zIndex = '2000';
-try { handle.setPointerCapture(e.pointerId); } catch{}
+try { handle.setPointerCapture(e.pointerId); } catch {}
 });
 document.addEventListener('pointermove', (e) => {
 if (!isDragging) return;
@@ -596,7 +575,7 @@ if (!isDragging) return;
 isDragging = false;
 handle.style.cursor = 'grab';
 wrapper.style.zIndex = '1000';
-try { handle.releasePointerCapture(event?.pointerId); } catch{}
+try { handle.releasePointerCapture(event?.pointerId); } catch {}
 const rect = wrapper.getBoundingClientRect();
 const posX = Math.round(rect.left);
 const posY = Math.round(rect.top);
@@ -686,7 +665,7 @@ setTimeout(initAccordion, 50);
 }, 100);
 compute();
 }
-window.initExpeditions = function () {
+window.initExpeditions = function() {
 if (window.expeditionsInitialized) return;
 options.load();
 initExpeditionsTable();
@@ -707,10 +686,10 @@ updateExpeditionsLang();
 initMainTableDrag();
 };
 window.updateExpeditionsLang = updateExpeditionsLang;
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
 initMainTableDrag();
 document.querySelectorAll('.nav-btn').forEach(btn => {
-btn.addEventListener('click', function () {
+btn.addEventListener('click', function() {
 if (this.dataset.view === 'expeditions') {
 setTimeout(() => {
 if (!window.expeditionsInitialized) {
@@ -723,9 +702,9 @@ initAccordion();
 });
 });
 document.querySelectorAll('.tab-btn').forEach(btn => {
-btn.addEventListener('click', function () {
+btn.addEventListener('click', function() {
 setTimeout(initAccordion, 100);
 });
 });
 });
-})(); // <-- Завершение IIFE
+})();
