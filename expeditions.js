@@ -35,9 +35,21 @@ const shipImageMap = {
 'reaper': 'reaper.png'
 };
 const shipProperties = [
-["SC", 16e3], ["LC", 3e4], ["LF", 4e3], ["HF", 1e4], ["PA", 23e3],
-["CR", 27e3], ["BS", 6e4], ["BC", 7e4], ["CS", 3e4], ["RC", 16e3],
-["EP", 1e3], ["BM", 75e3], ["DR", 11e4], ["DS", 9e6], ["RE", 14e4]
+["RC", 16e3],
+["CS", 3e4],
+["DS", 9e6],
+["EP", 1e3],
+["SC", 4e3],
+["LF", 4e3],
+["LC", 12e3],
+["HF", 1e4],
+["CR", 27e3],
+["PA", 23e3],
+["BS", 6e4],
+["BC", 7e4],
+["BM", 75e3],
+["DR", 11e4],
+["RE", 14e4]
 ];
 const fleetCodeMapping = {
 "SC": "202", "LC": "203", "LF": "204", "HF": "205", "PA": "219",
@@ -111,9 +123,9 @@ const idx = shipsData.findIndex(s => s[5] === abbrev);
 if (idx === -1) return 0;
 base = shipsData[idx][4] * (1 + 0.05 * options.prm.hyperTechLevel);
 if (options.prm.playerClass === 1 && idx < 2) {
-base += Math.floor(shipsData[idx][4] * 0.25 * (1 + options.prm.classBonusCollector / 100));
+base += shipsData[idx][4] * 0.25 * (1 + options.prm.classBonusCollector / 100);
 }
-base += Math.floor(shipsData[idx][4] * (options.prm.lfShipsBonuses[idx] || 0) / 100);
+base += shipsData[idx][4] * (options.prm.lfShipsBonuses[idx] || 0) / 100;
 return Math.floor(base);
 }
 let capacity = 0;
@@ -122,12 +134,12 @@ const count = parseInput(document.getElementById(`num${ship[5]}`));
 if (count > 0) {
 let inc = count * ship[4] * (1 + 0.05 * options.prm.hyperTechLevel);
 if (options.prm.playerClass === 1 && i < 2) {
-inc += Math.floor(count * ship[4] * 0.25 * (1 + options.prm.classBonusCollector / 100));
+inc += count * ship[4] * 0.25 * (1 + options.prm.classBonusCollector / 100);
 }
 if (options.prm.playerClass === 2 && (i === 7 || i === 14)) {
 inc += count * ship[4] * 0.2;
 }
-inc += Math.floor(count * ship[4] * (options.prm.lfShipsBonuses[i] || 0) / 100);
+inc += count * ship[4] * (options.prm.lfShipsBonuses[i] || 0) / 100;
 capacity += inc;
 }
 });
@@ -209,11 +221,24 @@ g = Math.max(g, shipProperties[d][1]);
 }
 }
 }
-const highTop = parseInt(document.getElementById('highTop')?.value) || 40000;
+const highTopSelect = document.getElementById('highTop');
+const idx = highTopSelect.selectedIndex;
+const highTopValues = [
+40000,      // 0: < 10.000
+500000,     // 1: < 100.000
+1200000,    // 2: < 1.000.000
+1800000,    // 3: < 5.000.000
+2400000,    // 4: < 25.000.000
+3000000,    // 5: < 50.000.000
+3600000,    // 6: < 75.000.000
+4200000,    // 7: < 100.000.000
+5000000     // 8: > 100.000.000
+];
+const highTop = highTopValues[idx] || 40000;
 options.prm.highTop = highTop;
 const factor = hasPathfinder
-? (options.prm.playerClass === 0 ? 3 * options.prm.universeSpeed : 2)
-: (options.prm.playerClass === 0 ? 1.5 * options.prm.universeSpeed : 1);
+? (options.prm.playerClass === 0 ? 3 * options.prm.universeSpeed : 2 * options.prm.universeSpeed)
+: (options.prm.playerClass === 0 ? 1.5 * options.prm.universeSpeed : options.prm.universeSpeed);
 let maxPoints = Math.floor(factor * highTop);
 const discovererBonus = options.prm.playerClass === 0 ? (1 + options.prm.classBonusDiscoverer / 100) : 1;
 maxPoints = Math.floor(maxPoints * (1 + options.prm.percentRes / 100) * discovererBonus);
@@ -223,21 +248,23 @@ const dict = window.getLangDict ? window.getLangDict(localStorage.getItem('og_ca
 const maxPointsLabel = dict.expeditionsMaxPointsLabel || 'Resource find (max):';
 const minLCUnit = dict.expeditionsMaxPointsLCUnit || 'LC';
 document.getElementById('max_points').textContent = `${maxPointsLabel}: ${numToOGame(maxPoints)} (${minLC} ${minLCUnit})`;
-const baseRes = Math.max(1000 * factor * highTop, 200000);
+let b = factor * highTop;
+let d_val = Math.max(1000 * b, 200000);
+d_val *= 0.001;
 const resFactor = (1 + options.prm.percentRes / 100) * discovererBonus * (1 + options.prm.resourceDiscoveryBooster / 100);
-const maxRes = Math.floor(baseRes * 0.001 * resFactor);
-const metal = totalCapacity > 0 ? Math.min(maxRes, totalCapacity) : 0;
-const crystal = totalCapacity > 0 ? Math.min(Math.floor(maxRes / 2), totalCapacity) : 0;
-const deut = totalCapacity > 0 ? Math.min(Math.floor(maxRes / 3), totalCapacity) : 0;
+d_val = Math.floor(d_val * resFactor);
+const metal = totalCapacity > 0 ? Math.min(d_val, totalCapacity) : 0;
+const crystal = totalCapacity > 0 ? Math.min(Math.floor(d_val / 2), totalCapacity) : 0;
+const deut = totalCapacity > 0 ? Math.min(Math.floor(d_val / 3), totalCapacity) : 0;
 const storageEl = document.getElementById('storageCapacity');
 if (storageEl) {
 storageEl.textContent = numToOGame(totalCapacity);
-storageEl.style.fontStyle = maxRes > totalCapacity ? 'italic' : 'normal';
+storageEl.style.fontStyle = d_val > totalCapacity ? 'italic' : 'normal';
 }
 document.getElementById('maxFindMet').textContent = numToOGame(metal);
 document.getElementById('maxFindCry').textContent = numToOGame(crystal);
 document.getElementById('maxFindDeu').textContent = numToOGame(deut);
-const c = foundShips ? Math.max(10000, factor * highTop) : 0;
+const c = foundShips ? Math.max(10000, Math.floor(b)) : 0;
 for (let d = 3; d < shipProperties.length; d++) {
 const canEl = document.getElementById(`can${shipProperties[d][0]}`);
 const findEl = document.getElementById(`find${shipProperties[d][0]}`);
@@ -248,7 +275,8 @@ findEl.textContent = numToOGame(maxShips);
 findEl.className = maxShips > 0 ? 'bolder-label' : '';
 }
 }
-const darkMatter = Math.floor(1800 * (1 + options.prm.darkMatterDiscoveryBonus / 100));
+const darkMatterRaw = 1800 * (1 + options.prm.darkMatterDiscoveryBonus / 100);
+const darkMatter = Math.min(2000000, Math.floor(darkMatterRaw));
 document.getElementById('darkMatterFind').textContent = numToOGame(darkMatter);
 options.save();
 }
@@ -259,12 +287,7 @@ const lang = localStorage.getItem('og_calc_lang_v2') || 'ru';
 const dict = window.getLangDict ? window.getLangDict(lang) : {};
 LOCA_YES = dict.expeditionsYes || "Yes";
 LOCA_NO = dict.expeditionsNo || "No";
-container.innerHTML = `
-<tr>
-<th data-i18n="ship">${dict.shipType || 'Ship Type'}</th>
-<th data-i18n="bonus">${dict.bonus || 'Bonus (%)'}</th>
-</tr>
-`;
+container.innerHTML = '<tr><th>Ship Type</th><th>Bonus (%)</th></tr>';
 shipsData.forEach((ship, i) => {
 const row = document.createElement('tr');
 row.className = i % 2 === 0 ? 'odd' : 'even';
@@ -409,29 +432,15 @@ compute();
 });
 const capRow = document.createElement('tr');
 capRow.className = 'storage-row';
-capRow.innerHTML = `
-<td colspan="2" class="first-column">${dict.expeditionsCargoCapacity || 'Storage Capacity:'}</td>
-<td colspan="2" style="text-align:right;"><span id="storageCapacity">0</span></td>
-`;
+capRow.innerHTML = `<td colspan="2">Storage Capacity:</td><td colspan="2" style="text-align:right;"><span id="storageCapacity">0</span></td>`;
 tbody.appendChild(capRow);
 const resRow = document.createElement('tr');
 resRow.className = 'resources-row';
-resRow.innerHTML = `
-<td colspan="2" class="first-column">${dict.expeditionsMaxResourcesLabel || 'Resource find (max):'}</td>
-<td style="text-align:right;">${dict.metal || 'Metal'}<br>${dict.crystal || 'Crystal'}<br>${dict.deut || 'Deuterium'}</td>
-<td style="text-align:right;">
-<span id="maxFindMet">0</span><br>
-<span id="maxFindCry">0</span><br>
-<span id="maxFindDeu">0</span>
-</td>
-`;
+resRow.innerHTML = `<td colspan="2">Resource find (max):</td><td style="text-align:right;">Metal<br>Crystal<br>Deuterium</td><td style="text-align:right;"><span id="maxFindMet">0</span><br><span id="maxFindCry">0</span><br><span id="maxFindDeu">0</span></td>`;
 tbody.appendChild(resRow);
 const dmRow = document.createElement('tr');
 dmRow.className = 'dark-matter-row';
-dmRow.innerHTML = `
-<td colspan="2" class="first-column">${dict.expeditionsDarkMatterFindLabel || 'Dark Matter find (max):'}</td>
-<td colspan="2" style="text-align:right;"><span id="darkMatterFind">0</span></td>
-`;
+dmRow.innerHTML = `<td colspan="2">Dark Matter find (max):</td><td colspan="2" style="text-align:right;"><span id="darkMatterFind">0</span></td>`;
 tbody.appendChild(dmRow);
 }
 function initAccordion() {
@@ -484,9 +493,9 @@ clearBtn.removeEventListener('click', clearFleet);
 clearBtn.addEventListener('click', clearFleet);
 }
 }
-function initMainTableDrag() {
-const handle = document.getElementById('dragHandle');
-const wrapper = document.getElementById('tableWrapper');
+function initDragHandler(wrapperId, handleId, storageKey) {
+const handle = document.getElementById(handleId);
+const wrapper = document.getElementById(wrapperId);
 if (!handle || !wrapper) return;
 let isDragging = false, startX, startY, startWrapperX = 0, startWrapperY = 0;
 function getCurrentPosition() {
@@ -524,76 +533,20 @@ const rect = wrapper.getBoundingClientRect();
 const posX = Math.round(rect.left);
 const posY = Math.round(rect.top);
 try {
-localStorage.setItem('og_calc_main_table_pos', JSON.stringify({ left: posX, top: posY }));
+localStorage.setItem(storageKey, JSON.stringify({ left: posX, top: posY }));
 } catch {}
 };
 document.addEventListener('pointerup', stop);
 document.addEventListener('pointercancel', stop);
 try {
-const pos = JSON.parse(localStorage.getItem('og_calc_main_table_pos') || '{}');
+const pos = JSON.parse(localStorage.getItem(storageKey) || '{}');
 if (pos.left != null && pos.top != null) {
 wrapper.style.transform = `translate(${Math.round(pos.left)}px, ${Math.round(pos.top)}px)`;
 wrapper.style.position = 'absolute';
 ['left','top','right','bottom'].forEach(p => wrapper.style[p] = 'auto');
 }
 } catch (e) {
-console.error("Error loading main table position:", e);
-}
-}
-function initExpeditionsTableDrag() {
-const handle = document.getElementById('dragHandleExpeditions');
-const wrapper = document.getElementById('expeditionsWrapper');
-if (!handle || !wrapper) return;
-let isDragging = false, startX, startY, startWrapperX = 0, startWrapperY = 0;
-function getCurrentPosition() {
-const style = getComputedStyle(wrapper);
-const transform = style.transform;
-if (transform && transform !== 'none') {
-const matrix = new DOMMatrix(transform);
-return { x: matrix.e, y: matrix.f };
-}
-return { x: parseFloat(style.left) || 0, y: parseFloat(style.top) || 0 };
-}
-handle.addEventListener('pointerdown', (e) => {
-isDragging = true;
-startX = e.clientX; startY = e.clientY;
-const pos = getCurrentPosition();
-startWrapperX = pos.x; startWrapperY = pos.y;
-handle.style.cursor = 'grabbing';
-wrapper.style.zIndex = '2000';
-try { handle.setPointerCapture(e.pointerId); } catch {}
-});
-document.addEventListener('pointermove', (e) => {
-if (!isDragging) return;
-const dx = e.clientX - startX, dy = e.clientY - startY;
-wrapper.style.transform = `translate(${Math.round(startWrapperX + dx)}px, ${Math.round(startWrapperY + dy)}px)`;
-wrapper.style.position = 'absolute';
-['left','top','right','bottom'].forEach(p => wrapper.style[p] = 'auto');
-});
-const stop = () => {
-if (!isDragging) return;
-isDragging = false;
-handle.style.cursor = 'grab';
-wrapper.style.zIndex = '1000';
-try { handle.releasePointerCapture(event?.pointerId); } catch {}
-const rect = wrapper.getBoundingClientRect();
-const posX = Math.round(rect.left);
-const posY = Math.round(rect.top);
-try {
-localStorage.setItem('og_calc_expeditions_pos', JSON.stringify({ left: posX, top: posY }));
-} catch {}
-};
-document.addEventListener('pointerup', stop);
-document.addEventListener('pointercancel', stop);
-try {
-const pos = JSON.parse(localStorage.getItem('og_calc_expeditions_pos') || '{}');
-if (pos.left != null && pos.top != null) {
-wrapper.style.transform = `translate(${Math.round(pos.left)}px, ${Math.round(pos.top)}px)`;
-wrapper.style.position = 'absolute';
-['left','top','right','bottom'].forEach(p => wrapper.style[p] = 'auto');
-}
-} catch (e) {
-console.error("Error loading expedition position:", e);
+console.error("Error loading position:", e);
 }
 }
 function updateExpeditionsLang() {
@@ -653,14 +606,14 @@ console.error("Error populating fleet from JSON:", e);
 initBonusesPanel();
 setTimeout(() => {
 const headers = document.querySelectorAll('#data-table th');
-if (headers.length > 0) headers[0].textContent = dict.shipType || 'Ship Type:';
-if (headers.length > 1) headers[1].textContent = dict.qty || 'Number:';
-if (headers.length > 2) headers[2].innerHTML = dict.canBeFound || 'Can a ship of this<br>type be found?';
-if (headers.length > 3) headers[3].innerHTML = dict.maxCanBeFound || 'Discoverable number<br>of ships (max):';
+if (headers.length > 0) headers[0].textContent = 'Ship Type';
+if (headers.length > 1) headers[1].textContent = 'Quantity';
+if (headers.length > 2) headers[2].innerHTML = 'Can be found?';
+if (headers.length > 3) headers[3].innerHTML = 'Max discoverable';
 const resourceRow = document.querySelector('.resources-row .first-column');
-if (resourceRow) resourceRow.textContent = dict.expeditionsMaxResourcesLabel || 'Resource find (max):';
+if (resourceRow) resourceRow.textContent = 'Resource find (max):';
 const darkMatterRow = document.querySelector('.dark-matter-row .first-column');
-if (darkMatterRow) darkMatterRow.textContent = dict.expeditionsDarkMatterFindLabel || 'Dark Matter find (max):';
+if (darkMatterRow) darkMatterRow.textContent = 'Dark Matter find (max):';
 setTimeout(initAccordion, 50);
 }, 100);
 compute();
@@ -676,18 +629,16 @@ console.error("Error populating fleet from JSON:", e);
 }
 initBonusesPanel();
 initAccordion();
-initExpeditionsTableDrag();
+initDragHandler('expeditionsWrapper', 'dragHandleExpeditions', 'og_calc_expeditions_pos');
 bindEvents();
 compute();
 window.expeditionsInitialized = true;
 document.removeEventListener('languageChanged', updateExpeditionsLang);
 document.addEventListener('languageChanged', updateExpeditionsLang);
 updateExpeditionsLang();
-initMainTableDrag();
 };
 window.updateExpeditionsLang = updateExpeditionsLang;
 document.addEventListener('DOMContentLoaded', function() {
-initMainTableDrag();
 document.querySelectorAll('.nav-btn').forEach(btn => {
 btn.addEventListener('click', function() {
 if (this.dataset.view === 'expeditions') {
