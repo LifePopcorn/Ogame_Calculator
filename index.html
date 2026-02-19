@@ -7,11 +7,9 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body class="theme-dark">
-<!-- Видео-фон -->
 <video autoplay muted loop playsinline id="bgVideo">
 <source src="./images/background.webm" type="video/webm" />
 </video>
-<!-- Главное меню навигации -->
 <nav id="mainNav" class="main-nav" aria-label="Главное меню">
 <button class="nav-btn active" data-view="costs" aria-selected="true" data-i18n="tabCosts">Расчет стоимости</button>
 <button class="nav-btn nav-btn-expeditions" data-view="expeditions" aria-selected="false" data-i18n="tabExpeditions">
@@ -20,14 +18,12 @@
 </button>
 </nav>
 <div class="main-content">
-<!-- Вкладка: Расчет стоимости -->
 <div class="table-wrapper" id="tableWrapper" role="region" aria-label="OGame калькулятор" tabindex="-1">
 <header class="top-controls">
 <div class="top-controls-left">
 <div class="drag-handle" id="dragHandle" tabindex="0" role="button" aria-label="Переместить таблицу" data-i18n="dragHandleLabel">Переместить таблицу</div>
 </div>
 </header>
-<!-- Левая панель вкладок -->
 <nav class="tabs-left" id="tabsLeft" aria-label="Навигация по разделам">
 <div class="tab-switch" role="tablist" aria-label="Tabs">
 <button class="tab-btn active" data-tab="buildings" aria-selected="true" data-i18n="tabBuildings" role="tab" tabindex="0">Постройки</button>
@@ -36,7 +32,6 @@
 <button class="tab-btn" data-tab="lifeforms" aria-selected="false" data-i18n="tabLifeforms" role="tab" tabindex="-1">Формы жизни</button>
 </div>
 </nav>
-<!-- Общая строка ввода коробок -->
 <div class="header-bar" id="headerBar">
 <div class="header-left">
 <div class="box-row" id="globalBoxRow">
@@ -65,7 +60,6 @@
 </div>
 </div>
 </div>
-<!-- Вкладка: Постройки -->
 <div id="tabBuildings" class="tab-content active" role="tabpanel" aria-hidden="false">
 <div class="table-frame">
 <table class="cost-table" id="buildingsTable" aria-describedby="buildingsDesc">
@@ -98,7 +92,6 @@
 </table>
 </div>
 </div>
-<!-- Вкладка: Исследования -->
 <div id="tabResearch" class="tab-content" role="tabpanel" aria-hidden="true">
 <div class="table-frame">
 <div class="tm-block" id="tmBlock" style="display:flex;align-items:center;gap:6px;padding:0;background:transparent;border:none;">
@@ -135,7 +128,6 @@
 </table>
 </div>
 </div>
-<!-- Вкладка: Флот -->
 <div id="tabFleet" class="tab-content" role="tabpanel" aria-hidden="true">
 <div class="table-frame" id="fleetFrame">
 <table class="cost-table" id="shipsTable" aria-describedby="fleetDesc">
@@ -185,7 +177,6 @@
 </div>
 </div>
 </div>
-<!-- Вкладка: Формы жизни -->
 <div id="tabLifeforms" class="tab-content" role="tabpanel" aria-hidden="true">
 <div class="table-frame">
 <div class="lf-subtabs" role="tablist" aria-label="LifeformTabs">
@@ -195,13 +186,12 @@
 <div style="display: flex; align-items: center; gap: 8px; margin-left: auto;">
 <select id="lifeformSelect" class="lifeform-select" aria-label="Lifeform" data-i18n-label="lfSelectLabel">
 <option value="humans" data-i18n="humans">Люди</option>
-<option value="rocktal" data-i18n="rocktal">Рок’тал</option>
+<option value="rocktal" data-i18n="rocktal">Рок'тал</option>
 <option value="mechas" data-i18n="mechas">Мехи</option>
 <option value="kaelesh" data-i18n="kaelesh">Кэлиш</option>
 </select>
 </div>
 </div>
-<!-- Подвкладка: Постройки форм жизни -->
 <div id="lf-buildings" class="subtab-content active" role="tabpanel" aria-hidden="false">
 <table class="cost-table" id="lfBuildingsTable" aria-describedby="lfBuildingsDesc">
 <thead>
@@ -232,7 +222,6 @@
 </tfoot>
 </table>
 </div>
-<!-- Подвкладка: Исследования форм жизни -->
 <div id="lf-research" class="subtab-content" role="tabpanel" aria-hidden="true">
 <table class="cost-table" id="lfResearchTable" aria-describedby="lfResearchDesc">
 <thead>
@@ -266,7 +255,6 @@
 </div>
 </div>
 </div>
-<!-- Вкладка: Экспедиции -->
 <div class="table-wrapper" id="expeditionsWrapper" style="display:none;" role="region" aria-label="Экспедиционный калькулятор" tabindex="-1">
 <header class="top-controls">
 <div class="top-controls-left">
@@ -274,7 +262,6 @@
 </div>
 </header>
 <div class="table-frame" style="padding: 0; max-width: 800px; margin: 0 auto;">
-<!-- Настройки -->
 <div id="settings-panel" class="ui-widget-content c-ui-widget-content ui-corner-all ui-panel expeditions-settings-section">
 <div class="settings-group">
 <h3 class="settings-title" data-i18n="expeditionsSettingsTitle">Калькулятор Экспедиции OGame</h3>
@@ -372,7 +359,6 @@
 </tr>
 </tbody>
 </table>
-<!-- Аккордеон: Повышение характеристик кораблей -->
 <div id="lf-bonuses-accordion" class="ui-accordion ui-widget ui-helper-reset ui-accordion-icons" role="tablist">
 <h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="0" style="cursor: pointer; pointer-events: auto;">
 <span class="ui-icon ui-icon-triangle-1-e"></span>
@@ -391,7 +377,6 @@
 </div>
 </div>
 </div>
-<!-- Данные: Состав флота -->
 <div id="data-panel" class="ui-panel ui-widget-content ui-corner-bottom expeditions-data-section">
 <h3 class="data-title" data-i18n="expeditionsFleetTitle">Состав флота для экспедиции</h3>
 <table id="data-table" class="lined" cellpadding="1" cellspacing="1" width="100%" style="font-size: 12px;">
@@ -404,20 +389,17 @@
 </tr>
 </thead>
 <tbody id="expeditionsFleetBody">
-<!-- Заполняется скриптом -->
 </tbody>
 </table>
 </div>
 </div>
 </div>
 </div>
-<!-- Элементы управления -->
 <div class="zoom-controls">
 <button id="globalZoomIn" title="Приблизить">+</button>
 <button id="globalZoomOut" title="Отдалить">−</button>
 <button id="globalZoomReset" title="Сброс">↻</button>
 </div>
-<!-- Выбор языка -->
 <div class="language-container" aria-hidden="false">
 <div class="lang-dropdown">
 <button id="langToggle" class="tab-btn">
@@ -427,23 +409,9 @@
 <div id="langDropdownMenu" class="dropdown-menu"></div>
 </div>
 </div>
-<!-- Версия -->
-<div class="revision-badge">Version 1.07.5a</div>
-<!-- Подключение скриптов -->
+<div class="revision-badge">Version 1.07.6a</div>
 <script src="languages.js"></script>
 <script src="script.js"></script>
 <script src="expeditions.js"></script>
-<!-- Переключение главных вкладок -->
-<script>
-document.querySelectorAll('.nav-btn').forEach(btn => {
-btn.addEventListener('click', () => {
-document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-btn.classList.add('active');
-const view = btn.dataset.view;
-document.getElementById('tableWrapper').style.display = view === 'costs' ? 'block' : 'none';
-document.getElementById('expeditionsWrapper').style.display = view === 'expeditions' ? 'block' : 'none';
-});
-});
-</script>
 </body>
 </html>
