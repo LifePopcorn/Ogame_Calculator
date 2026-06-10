@@ -545,7 +545,7 @@ body {
 }
 
 .cost-table td:first-child, .cost-table th:first-child { text-align: left; width: 220px; padding-left: 10px; }
-#sumTotalMetalB, #sumTotalMetalR, #sumTotalMetalLfB, #sumTotalMetalLfR { text-align: left !important; padding-left: 10px; padding-right: 0; }
+#sumTotalMetalB, #sumTotalMetalR, #sumTotalMetalLfB, #sumTotalMetalLfR { text-align: left !important; padding-left: 0; padding-right: 0; }
 
 #lfBuildingsTable th:first-child, #lfBuildingsTable td:first-child,
 #lfResearchTable th:first-child, #lfResearchTable td:first-child {
