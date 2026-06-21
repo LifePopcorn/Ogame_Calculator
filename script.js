@@ -86,7 +86,7 @@ const TECH_COSTS_LF = {
 3105: [160000, 120000, 50000, 0, 4500, 1.5, 1.5, 1.5, 0, 1.4],
 3106: [50000, 50000, 20000, 0, 5000, 1.5, 1.5, 1.5, 0, 1.3],
 3107: [70000, 40000, 20000, 0, 5500, 1.3, 1.3, 1.3, 0, 1.3],
-3108: [160000, 120000, 50000, 0, 6000, 1.5, 1.5, 1.5, 0, 1.4],
+3108: [160000, 12000, 50000, 0, 6000, 1.5, 1.5, 1.5, 0, 1.4],
 3109: [160000, 120000, 50000, 0, 6500, 1.5, 1.5, 1.5, 0, 1.4],
 3110: [85000, 40000, 35000, 0, 7000, 1.2, 1.2, 1.2, 0, 1.3],
 3111: [120000, 30000, 25000, 0, 7500, 1.3, 1.3, 1.3, 0, 1.3],
@@ -154,7 +154,8 @@ LF_RACE: 'og_calc_lf_race_v1',
 ROCKTAL_MEGALITH_LEVEL: 'og_calc_rocktal_megalith_level',
 ROCKTAL_MRC_LEVEL: 'og_calc_rocktal_mrc_level',
 ROCKTAL_RUNO_LEVEL: 'og_calc_rocktal_runo_level',
-SUM_ALL_TABS: 'og_calc_sum_all_tabs'
+SUM_ALL_TABS: 'og_calc_sum_all_tabs',
+LF_TOTALS: 'og_calc_lf_totals_v1'
 };
 const LANGUAGE_NAMES = {
 en: 'English', ru: 'Russian', de: 'Deutsch', pl: 'Polski', es: 'Español',
@@ -265,6 +266,32 @@ const LF_RESEARCH_FILENAMES = {
 4116: "speed_boost_battleship.png", 4117: "psionic_shield_matrix.png", 4118: "kaelesh_explorer_enhancement.png"
 };
 const BONUS_INPUT_IDS = ['megalithLevel', 'mrcLevel', 'runoLevel', 'humansLevel', 'mechasLevel', 'kaeleshLevel'];
+let lfTotals = {
+humans: { buildings: 0, research: 0 },
+rocktal: { buildings: 0, research: 0 },
+mechas: { buildings: 0, research: 0 },
+kaelesh: { buildings: 0, research: 0 }
+};
+function saveLfTotals() {
+try { safeLocalStorageSet(KEYS.LF_TOTALS, JSON.stringify(lfTotals)); } catch (e) {}
+}
+function loadLfTotals() {
+try {
+const saved = safeLocalStorageGet(KEYS.LF_TOTALS, null);
+if (!saved) return;
+const data = JSON.parse(saved);
+if (data && typeof data === 'object') {
+['humans', 'rocktal', 'mechas', 'kaelesh'].forEach(race => {
+if (data[race]) {
+lfTotals[race] = {
+buildings: Number(data[race].buildings) || 0,
+research: Number(data[race].research) || 0
+};
+}
+});
+}
+} catch (e) {}
+}
 class LimitedCache {
 constructor(maxSize = 500) {
 this.cache = new Map();
@@ -448,6 +475,7 @@ document.getElementById(sumIds.p).textContent = formatNumberWithDots(tp);
 document.getElementById(sumIds.total).textContent = formatNumberWithDots(Math.round(convertToMetal(tm, tc, td)));
 }
 updateBoxesNeeded();
+updateSumAllTabsRows();
 }
 function recalcLfTable(tbodyId, isBuilding) {
 const tbody = document.getElementById(tbodyId);
@@ -515,8 +543,13 @@ updateResourceCell(document.getElementById(`sumMetal${suffix}`), tm, 'val-metal'
 updateResourceCell(document.getElementById(`sumCrystal${suffix}`), tc, 'val-crystal');
 updateResourceCell(document.getElementById(`sumDeut${suffix}`), td, 'val-deut');
 document.getElementById(`sumPoints${suffix}`).textContent = formatNumberWithDots(tp);
-document.getElementById(`sumTotalMetal${suffix}`).textContent = formatNumberWithDots(Math.round(convertToMetal(tm, tc, td)));
+const totalMetalLf = Math.round(convertToMetal(tm, tc, td));
+document.getElementById(`sumTotalMetal${suffix}`).textContent = formatNumberWithDots(totalMetalLf);
+if (isBuilding) lfTotals[currentLifeformRace].buildings = totalMetalLf;
+else lfTotals[currentLifeformRace].research = totalMetalLf;
+saveLfTotals();
 updateBoxesNeeded();
+updateSumAllTabsRows();
 }
 function recalcAllBuildings() { recalcStandardTable('tbodyBuildings', BUILDINGS_DATA, { m: 'sumMetalB', c: 'sumCrystalB', d: 'sumDeutB', p: 'sumPointsB', total: 'sumTotalMetalB' }); }
 function recalcAllMoonBuildings() { recalcStandardTable('tbodyMoonBuildings', MOON_BUILDINGS_DATA, { m: 'sumMetalMoon', c: 'sumCrystalMoon', d: 'sumDeutMoon', p: 'sumPointsMoon', total: 'sumTotalMetalMoon' }, true); }
@@ -554,6 +587,7 @@ const lang = safeLocalStorageGet(KEYS.LANG, 'ru');
 const dict = window.getLangDict ? window.getLangDict(lang) : {};
 document.getElementById('tmTotal').textContent = (dict.totalTMLabel || 'Итого: ') + formatNumberWithDots(totalTM);
 updateBoxesNeeded();
+updateSumAllTabsRows();
 }
 function calcBuildCostLF(techID, techLevel, techData, costRdc) {
 const cacheKey = `build_${techID}_${techLevel}_${costRdc}`;
@@ -860,18 +894,18 @@ const tdD = document.createElement('td'); tdD.appendChild(formatSpanDeut(ship.de
 const tdP = document.createElement('td'); tdP.className = 'p'; tdP.textContent = '0';
 row.append(tdName, tdQty, tdM, tdC, tdD, tdP); frag.appendChild(row);
 });
-const trSum = document.createElement('tr'); trSum.className = 'summary-row';
+const trSum = document.createElement('tr'); trSum.className = 'summary-row regular-total-row';
 const tdNameSum = document.createElement('td'); tdNameSum.style.textAlign = 'left'; tdNameSum.style.fontWeight = 'bold';
 const lang = safeLocalStorageGet(KEYS.LANG, 'ru');
 const dict = window.getLangDict ? window.getLangDict(lang) : {};
 tdNameSum.textContent = (dict && dict.total) ? dict.total : 'Итого';
 const tdQtySum = document.createElement('td');
-const tdMSum = document.createElement('td'); tdMSum.className = 'm'; tdMSum.appendChild(formatSpanMetal(0));
-const tdCSum = document.createElement('td'); tdCSum.className = 'c'; tdCSum.appendChild(formatSpanCrystal(0));
-const tdDSum = document.createElement('td'); tdDSum.className = 'd'; tdDSum.appendChild(formatSpanDeut(0));
+const tdMSum = document.createElement('td'); tdMSum.className = 'm'; tdMSum.id = 'sumMetalF'; tdMSum.appendChild(formatSpanMetal(0));
+const tdCSum = document.createElement('td'); tdCSum.className = 'c'; tdCSum.id = 'sumCrystalF'; tdCSum.appendChild(formatSpanCrystal(0));
+const tdDSum = document.createElement('td'); tdDSum.className = 'd'; tdDSum.id = 'sumDeutF'; tdDSum.appendChild(formatSpanDeut(0));
 const tdPSum = document.createElement('td'); tdPSum.className = 'p'; tdPSum.textContent = '0';
 trSum.append(tdNameSum, tdQtySum, tdMSum, tdCSum, tdDSum, tdPSum); frag.appendChild(trSum);
-const trTotal = document.createElement('tr'); trTotal.className = 'total-metal-row';
+const trTotal = document.createElement('tr'); trTotal.className = 'total-metal-row regular-total-row';
 const tdNameTotal = document.createElement('td'); tdNameTotal.style.textAlign = 'left'; tdNameTotal.style.fontWeight = 'bold';
 tdNameTotal.textContent = (dict && dict.totalInMetal) ? dict.totalInMetal : 'Всего в металле';
 const tdQtyTotal = document.createElement('td');
@@ -880,6 +914,25 @@ const spanTotalMetal = document.createElement('span'); spanTotalMetal.id = 'sumT
 tdMTotal.appendChild(spanTotalMetal);
 const tdPTotal = document.createElement('td');
 trTotal.append(tdNameTotal, tdQtyTotal, tdMTotal, tdPTotal); frag.appendChild(trTotal);
+const trSumAll = document.createElement('tr'); trSumAll.className = 'sum-all-tabs-row'; trSumAll.style.display = 'none';
+const tdNameSumAll = document.createElement('td'); tdNameSumAll.style.textAlign = 'left'; tdNameSumAll.style.fontWeight = 'bold';
+tdNameSumAll.textContent = (dict && dict.sumAllTabs) ? dict.sumAllTabs : 'Сумма по всем вкладкам';
+const tdQtySumAll = document.createElement('td');
+const tdMSumAll = document.createElement('td'); tdMSumAll.className = 'm'; tdMSumAll.innerHTML = '<span class="val-metal sum-all-tabs-metal">0</span>';
+const tdCSumAll = document.createElement('td'); tdCSumAll.className = 'c'; tdCSumAll.innerHTML = '<span class="val-crystal sum-all-tabs-crystal">0</span>';
+const tdDSumAll = document.createElement('td'); tdDSumAll.className = 'd'; tdDSumAll.innerHTML = '<span class="val-deut sum-all-tabs-deut">0</span>';
+const tdPSumAll = document.createElement('td'); tdPSumAll.className = 'p'; tdPSumAll.innerHTML = '<span class="sum-all-tabs-points">0</span>';
+trSumAll.append(tdNameSumAll, tdQtySumAll, tdMSumAll, tdCSumAll, tdDSumAll, tdPSumAll);
+const trSumAllTotal = document.createElement('tr'); trSumAllTotal.className = 'sum-all-tabs-total-row'; trSumAllTotal.style.display = 'none';
+const tdNameSumAllTotal = document.createElement('td'); tdNameSumAllTotal.style.textAlign = 'left'; tdNameSumAllTotal.style.fontWeight = 'bold';
+tdNameSumAllTotal.textContent = (dict && dict.totalInMetal) ? dict.totalInMetal : 'Всего в металле';
+const tdQtySumAllTotal = document.createElement('td');
+const tdMSumAllTotal = document.createElement('td'); tdMSumAllTotal.colSpan = 3; tdMSumAllTotal.className = 'm';
+tdMSumAllTotal.innerHTML = '<span class="sum-all-tabs-total">0</span>';
+const tdPSumAllTotal = document.createElement('td');
+trSumAllTotal.append(tdNameSumAllTotal, tdQtySumAllTotal, tdMSumAllTotal, tdPSumAllTotal);
+frag.appendChild(trSumAll);
+frag.appendChild(trSumAllTotal);
 tableBody.appendChild(frag);
 attachLiveThousandsFormatting('input[data-id]');
 tableBody.addEventListener('input', debounce((e) => {
@@ -910,8 +963,8 @@ fleetPoints += shipPoints;
 const tbody = document.querySelector('#shipsTable tbody');
 if (tbody) {
 const rows = tbody.querySelectorAll('tr');
-if (rows.length >= 2) {
-const sumRow = rows[rows.length - 2], totalRow = rows[rows.length - 1];
+if (rows.length >= 4) {
+const sumRow = rows[rows.length - 4], totalRow = rows[rows.length - 3];
 updateResourceCell(sumRow.querySelector('td.m'), fleetM, 'val-metal');
 updateResourceCell(sumRow.querySelector('td.c'), fleetC, 'val-crystal');
 updateResourceCell(sumRow.querySelector('td.d'), fleetD, 'val-deut');
@@ -922,6 +975,7 @@ if (totalSpan) totalSpan.textContent = formatNumberWithDots(totalMetal);
 }
 }
 updateBoxesNeeded();
+updateSumAllTabsRows();
 } catch (e) { console.error('Fleet compute error:', e); }
 }
 function saveShipQuantities() {
@@ -1037,6 +1091,7 @@ const sel = document.getElementById('lifeformSelect');
 if (sel) {
 sel.addEventListener('change', (e) => {
 persistLfInputs();
+saveLfTotals();
 currentLifeformRace = e.target.value;
 safeLocalStorageSet(KEYS.LF_RACE, currentLifeformRace);
 updateLfBonusesVisibility(currentLifeformRace);
@@ -1308,11 +1363,15 @@ function getSumAllTabsMetalValue() {
 let total = 0;
 try {
 const sumB = parseNumberInput(document.getElementById('sumTotalMetalB')?.textContent) || 0;
+const sumMoon = parseNumberInput(document.getElementById('sumTotalMetalMoon')?.textContent) || 0;
 const sumR = parseNumberInput(document.getElementById('sumTotalMetalR')?.textContent) || 0;
-const sumLfB = parseNumberInput(document.getElementById('sumTotalMetalLfB')?.textContent) || 0;
-const sumLfR = parseNumberInput(document.getElementById('sumTotalMetalLfR')?.textContent) || 0;
 const sumFleet = parseNumberInput(document.getElementById('sumTotalMetalF')?.textContent) || 0;
-total = sumB + sumR + sumLfB + sumLfR + sumFleet;
+let sumLfB = 0, sumLfR = 0;
+Object.values(lfTotals).forEach(race => {
+sumLfB += race.buildings || 0;
+sumLfR += race.research || 0;
+});
+total = sumB + sumMoon + sumR + sumLfB + sumLfR + sumFleet;
 } catch (e) { console.warn('Sum tabs error:', e); }
 return total;
 }
@@ -1327,6 +1386,47 @@ return parseNumberInput(document.getElementById(activeSub === 'lf-buildings' ? '
 }
 return parseNumberInput(document.getElementById('sumTotalMetalB')?.textContent);
 } catch (e) { return 0; }
+}
+function updateSumAllTabsRows() {
+const show = isSumAllTabsMode;
+document.querySelectorAll('.sum-all-tabs-row, .sum-all-tabs-total-row').forEach(row => {
+row.style.display = show ? '' : 'none';
+});
+document.querySelectorAll('.regular-total-row').forEach(row => {
+row.style.display = show ? 'none' : '';
+});
+if (!show) return;
+const totals = { m: 0, c: 0, d: 0, p: 0 };
+const ids = [
+['sumMetalB', 'sumCrystalB', 'sumDeutB', 'sumPointsB'],
+['sumMetalMoon', 'sumCrystalMoon', 'sumDeutMoon', 'sumPointsMoon'],
+['sumMetalR', 'sumCrystalR', 'sumDeutR', 'sumPointsR'],
+['sumMetalF', 'sumCrystalF', 'sumDeutF', null],
+['sumMetalLfB', 'sumCrystalLfB', 'sumDeutLfB', 'sumPointsLfB'],
+['sumMetalLfR', 'sumCrystalLfR', 'sumDeutLfR', 'sumPointsLfR']
+];
+ids.forEach(([mId, cId, dId, pId]) => {
+const mEl = document.getElementById(mId);
+const cEl = document.getElementById(cId);
+const dEl = document.getElementById(dId);
+totals.m += mEl ? (parseNumberInput(mEl.textContent) || 0) : 0;
+totals.c += cEl ? (parseNumberInput(cEl.textContent) || 0) : 0;
+totals.d += dEl ? (parseNumberInput(dEl.textContent) || 0) : 0;
+if (pId) {
+const pEl = document.getElementById(pId);
+totals.p += pEl ? (parseNumberInput(pEl.textContent) || 0) : 0;
+}
+});
+const fleetPointsEl = document.querySelector('#shipsTable tbody tr.summary-row td.p');
+if (fleetPointsEl) {
+totals.p += parseNumberInput(fleetPointsEl.textContent) || 0;
+}
+const totalMetal = Math.round(convertToMetal(totals.m, totals.c, totals.d));
+document.querySelectorAll('.sum-all-tabs-metal').forEach(el => el.textContent = formatNumberWithDots(totals.m));
+document.querySelectorAll('.sum-all-tabs-crystal').forEach(el => el.textContent = formatNumberWithDots(totals.c));
+document.querySelectorAll('.sum-all-tabs-deut').forEach(el => el.textContent = formatNumberWithDots(totals.d));
+document.querySelectorAll('.sum-all-tabs-total').forEach(el => el.textContent = formatNumberWithDots(totalMetal));
+document.querySelectorAll('.sum-all-tabs-points').forEach(el => el.textContent = formatNumberWithDots(totals.p));
 }
 function updateBoxesNeeded() {
 try {
@@ -1539,6 +1639,8 @@ localStorage.removeItem(KEYS.SUM_ALL_TABS);
 isSumAllTabsMode = false;
 const checkbox = document.getElementById('sumAllTabsCheckbox');
 if (checkbox) checkbox.checked = false;
+Object.keys(lfTotals).forEach(race => { lfTotals[race] = { buildings: 0, research: 0 }; });
+saveLfTotals();
 document.querySelectorAll('input').forEach(i => { i.value = ''; });
 BONUS_INPUT_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
 buildRowsBuildings(); buildRowsResearch(); buildRowsMoonBuildings(); buildRowsLfBuildings(); buildRowsLfResearch(); renderTable();
@@ -1590,6 +1692,7 @@ bgVideo.pause(); bgVideo.src = targetSrc; bgVideo.load(); bgVideo.play().catch((
 }
 function restoreFromStorage() {
 try {
+loadLfTotals();
 buildRowsBuildings(); buildRowsResearch(); buildRowsMoonBuildings(); buildRowsLfBuildings(); buildRowsLfResearch(); renderTable();
 const inputsBuild = JSON.parse(safeLocalStorageGet(KEYS.INPUTS_BUILD, 'null'));
 if (inputsBuild) {
@@ -1669,6 +1772,7 @@ const checkbox = document.getElementById('sumAllTabsCheckbox');
 if (checkbox) checkbox.checked = isSumAllTabsMode;
 }
 } catch (e) { console.warn('Restore sum tabs:', e); }
+updateSumAllTabsRows();
 setTimeout(() => {
 const lang = safeLocalStorageGet(KEYS.LANG, 'ru');
 const dict = window.getLangDict ? window.getLangDict(lang) : {};
@@ -1711,6 +1815,7 @@ if (sumAllTabsCheckbox) {
 sumAllTabsCheckbox.addEventListener('change', function() {
 isSumAllTabsMode = this.checked;
 safeLocalStorageSet(KEYS.SUM_ALL_TABS, String(isSumAllTabsMode));
+updateSumAllTabsRows();
 updateBoxesNeeded();
 });
 }
