@@ -1,13 +1,6 @@
-/* ============================================
-   OGame Calculator — Desktop-Only CSS v2.1
-   Удалена мобильная адаптация
-   ============================================ */
-
 @layer base, components, utilities;
 
-/* ---------- CSS Custom Properties ---------- */
 :root {
-  /* Цвета */
   --accent: #1E90FF;
   --accent-hover: #4aa3ff;
   --metal: #DAA520;
@@ -17,8 +10,6 @@
   --lf: #9b59b6;
   --danger: #d32f2f;
   --success: #2e7d32;
-
-  /* Фоны */
   --bg-primary: #071021;
   --bg-secondary: rgba(20, 24, 32, 0.95);
   --bg-tertiary: rgba(18, 22, 30, 0.95);
@@ -26,27 +17,19 @@
   --header-bg: linear-gradient(180deg, rgba(20, 24, 32, 0.97), rgba(10, 12, 18, 0.97));
   --btn-grad: linear-gradient(180deg, rgba(30, 144, 255, 0.16), rgba(30, 144, 255, 0.10));
   --btn-active-grad: linear-gradient(180deg, rgba(30, 144, 255, 0.3), rgba(30, 144, 255, 0.2));
-
-  /* Текст */
   --text-primary: #e6edf3;
   --text-secondary: #cfe0ff;
   --text-muted: #637381;
-
-  /* Границы и радиусы */
   --border-color: #29323d;
   --input-border: #4a5562;
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
-
-  /* Тени */
   --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.5);
   --shadow-inset: inset 0 1px 1.5px rgba(255, 255, 255, 0.25), inset 0 -1px 1.5px rgba(0, 0, 0, 0.25);
   --shadow-active-inset: inset 0 1px 2px rgba(255, 255, 255, 0.35);
   --shadow-active: 0 4px 10px rgba(0, 0, 0, 0.45);
-
-  /* Z-index система */
   --z-bg: -1;
   --z-content: 1;
   --z-table: 1000;
@@ -54,13 +37,9 @@
   --z-nav: 10003;
   --z-overlay: 10004;
   --z-dropdown: 10005;
-
-  /* Размеры */
   --input-h: 22px;
   --row-h: 22px;
   --icon-size: 20px;
-
-  /* Переходы */
   --transition-fast: 150ms ease;
   --transition-normal: 200ms ease;
 }
@@ -129,6 +108,7 @@
 
   .tab-content.active,
   .subtab-content.active { display: block; }
+
   .building-subtab-content.active {
     display: block;
     animation: buildingFadeIn 180ms ease;
@@ -136,7 +116,6 @@
 }
 
 @layer components {
-  /* ---------- Универсальные кнопки ---------- */
   :is(.nav-btn, .tab-btn, .lf-subtab-btn, .building-subtab-btn) {
     padding: 6px 10px;
     border-radius: var(--radius-md);
@@ -176,23 +155,25 @@
     --btn-active-grad: linear-gradient(180deg, color-mix(in oklab, var(--metal) 88%, white 12%), var(--metal));
     border-color: var(--metal);
   }
+
   .tab-btn[data-tab="research"].active {
     --btn-active-grad: linear-gradient(180deg, #4caf50, #228B22);
     border-color: #228B22;
     --shadow-active: 0 4px 10px rgba(0, 128, 0, 0.35);
   }
+
   .tab-btn[data-tab="fleet"].active {
     --btn-active-grad: linear-gradient(180deg, #e53935, #b71c1c);
     border-color: #b71c1c;
     --shadow-active: 0 4px 10px rgba(183, 28, 28, 0.45);
   }
+
   .tab-btn[data-tab="lifeforms"].active {
     --btn-active-grad: linear-gradient(180deg, color-mix(in oklab, var(--lf) 85%, white 15%), var(--lf));
     border-color: var(--lf);
     --shadow-active: 0 4px 10px rgba(155, 89, 182, 0.45);
   }
 
-  /* ---------- Навигация ---------- */
   .main-nav {
     position: absolute;
     left: 12px;
@@ -210,7 +191,6 @@
     left: 180px;
   }
 
-  /* ---------- Верхние контролы ---------- */
   :is(.top-controls, .header-bar, .top-controls-left, .header-left, .box-row) {
     display: flex;
     align-items: center;
@@ -260,7 +240,6 @@
     flex-shrink: 0;
   }
 
-  /* ---------- Inputs ---------- */
   :is(.level-input, .count-input, .percent-input, .input-5columns,
       .lvl-input, .planet-input, input[type="text"]) {
     padding: 3px 6px;
@@ -290,14 +269,13 @@
     transform: translateY(-1px);
   }
 
-  /* ---------- Таблицы ---------- */
   #data-table {
     width: 100%;
     border-collapse: collapse;
     background: rgba(15, 18, 23, 0.95);
     font-size: 13px;
     margin-top: 2px;
-    table-layout: fixed;
+    table-layout: auto;
     contain: content;
   }
 
@@ -307,6 +285,7 @@
     vertical-align: middle;
     height: var(--row-h);
     font-size: 13px;
+    white-space: nowrap;
   }
 
   #data-table .first-column {
@@ -317,7 +296,7 @@
 
   #data-table th:nth-child(2),
   #data-table td:nth-child(2) {
-    inline-size: 100px;
+    min-inline-size: 60px;
   }
 
   #data-table input[type="text"] {
@@ -340,7 +319,6 @@
     text-align: right;
   }
 
-  /* ---------- Drag handle ---------- */
   .drag-handle {
     padding: 5px 7px;
     border-radius: var(--radius-sm);
@@ -361,7 +339,6 @@
     background: rgb(30, 144, 255);
   }
 
-  /* ---------- Accordion ---------- */
   :is(.ui-widget-header, .ui-accordion-header) {
     background: #2b313b;
     border: 1px solid #3a424d;
@@ -406,13 +383,12 @@
     display: none;
   }
 
-  /* ---------- Таблицы бонусов LF ---------- */
   #lf-ships-bonuses {
     inline-size: 100%;
     border-collapse: collapse;
     margin-top: 6px;
     font-size: 13px;
-    table-layout: fixed;
+    table-layout: auto;
   }
 
   :is(#lf-ships-bonuses th, #lf-ships-bonuses td) {
@@ -420,6 +396,7 @@
     border: 1px solid #3a424d;
     text-align: center;
     height: var(--row-h);
+    white-space: nowrap;
   }
 
   #lf-ships-bonuses input {
@@ -428,7 +405,6 @@
     text-align: center;
   }
 
-  /* ---------- Selects ---------- */
   :is(.lifeform-select, #expeditionsWrapper select) {
     padding: 1px 16px 1px 5px;
     border-radius: var(--radius-sm);
@@ -462,7 +438,6 @@
     color: #fff;
   }
 
-  /* ---------- Tabs left ---------- */
   .tabs-left {
     position: absolute;
     left: calc(-140px + 0.1px);
@@ -493,7 +468,6 @@
     letter-spacing: 0.2px;
   }
 
-  /* ---------- Table frames ---------- */
   :is(.table-frame, #fleetFrame) {
     padding: 8px;
     border-radius: 0 0 var(--radius-lg) var(--radius-lg);
@@ -502,6 +476,7 @@
     border: 2px solid #253041;
     border-top: none;
     inline-size: 100%;
+    overflow-x: auto;
   }
 
   #fleetFrame { overflow-x: auto; }
@@ -522,11 +497,9 @@
   #shipsTable :is(th, td):nth-child(1) {
     min-inline-size: 180px;
     text-align: left;
-    white-space: normal;
-    word-break: break-word;
+    white-space: nowrap;
   }
 
-  /* ---------- Cost table ---------- */
   .cost-table {
     inline-size: 100%;
     border-collapse: collapse;
@@ -549,20 +522,22 @@
     padding: 6px 8px;
     border: 1px solid var(--border-color);
     vertical-align: middle;
+    white-space: nowrap;
   }
 
   :is(.cost-table th, .cost-table td):first-child {
     text-align: left;
-    inline-size: 220px;
+    min-inline-size: 150px;
     padding-left: 10px;
+    white-space: nowrap;
   }
 
   :is(#lfBuildingsTable, #lfResearchTable) :is(th, td):first-child {
     min-inline-size: 250px;
     padding-left: 12px;
+    white-space: nowrap;
   }
 
-  /* ---------- Icons ---------- */
   .icon {
     inline-size: var(--icon-size);
     block-size: var(--icon-size);
@@ -593,12 +568,10 @@
     color: var(--text-secondary);
   }
 
-  /* ---------- Resource colors ---------- */
   .val-metal { color: var(--metal) !important; font-weight: 700; text-shadow: 0 0 8px rgba(218, 165, 32, 0.4); }
   .val-crystal { color: var(--crystal) !important; font-weight: 700; text-shadow: 0 0 8px rgba(122, 209, 255, 0.4); }
   .val-deut { color: var(--deut) !important; font-weight: 700; text-shadow: 0 0 8px rgba(155, 231, 143, 0.4); }
   .try-value { color: var(--try-color); font-weight: 800; }
-
   .can-be-found-yes { color: #32CD32 !important; font-weight: bold; text-shadow: 0 0 8px rgba(76, 175, 80, 0.4); }
   .can-be-found-no { color: #FF0000 !important; font-weight: bold; text-shadow: 0 0 8px rgba(255, 77, 77, 0.4); }
 
@@ -613,7 +586,6 @@
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 2px rgba(0, 0, 0, 0.2);
   }
 
-  /* ---------- Delivery block ---------- */
   .delivery {
     margin-top: 8px;
     padding: 8px;
@@ -625,7 +597,6 @@
     gap: 8px;
   }
 
-  /* ---------- Subtabs ---------- */
   :is(.building-subtabs, .lf-subtabs) {
     display: flex;
     align-items: center;
@@ -671,7 +642,6 @@
     --shadow-active: 0 4px 10px rgba(155, 89, 182, 0.45);
   }
 
-  /* ---------- LF bonuses ---------- */
   .lf-bonuses {
     display: flex;
     gap: 8px;
@@ -694,7 +664,6 @@
     text-align: right;
   }
 
-  /* ---------- Zoom controls ---------- */
   .zoom-controls {
     position: fixed;
     inset-block-start: 12px;
@@ -730,7 +699,6 @@
 
   #globalZoomReset { font-size: 16px; line-height: 1; }
 
-  /* ---------- Language dropdown ---------- */
   .language-container {
     position: fixed;
     inset-block-start: 48px;
@@ -812,7 +780,6 @@
   #currentLang { display: flex; align-items: center; gap: 4px; }
   .dropdown-icon { font-size: 8px; margin-left: 4px; opacity: 0.8; }
 
-  /* ---------- Revision badge ---------- */
   .revision-badge {
     position: fixed;
     inset-block-end: 12px;
@@ -837,7 +804,6 @@
     transform: translateY(-1px);
   }
 
-  /* ---------- Expeditions sections ---------- */
   .expeditions-settings-section {
     padding: 5px 7px;
     margin-bottom: 3px;
@@ -854,7 +820,6 @@
     border-top: none;
   }
 
-  /* ---------- Panels ---------- */
   :is(#settings-panel, #data-panel) {
     background: var(--bg-secondary);
     border: 1px solid #2a303a;
@@ -864,7 +829,6 @@
   #settings-panel { border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
   #data-panel { background: var(--bg-tertiary); border-radius: 0 0 var(--radius-sm) var(--radius-sm); margin-top: -1px; }
 
-  /* ---------- Utilities ---------- */
   .first-column { padding-left: 4px; }
   .centered { text-align: center; }
   .right-aligned { text-align: right; }
@@ -897,21 +861,19 @@
   .planet-single-row { display: flex; gap: 12px; align-items: center; margin-top: 8px; }
   .planet-field { display: flex; align-items: center; gap: 6px; }
   .ship-name { font-weight: 600; font-size: 12px; }
-
   .nav-btn-expeditions { display: flex; align-items: center; gap: 4px; }
   .nav-btn-expeditions .icon { margin: 0; }
 
-  /* ---------- Focus states ---------- */
   :is(input, button, select):focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
 
-  /* ---------- Expeditions table specifics ---------- */
   #expeditionsFleetBody .detail-row td:first-child {
     color: var(--text-secondary);
     letter-spacing: 0.2px;
   }
+
   #expeditionsFleetBody .detail-row td:last-child { font-variant-numeric: tabular-nums; }
   #expeditionsFleetBody .dark-matter-row td { padding-block: 6px; }
 }
@@ -923,7 +885,6 @@
   }
 }
 
-/* ---------- GPU hints ---------- */
 :is(.table-wrapper, #expeditionsWrapper) :is(input, button, select, textarea) {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
