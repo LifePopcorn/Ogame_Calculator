@@ -42,29 +42,44 @@
 
             <div class="box-row" id="globalBoxRow">
     <div class="label">
-        <span data-i18n="boxesLabel">Коробка с металлом</span>
-        <input type="text" id="boxValue" class="level-input" data-i18n-ph="boxValuePh" placeholder="Металла в 1 коробке">
+        <label for="boxValue" data-i18n="metalBox">Коробка с металлом</label>
+        <input type="text" id="boxValue" inputmode="numeric" placeholder="0" data-i18n-ph="metalBoxPlaceholder">
     </div>
     <div class="info">
-        <div class="info-row">
-            <span data-i18n="needOpen">Нужно открыть:</span>
-            <span id="boxesNeeded">—</span>
+    <div class="info-row">
+        <div>
+            <span data-i18n="boxesNeeded">Нужно открыть:</span>
+            <span id="boxesNeeded" class="tm-left">—</span>
             <span data-i18n="boxes">коробок</span>
-            <span id="boxesCostTL">TRY: — /</span>
-<select id="currencySelector" class="currency-selector">
-    <option value="BYN">BYN</option>
-    <option value="RUB">RUB</option>
-    <option value="USD">USD</option>
-    <option value="EUR">EUR</option>
-</select>
-<span id="currencyValue">—</span>
         </div>
-        <div class="info-row">
-            <span data-i18n="leftoverLabel">Остаток ТМ</span>:
-            <span class="tm-left"><span id="leftoverTmValue">—</span></span>
-            <label><input type="checkbox" id="sumAllTabsCheckbox" class="ui-checkbox"> <span data-i18n="sumAllTabs">Сумма по всем вкладкам</span></label>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <select id="baseCurrencySelector" class="currency-selector">
+                <option value="TRY">TRY</option>
+                <option value="BYN">BYN</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="RUB">RUB</option>
+            </select>
+            <span id="boxesCostTL" class="try-value">—</span>
+            <select id="currencySelector" class="currency-selector">
+                <option value="BYN">BYN</option>
+                <option value="RUB">RUB</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="TRY">TRY</option>
+            </select>
+            <span id="currencyValue" class="try-value">—</span>
         </div>
     </div>
+    <div class="info-row">
+        <span data-i18n="leftoverTM">Остаток ТМ:</span>
+        <span id="leftoverTmValue" class="tm-left">—</span>
+        <label style="margin-left: 12px; cursor: pointer;">
+            <input type="checkbox" id="sumAllTabsCheckbox">
+            <span data-i18n="sumAllTabs">Сумма по всем вкладкам</span>
+        </label>
+    </div>
+</div>
 </div>
 
             <div aria-hidden="false" class="tab-content active" id="tabBuildings" role="tabpanel">

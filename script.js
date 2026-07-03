@@ -147,7 +147,8 @@ CURRENCY_RATES: {
 BYN: 1,
 RUB: 23.5,
 USD: 0.31,
-EUR: 0.28
+EUR: 0.28,
+TRY: 16.01
 },
 MAX_LEVEL_SPAN: 1000,
 TM_PER_LEVEL_FACTOR: 2
@@ -170,7 +171,8 @@ ROCKTAL_MRC_LEVEL: 'og_calc_rocktal_mrc_level',
 ROCKTAL_RUNO_LEVEL: 'og_calc_rocktal_runo_level',
 SUM_ALL_TABS: 'og_calc_sum_all_tabs',
 LF_TOTALS: 'og_calc_lf_totals_v1',
-CURRENCY: 'og_calc_currency_v1'
+CURRENCY: 'og_calc_currency_v1',
+BASE_CURRENCY: 'og_calc_base_currency_v1'
 };
 const LANGUAGE_NAMES = {
 en: 'English',
@@ -1527,7 +1529,7 @@ const boxValueInput = document.getElementById('boxValue');
 const boxValue = parseNumberInput(sanitizeInput(boxValueInput?.value || ''));
 if (!boxValue || boxValue <= 0) {
 if (boxesNeededEl) boxesNeededEl.textContent = '—';
-const boxesCost = document.getElementById('boxesCostTL'); if (boxesCost) boxesCost.innerHTML = 'TRY: —';
+const boxesCost = document.getElementById('boxesCostTL'); if (boxesCost) boxesCost.innerHTML = '—';
 const leftover = document.getElementById('leftoverTmValue'); if (leftover) leftover.textContent = '—';
 return;
 }
@@ -1546,45 +1548,47 @@ function updateBoxesCostTL(targetMetal = null) {
         if (!boxesCostTLEl) return;
         const boxValue = parseNumberInput(sanitizeInput(boxValueInput?.value || ''));
         if (boxValue <= 0) {
-            boxesCostTLEl.innerHTML = 'TRY: —';
+            boxesCostTLEl.textContent = '—';
             if (leftoverTmValueEl) leftoverTmValueEl.textContent = '—';
-            if (currencyValueEl) currencyValueEl.textContent = '—';
+            if (currencyValueEl) currencyValueEl.textContent = '0';
             return;
         }
         if (targetMetal === null) targetMetal = isSumAllTabsMode ? getSumAllTabsMetalValue() : getCurrentTotalMetalValue();
         if (!Number.isFinite(targetMetal) || targetMetal <= 0) {
-            boxesCostTLEl.innerHTML = 'TRY: 0';
+            boxesCostTLEl.textContent = '0';
             if (leftoverTmValueEl) leftoverTmValueEl.textContent = '0';
-            if (currencyValueEl) currencyValueEl.textContent = '—';
+            if (currencyValueEl) currencyValueEl.textContent = '0';
             return;
         }
         const neededBoxesRaw = Math.ceil(targetMetal / boxValue);
         const MAX_ALLOWED_BOXES = 1e9;
         if (neededBoxesRaw > MAX_ALLOWED_BOXES) {
-            boxesCostTLEl.innerHTML = 'TRY: —';
+            boxesCostTLEl.textContent = '—';
             if (leftoverTmValueEl) leftoverTmValueEl.textContent = '—';
-            if (currencyValueEl) currencyValueEl.textContent = '—';
+            if (currencyValueEl) currencyValueEl.textContent = '0';
             return;
         }
         const requiredTM = neededBoxesRaw * CONFIG.TM_PER_BOX;
         const pack = (CONFIG.TM_PACKS && CONFIG.TM_PACKS[0]) || null;
         const packTm = pack?.tm || 0, packPriceTRY = pack?.priceTRY || 0;
         if (packTm <= 0 || packPriceTRY <= 0) {
-            boxesCostTLEl.innerHTML = 'TRY: —';
+            boxesCostTLEl.textContent = '—';
             if (leftoverTmValueEl) leftoverTmValueEl.textContent = '—';
-            if (currencyValueEl) currencyValueEl.textContent = '—';
+            if (currencyValueEl) currencyValueEl.textContent = '0';
             return;
         }
         const packsCount = Math.max(1, Math.ceil(requiredTM / packTm));
         const totalTRY = packsCount * packPriceTRY;
         const leftoverTM = packsCount * packTm - requiredTM;
-        const selectedCurrency = safeLocalStorageGet(KEYS.CURRENCY, 'BYN');
+        const baseCurrency = safeLocalStorageGet(KEYS.BASE_CURRENCY, 'TRY');
+        const targetCurrency = safeLocalStorageGet(KEYS.CURRENCY, 'BYN');
         const amountInBYN = totalTRY / CONFIG.TRY_TO_BYN_RATE;
-        const amountInSelectedCurrency = Math.round(amountInBYN * CONFIG.CURRENCY_RATES[selectedCurrency]);
-        const tryValue = formatNumberWithDots(totalTRY);
-        const currencyValue = formatNumberWithDots(amountInSelectedCurrency);
-        boxesCostTLEl.innerHTML = `<span class="try-value">TRY: ${tryValue} / </span>`;
-        if (currencyValueEl) currencyValueEl.textContent = currencyValue;
+        const amountInBaseCurrency = Math.round(amountInBYN * CONFIG.CURRENCY_RATES[baseCurrency]);
+        const amountInTargetCurrency = Math.round(amountInBYN * CONFIG.CURRENCY_RATES[targetCurrency]);
+        const baseValue = formatNumberWithDots(amountInBaseCurrency);
+        const targetValue = formatNumberWithDots(amountInTargetCurrency);
+        boxesCostTLEl.textContent = baseValue;
+        if (currencyValueEl) currencyValueEl.textContent = targetValue;
         if (leftoverTmValueEl) leftoverTmValueEl.textContent = leftoverTM > 0 ? formatWithDotsRaw(leftoverTM) : '0';
     } catch (e) { console.warn('Update boxes cost:', e); }
 }
@@ -1741,31 +1745,32 @@ ctrl?.reset();
 });
 }
 function fullResetToZero() {
-try {
-Object.values(KEYS).forEach(k => { if (k !== KEYS.TRANSFORM) localStorage.removeItem(k); });
-localStorage.removeItem('og_calc_expeditions_transform');
-localStorage.removeItem('og_calc_expeditions_pos');
-BONUS_INPUT_IDS.forEach(id => localStorage.removeItem(`og_calc_${id}`));
-localStorage.removeItem(KEYS.SUM_ALL_TABS);
-isSumAllTabsMode = false;
-const checkbox = document.getElementById('sumAllTabsCheckbox');
-if (checkbox) checkbox.checked = false;
-Object.keys(lfTotals).forEach(race => {
-lfTotals[race] = {
-buildings: { m: 0, c: 0, d: 0, p: 0, total: 0 },
-research: { m: 0, c: 0, d: 0, p: 0, total: 0 }
-};
-});
-saveLfTotals();
-document.querySelectorAll('input').forEach(i => { i.value = ''; });
-BONUS_INPUT_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-buildRowsBuildings(); buildRowsResearch(); buildRowsMoonBuildings(); buildRowsLfBuildings(); buildRowsLfResearch(); renderTable();
-recalcAllBuildings(); recalcAllResearch(); recalcAllMoonBuildings(); recalcAllLfBuildings(); recalcAllLfResearch(); computeFleet();
-['sumPointsB', 'sumPointsR', 'sumPointsLfB', 'sumPointsLfR'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '0'; });
-const boxesNeeded = document.getElementById('boxesNeeded'); if (boxesNeeded) boxesNeeded.textContent = '—';
-const boxesCost = document.getElementById('boxesCostTL'); if (boxesCost) boxesCost.innerHTML = 'TRY: —';
-const leftover = document.getElementById('leftoverTmValue'); if (leftover) leftover.textContent = '—';
-} catch (e) { console.error('Full reset:', e); }
+    try {
+        Object.values(KEYS).forEach(k => { if (k !== KEYS.TRANSFORM) localStorage.removeItem(k); });
+        localStorage.removeItem('og_calc_expeditions_transform');
+        localStorage.removeItem('og_calc_expeditions_pos');
+        BONUS_INPUT_IDS.forEach(id => localStorage.removeItem(`og_calc_${id}`));
+        localStorage.removeItem(KEYS.SUM_ALL_TABS);
+        isSumAllTabsMode = false;
+        const checkbox = document.getElementById('sumAllTabsCheckbox');
+        if (checkbox) checkbox.checked = false;
+        Object.keys(lfTotals).forEach(race => {
+            lfTotals[race] = {
+                buildings: { m: 0, c: 0, d: 0, p: 0, total: 0 },
+                research: { m: 0, c: 0, d: 0, p: 0, total: 0 }
+            };
+        });
+        saveLfTotals();
+        document.querySelectorAll('input').forEach(i => { i.value = ''; });
+        BONUS_INPUT_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+        buildRowsBuildings(); buildRowsResearch(); buildRowsMoonBuildings(); buildRowsLfBuildings(); buildRowsLfResearch(); renderTable();
+        recalcAllBuildings(); recalcAllResearch(); recalcAllMoonBuildings(); recalcAllLfBuildings(); recalcAllLfResearch(); computeFleet();
+        ['sumPointsB', 'sumPointsR', 'sumPointsLfB', 'sumPointsLfR'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '0'; });
+        const boxesNeeded = document.getElementById('boxesNeeded'); if (boxesNeeded) boxesNeeded.textContent = '—';
+        const boxesCost = document.getElementById('boxesCostTL'); if (boxesCost) boxesCost.innerHTML = '—';
+        const leftover = document.getElementById('leftoverTmValue'); if (leftover) leftover.textContent = '—';
+        const currencyValue = document.getElementById('currencyValue'); if (currencyValue) currencyValue.textContent = '0';
+    } catch (e) { console.error('Full reset:', e); }
 }
 function resetAndCenter() {
 fullResetToZero();
@@ -1948,6 +1953,15 @@ setTimeout(() => {
 if (typeof window.initExpeditionUI === 'function') window.initExpeditionUI();
 else document.dispatchEvent(new CustomEvent('initExpeditionOnLoad'));
 }, 150);
+}
+const baseCurrencySelector = document.getElementById('baseCurrencySelector');
+if (baseCurrencySelector) {
+const savedBaseCurrency = safeLocalStorageGet(KEYS.BASE_CURRENCY, 'TRY');
+baseCurrencySelector.value = savedBaseCurrency;
+baseCurrencySelector.addEventListener('change', function() {
+safeLocalStorageSet(KEYS.BASE_CURRENCY, this.value);
+updateBoxesCostTL();
+});
 }
 const currencySelector = document.getElementById('currencySelector');
 if (currencySelector) {

@@ -158,7 +158,7 @@ border-color: var(--lf);
 .main-nav {
 position: absolute;
 left: 12px;
-top: 50px; /* было 50px */
+top: 50px;
 display: flex;
 flex-direction: column;
 gap: 6px;
@@ -187,7 +187,7 @@ background: var(--header-bg);
 border: 2px solid #253041;
 border-bottom: none;
 border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-flex-wrap: wrap;
+flex-wrap: nowrap;
 width: 100%;
 }
 .box-row .label {
@@ -206,6 +206,12 @@ gap: 4px;
 white-space: nowrap;
 margin-left: auto;
 margin-right: 40px;
+align-items: flex-start;
+}
+.box-row .info-row {
+display: flex;
+align-items: center;
+gap: 12px;
 }
 .box-row input#boxValue {
 width: 180px;
@@ -251,18 +257,21 @@ min-width: 50px;
 width: auto;
 height: 22px;
 font-size: 11px;
-transition: border-color var(--transition-normal), background var(--transition-normal);
+transition: border-color var(--transition-normal), background var(--transition-normal), transform 0.2s ease;
 appearance: none;
-background-image: 
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 24 24'%3E%3Cpath fill='%234caf50' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
 background-repeat: no-repeat;
 background-position: right 4px center;
-background-size: 8px;
-padding-right: 16px;
+background-size: 10px;
+padding-right: 18px;
 }
-.currency-selector:focus {
+.currency-selector:focus,
+.currency-selector:active {
 outline: none;
 border-color: var(--accent);
 background-color: rgba(30, 144, 255, 0.15);
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 24 24'%3E%3Cpath fill='%234caf50' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+transform: rotate(-90deg);
 }
 .currency-selector option {
 background: var(--bg-secondary);
@@ -285,7 +294,6 @@ height: var(--row-h);
 font-size: 13px;
 white-space: nowrap;
 }
-/* ИЗМЕНЕНИЕ: первая колонка таблицы экспедиций — картинки с самого края, достаточная ширина */
 #data-table .first-column {
 font-weight: bold;
 text-align: left;
@@ -342,13 +350,12 @@ text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 cursor: grabbing;
 background: rgb(30, 144, 255);
 }
-/* ИЗМЕНЕНИЕ: кнопка "Переместить таблицу" выровнена по верхнему левому углу таблицы экспедиций */
 #dragHandleExpeditions {
-  position: absolute !important;
-  top: -22px !important;
-  left: 25px !important;
-  z-index: calc(var(--z-tabs) - 1) !important;
-  margin: 0 !important;
+position: absolute !important;
+top: -22px !important;
+left: 25px !important;
+z-index: calc(var(--z-tabs) - 1) !important;
+margin: 0 !important;
 }
 :is(.ui-widget-header, .ui-accordion-header) {
 background: #2b313b;
@@ -372,7 +379,6 @@ border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 display: inline-block;
 width: 12px;
 height: 12px;
-background: 
 background-size: 9px;
 transition: transform var(--transition-fast);
 }
@@ -408,7 +414,6 @@ inline-size: 45px;
 block-size: 18px;
 text-align: center;
 }
-/* ИЗМЕНЕНИЕ: в таблице гармошки первая колонка — картинки с самого края */
 #lf-ships-bonuses td:first-child {
 text-align: left !important;
 padding: 2px 6px 2px 0 !important;
@@ -424,25 +429,30 @@ max-width: 20px !important;
 max-height: 20px !important;
 }
 :is(.lifeform-select, #expeditionsWrapper select) {
-padding: 1px 16px 1px 5px;
+padding: 1px 18px 1px 5px;
 border-radius: var(--radius-sm);
 border: 1px solid var(--lf);
 background: #1d1f27;
 color: #fff;
 font-weight: 700;
-min-width: 90px;
+min-width: 72px;
+max-width: 90px;
 height: 20px;
 box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.12);
 appearance: none;
-background-image: 
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 24 24'%3E%3Cpath fill='%234caf50' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
 background-repeat: no-repeat;
 background-position: right 5px center;
-background-size: 8px;
+background-size: 10px;
+transition: border-color var(--transition-normal), background var(--transition-normal), transform 0.2s ease;
 }
-:is(.lifeform-select, #expeditionsWrapper select):focus {
+:is(.lifeform-select, #expeditionsWrapper select):focus,
+:is(.lifeform-select, #expeditionsWrapper select):active {
 outline: none;
 border-color: var(--lf);
 box-shadow: 0 0 0 2px rgba(155, 89, 182, 0.3);
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 24 24'%3E%3Cpath fill='%234caf50' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+transform: rotate(-90deg);
 }
 #expeditionsWrapper select option {
 color: var(--text-primary);
@@ -452,7 +462,6 @@ background: #2b313b;
 background: rgba(30, 144, 255, 0.2);
 color: #fff;
 }
-/* ИЗМЕНЕНИЕ: укорочены селекторы скорости вселенной и бустера поиска ресурсов */
 #universe-speed,
 #resource-discovery-booster {
 min-width: 55px !important;
@@ -463,7 +472,7 @@ padding: 1px 18px 1px 4px !important;
 .tabs-left {
 position: absolute;
 left: calc(-140px + 0.1px);
-inset-block-start: 36px; /* было 0, изменили на 45px */
+inset-block-start: 36px;
 z-index: var(--z-tabs);
 display: flex;
 flex-direction: column;
@@ -860,4 +869,13 @@ transform: translateZ(0);
 :is(.table-wrapper, #expeditionsWrapper) .icon {
 image-rendering: crisp-edges;
 image-rendering: -webkit-optimize-contrast;
+}
+#boxesNeeded.tm-left {
+background: transparent;
+color: #7FFFD4;
+border: 1px solid #FFFF00;
+box-shadow: none;
+padding: 1px 8px;
+min-inline-size: auto;
+border-radius: var(--radius-sm);
 }
