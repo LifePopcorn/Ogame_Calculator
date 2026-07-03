@@ -40,33 +40,32 @@
                 </div>
             </nav>
 
-            <div class="header-bar" id="headerBar">
-                <div class="header-left">
-                    <div class="box-row" id="globalBoxRow">
-                        <label class="label" id="lblBoxes">
-                            <img alt="" class="icon" src="images/metal_box.png"/>
-                            <span data-i18n="boxesLabel">Коробка с металлом</span>
-                        </label>
-                        <input data-i18n-ph="boxValuePh" id="boxValue" inputmode="numeric" placeholder="Металла в 1 коробке" style="width:170px" type="text"/>
-                        <div aria-live="polite" class="info">
-                            <div class="need-open" style="display:flex;gap:4px;align-items:center;">
-                                <span data-i18n="needOpen">Нужно открыть:</span>
-                                <span id="boxesNeeded">—</span>
-                                <span data-i18n="boxes">коробок</span>
-                                <div class="try-value" id="boxesCostTL" style="margin-left:6px;">TRY: —</div>
-                            </div>
-                            <div aria-live="polite" class="leftover" style="display:flex;gap:4px;align-items:center;">
-                                <span data-i18n="leftoverLabel">Остаток ТМ</span>
-                                <span class="tm-left" id="leftoverTmValue">—</span>
-                                <label for="sumAllTabsCheckbox" style="display:flex;align-items:center;gap:4px;margin-left:12px;color:#7ad1ff;padding:2px 6px;border-radius:4px;font-size:11px;cursor:pointer;">
-                                    <input id="sumAllTabsCheckbox" style="width:14px;height:14px;" type="checkbox"/>
-                                    <span data-i18n="sumAllTabs">Сумма по всем вкладкам</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="box-row" id="globalBoxRow">
+    <div class="label">
+        <span data-i18n="boxesLabel">Коробка с металлом</span>
+        <input type="text" id="boxValue" class="level-input" data-i18n-ph="boxValuePh" placeholder="Металла в 1 коробке">
+    </div>
+    <div class="info">
+        <div class="info-row">
+            <span data-i18n="needOpen">Нужно открыть:</span>
+            <span id="boxesNeeded">—</span>
+            <span data-i18n="boxes">коробок</span>
+            <span id="boxesCostTL">TRY: — /</span>
+<select id="currencySelector" class="currency-selector">
+    <option value="BYN">BYN</option>
+    <option value="RUB">RUB</option>
+    <option value="USD">USD</option>
+    <option value="EUR">EUR</option>
+</select>
+<span id="currencyValue">—</span>
+        </div>
+        <div class="info-row">
+            <span data-i18n="leftoverLabel">Остаток ТМ</span>:
+            <span class="tm-left"><span id="leftoverTmValue">—</span></span>
+            <label><input type="checkbox" id="sumAllTabsCheckbox" class="ui-checkbox"> <span data-i18n="sumAllTabs">Сумма по всем вкладкам</span></label>
+        </div>
+    </div>
+</div>
 
             <div aria-hidden="false" class="tab-content active" id="tabBuildings" role="tabpanel">
                 <div class="table-frame">
@@ -591,7 +590,7 @@
         </div>
     </div>
 
-    <div class="revision-badge">Version 1.07.6a</div>
+    <div class="revision-badge">Version 1.08.0b</div>
 
     <script src="languages.js"></script>
     <script src="script.js"></script>

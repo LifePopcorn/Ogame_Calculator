@@ -1,10 +1,18 @@
 (function() {
 'use strict';
 const LANGUAGE_ICONS = {
-en: 'images/languages/en.png', ru: 'images/languages/ru.png', de: 'images/languages/de.png',
-pl: 'images/languages/pl.png', es: 'images/languages/es.png', fr: 'images/languages/fr.png',
-it: 'images/languages/it.png', nl: 'images/languages/nl.png', sk: 'images/languages/sk.png',
-tr: 'images/languages/tr.png', pt: 'images/languages/pt.png', bs: 'images/languages/bs.png'
+en: 'images/languages/en.png',
+ru: 'images/languages/ru.png',
+de: 'images/languages/de.png',
+pl: 'images/languages/pl.png',
+es: 'images/languages/es.png',
+fr: 'images/languages/fr.png',
+it: 'images/languages/it.png',
+nl: 'images/languages/nl.png',
+sk: 'images/languages/sk.png',
+tr: 'images/languages/tr.png',
+pt: 'images/languages/pt.png',
+bs: 'images/languages/bs.png'
 };
 const TECH_COSTS_LF = {
 1001: [7, 2, 0, 0, 40, 1.2, 1.2, 0, 0, 1.21],
@@ -135,6 +143,12 @@ TM_PACKS: [{ tm: 12500000, priceTRY: 900 }],
 METAL_EQ_CRYSTAL: 1.5,
 METAL_EQ_DEUT: 3,
 TRY_TO_BYN_RATE: 16.01,
+CURRENCY_RATES: {
+BYN: 1,
+RUB: 23.5,
+USD: 0.31,
+EUR: 0.28
+},
 MAX_LEVEL_SPAN: 1000,
 TM_PER_LEVEL_FACTOR: 2
 };
@@ -155,12 +169,22 @@ ROCKTAL_MEGALITH_LEVEL: 'og_calc_rocktal_megalith_level',
 ROCKTAL_MRC_LEVEL: 'og_calc_rocktal_mrc_level',
 ROCKTAL_RUNO_LEVEL: 'og_calc_rocktal_runo_level',
 SUM_ALL_TABS: 'og_calc_sum_all_tabs',
-LF_TOTALS: 'og_calc_lf_totals_v1'
+LF_TOTALS: 'og_calc_lf_totals_v1',
+CURRENCY: 'og_calc_currency_v1'
 };
 const LANGUAGE_NAMES = {
-en: 'English', ru: 'Russian', de: 'Deutsch', pl: 'Polski', es: 'Español',
-fr: 'Français', it: 'Italiano', nl: 'Nederlands', sk: 'Slovenčina',
-tr: 'Türkçe', pt: 'Português', bs: 'Bosnian'
+en: 'English',
+ru: 'Russian',
+de: 'Deutsch',
+pl: 'Polski',
+es: 'Español',
+fr: 'Français',
+it: 'Italiano',
+nl: 'Nederlands',
+sk: 'Slovenčina',
+tr: 'Türkçe',
+pt: 'Português',
+bs: 'Bosnian'
 };
 const MRC_REDUCABLE_IDS = new Set([1, 2, 3, 4, 12]);
 const IMAGES_ROOT_PATH = 'images/';
@@ -168,14 +192,22 @@ const IMAGES_BUILDINGS_PATH = 'images/buildings/';
 const IMAGES_RESEARCH_PATH = 'images/research/';
 const IMAGES_SHIPS_PATH = 'images/ships/';
 const BUILDINGS_DATA = [
-{ base: { m: 60, c: 15, d: 0 }, factor: 1.5 }, { base: { m: 48, c: 24, d: 0 }, factor: 1.6 },
-{ base: { m: 225, c: 75, d: 0 }, factor: 1.5 }, { base: { m: 75, c: 30, d: 0 }, factor: 1.5 },
-{ base: { m: 900, c: 360, d: 180 }, factor: 1.8 }, { base: { m: 400, c: 120, d: 200 }, factor: 2.0 },
-{ base: { m: 1000000, c: 500000, d: 100000 }, factor: 2.0 }, { base: { m: 400, c: 200, d: 100 }, factor: 2.0 },
-{ base: { m: 1000, c: 0, d: 0 }, factor: 2.0 }, { base: { m: 1000, c: 500, d: 0 }, factor: 2.0 },
-{ base: { m: 1000, c: 1000, d: 0 }, factor: 2.0 }, { base: { m: 200, c: 400, d: 200 }, factor: 2.0 },
-{ base: { m: 0, c: 50000, d: 100000 }, factor: 2.0 }, { base: { m: 20000, c: 40000, d: 0 }, factor: 2.0 },
-{ base: { m: 200, c: 0, d: 50 }, factor: 5.0 }, { base: { m: 20000, c: 20000, d: 1000 }, factor: 2.0 }
+{ base: { m: 60, c: 15, d: 0 }, factor: 1.5 },
+{ base: { m: 48, c: 24, d: 0 }, factor: 1.6 },
+{ base: { m: 225, c: 75, d: 0 }, factor: 1.5 },
+{ base: { m: 75, c: 30, d: 0 }, factor: 1.5 },
+{ base: { m: 900, c: 360, d: 180 }, factor: 1.8 },
+{ base: { m: 400, c: 120, d: 200 }, factor: 2.0 },
+{ base: { m: 1000000, c: 500000, d: 100000 }, factor: 2.0 },
+{ base: { m: 400, c: 200, d: 100 }, factor: 2.0 },
+{ base: { m: 1000, c: 0, d: 0 }, factor: 2.0 },
+{ base: { m: 1000, c: 500, d: 0 }, factor: 2.0 },
+{ base: { m: 1000, c: 1000, d: 0 }, factor: 2.0 },
+{ base: { m: 200, c: 400, d: 200 }, factor: 2.0 },
+{ base: { m: 0, c: 50000, d: 100000 }, factor: 2.0 },
+{ base: { m: 20000, c: 40000, d: 0 }, factor: 2.0 },
+{ base: { m: 200, c: 0, d: 50 }, factor: 5.0 },
+{ base: { m: 20000, c: 20000, d: 1000 }, factor: 2.0 }
 ];
 const MOON_BUILDINGS_DATA = [
 { id: 44, name: 'Фабрика роботов', base: { m: 400, c: 120, d: 200 }, factor: 2.0, img: 'robot_factory.png' },
@@ -185,26 +217,59 @@ const MOON_BUILDINGS_DATA = [
 { id: 43, name: 'Ворота', base: { m: 2000000, c: 4000000, d: 2000000 }, factor: 2.0, img: 'jump_gate.png' }
 ];
 const ICONS_BUILDINGS = [
-"metal_mine.png", "crystal_mine.png", "deuterium_synth.png", "solar_plant.png",
-"fusion_plant.png", "robot_factory.png", "nanite_factory.png", "shipyard.png",
-"metal_storage.png", "crystal_storage.png", "deuterium_tank.png", "research_lab.png",
-"terraformer.png", "alliance_depot.png", "dock.png", "missile_silo.png"
+"metal_mine.png",
+"crystal_mine.png",
+"deuterium_synth.png",
+"solar_plant.png",
+"fusion_plant.png",
+"robot_factory.png",
+"nanite_factory.png",
+"shipyard.png",
+"metal_storage.png",
+"crystal_storage.png",
+"deuterium_tank.png",
+"research_lab.png",
+"terraformer.png",
+"alliance_depot.png",
+"dock.png",
+"missile_silo.png"
 ];
 const MOON_BUILDINGS_ICONS = ['robot_factory.png', 'shipyard.png', 'lunar_base.png', 'sensor_phalanx.png', 'jump_gate.png'];
 const RESEARCH_DATA = [
-{ base: { m: 200, c: 1000, d: 200 }, factor: 2.0 }, { base: { m: 0, c: 400, d: 600 }, factor: 2.0 },
-{ base: { m: 800, c: 200, d: 0 }, factor: 2.0 }, { base: { m: 200, c: 600, d: 0 }, factor: 2.0 },
-{ base: { m: 1000, c: 0, d: 0 }, factor: 2.0 }, { base: { m: 0, c: 800, d: 400 }, factor: 2.0 },
-{ base: { m: 0, c: 4000, d: 2000 }, factor: 2.0 }, { base: { m: 400, c: 0, d: 600 }, factor: 2.0 },
-{ base: { m: 2000, c: 4000, d: 600 }, factor: 2.0 }, { base: { m: 10000, c: 20000, d: 6000 }, factor: 2.0 },
-{ base: { m: 200, c: 100, d: 0 }, factor: 2.0 }, { base: { m: 1000, c: 300, d: 100 }, factor: 2.0 },
-{ base: { m: 2000, c: 4000, d: 1000 }, factor: 2.0 }, { base: { m: 240000, c: 400000, d: 160000 }, factor: 2.0 },
-{ base: { m: 4000, c: 8000, d: 4000 }, factor: 1.75 }, { base: { m: 0, c: 0, d: 0 }, factor: 3.0 }
+{ base: { m: 200, c: 1000, d: 200 }, factor: 2.0 },
+{ base: { m: 0, c: 400, d: 600 }, factor: 2.0 },
+{ base: { m: 800, c: 200, d: 0 }, factor: 2.0 },
+{ base: { m: 200, c: 600, d: 0 }, factor: 2.0 },
+{ base: { m: 1000, c: 0, d: 0 }, factor: 2.0 },
+{ base: { m: 0, c: 800, d: 400 }, factor: 2.0 },
+{ base: { m: 0, c: 4000, d: 2000 }, factor: 2.0 },
+{ base: { m: 400, c: 0, d: 600 }, factor: 2.0 },
+{ base: { m: 2000, c: 4000, d: 600 }, factor: 2.0 },
+{ base: { m: 10000, c: 20000, d: 6000 }, factor: 2.0 },
+{ base: { m: 200, c: 100, d: 0 }, factor: 2.0 },
+{ base: { m: 1000, c: 300, d: 100 }, factor: 2.0 },
+{ base: { m: 2000, c: 4000, d: 1000 }, factor: 2.0 },
+{ base: { m: 240000, c: 400000, d: 160000 }, factor: 2.0 },
+{ base: { m: 4000, c: 8000, d: 4000 }, factor: 1.75 },
+{ base: { m: 0, c: 0, d: 0 }, factor: 3.0 }
 ];
 const ICONS_RESEARCH = [
-"spy.png", "computer.png", "weapons.png", "shield.png", "armor.png", "energy.png",
-"hyperspace.png", "combustion.png", "impulse.png", "hyperdrive.png", "laser.png",
-"ion.png", "plasma.png", "irn.png", "astro.png", "graviton.png"
+"spy.png",
+"computer.png",
+"weapons.png",
+"shield.png",
+"armor.png",
+"energy.png",
+"hyperspace.png",
+"combustion.png",
+"impulse.png",
+"hyperdrive.png",
+"laser.png",
+"ion.png",
+"plasma.png",
+"irn.png",
+"astro.png",
+"graviton.png"
 ];
 const shipList = [
 { id: "small_cargo", metal: 2000, crystal: 2000, deut: 0, img: "maly_transport.png" },
@@ -267,10 +332,10 @@ const LF_RESEARCH_FILENAMES = {
 };
 const BONUS_INPUT_IDS = ['megalithLevel', 'mrcLevel', 'runoLevel', 'humansLevel', 'mechasLevel', 'kaeleshLevel'];
 let lfTotals = {
-humans: { buildings: 0, research: 0 },
-rocktal: { buildings: 0, research: 0 },
-mechas: { buildings: 0, research: 0 },
-kaelesh: { buildings: 0, research: 0 }
+humans: { buildings: { m: 0, c: 0, d: 0, p: 0, total: 0 }, research: { m: 0, c: 0, d: 0, p: 0, total: 0 } },
+rocktal: { buildings: { m: 0, c: 0, d: 0, p: 0, total: 0 }, research: { m: 0, c: 0, d: 0, p: 0, total: 0 } },
+mechas: { buildings: { m: 0, c: 0, d: 0, p: 0, total: 0 }, research: { m: 0, c: 0, d: 0, p: 0, total: 0 } },
+kaelesh: { buildings: { m: 0, c: 0, d: 0, p: 0, total: 0 }, research: { m: 0, c: 0, d: 0, p: 0, total: 0 } }
 };
 function saveLfTotals() {
 try { safeLocalStorageSet(KEYS.LF_TOTALS, JSON.stringify(lfTotals)); } catch (e) {}
@@ -284,8 +349,20 @@ if (data && typeof data === 'object') {
 ['humans', 'rocktal', 'mechas', 'kaelesh'].forEach(race => {
 if (data[race]) {
 lfTotals[race] = {
-buildings: Number(data[race].buildings) || 0,
-research: Number(data[race].research) || 0
+buildings: {
+m: Number(data[race].buildings?.m) || 0,
+c: Number(data[race].buildings?.c) || 0,
+d: Number(data[race].buildings?.d) || 0,
+p: Number(data[race].buildings?.p) || 0,
+total: Number(data[race].buildings?.total) || 0
+},
+research: {
+m: Number(data[race].research?.m) || 0,
+c: Number(data[race].research?.c) || 0,
+d: Number(data[race].research?.d) || 0,
+p: Number(data[race].research?.p) || 0,
+total: Number(data[race].research?.total) || 0
+}
 };
 }
 });
@@ -545,8 +622,11 @@ updateResourceCell(document.getElementById(`sumDeut${suffix}`), td, 'val-deut');
 document.getElementById(`sumPoints${suffix}`).textContent = formatNumberWithDots(tp);
 const totalMetalLf = Math.round(convertToMetal(tm, tc, td));
 document.getElementById(`sumTotalMetal${suffix}`).textContent = formatNumberWithDots(totalMetalLf);
-if (isBuilding) lfTotals[currentLifeformRace].buildings = totalMetalLf;
-else lfTotals[currentLifeformRace].research = totalMetalLf;
+if (isBuilding) {
+lfTotals[currentLifeformRace].buildings = { m: tm, c: tc, d: td, p: tp, total: totalMetalLf };
+} else {
+lfTotals[currentLifeformRace].research = { m: tm, c: tc, d: td, p: tp, total: totalMetalLf };
+}
 saveLfTotals();
 updateBoxesNeeded();
 updateSumAllTabsRows();
@@ -1368,8 +1448,8 @@ const sumR = parseNumberInput(document.getElementById('sumTotalMetalR')?.textCon
 const sumFleet = parseNumberInput(document.getElementById('sumTotalMetalF')?.textContent) || 0;
 let sumLfB = 0, sumLfR = 0;
 Object.values(lfTotals).forEach(race => {
-sumLfB += race.buildings || 0;
-sumLfR += race.research || 0;
+sumLfB += race.buildings?.total || 0;
+sumLfR += race.research?.total || 0;
 });
 total = sumB + sumMoon + sumR + sumLfB + sumLfR + sumFleet;
 } catch (e) { console.warn('Sum tabs error:', e); }
@@ -1401,9 +1481,7 @@ const ids = [
 ['sumMetalB', 'sumCrystalB', 'sumDeutB', 'sumPointsB'],
 ['sumMetalMoon', 'sumCrystalMoon', 'sumDeutMoon', 'sumPointsMoon'],
 ['sumMetalR', 'sumCrystalR', 'sumDeutR', 'sumPointsR'],
-['sumMetalF', 'sumCrystalF', 'sumDeutF', null],
-['sumMetalLfB', 'sumCrystalLfB', 'sumDeutLfB', 'sumPointsLfB'],
-['sumMetalLfR', 'sumCrystalLfR', 'sumDeutLfR', 'sumPointsLfR']
+['sumMetalF', 'sumCrystalF', 'sumDeutF', null]
 ];
 ids.forEach(([mId, cId, dId, pId]) => {
 const mEl = document.getElementById(mId);
@@ -1421,6 +1499,20 @@ const fleetPointsEl = document.querySelector('#shipsTable tbody tr.summary-row t
 if (fleetPointsEl) {
 totals.p += parseNumberInput(fleetPointsEl.textContent) || 0;
 }
+Object.values(lfTotals).forEach(race => {
+if (race.buildings) {
+totals.m += race.buildings.m || 0;
+totals.c += race.buildings.c || 0;
+totals.d += race.buildings.d || 0;
+totals.p += race.buildings.p || 0;
+}
+if (race.research) {
+totals.m += race.research.m || 0;
+totals.c += race.research.c || 0;
+totals.d += race.research.d || 0;
+totals.p += race.research.p || 0;
+}
+});
 const totalMetal = Math.round(convertToMetal(totals.m, totals.c, totals.d));
 document.querySelectorAll('.sum-all-tabs-metal').forEach(el => el.textContent = formatNumberWithDots(totals.m));
 document.querySelectorAll('.sum-all-tabs-crystal').forEach(el => el.textContent = formatNumberWithDots(totals.c));
@@ -1446,36 +1538,55 @@ updateBoxesCostTL(targetMetal);
 } catch (e) { console.warn('Update boxes:', e); }
 }
 function updateBoxesCostTL(targetMetal = null) {
-try {
-const boxesCostTLEl = document.getElementById('boxesCostTL'), leftoverTmValueEl = document.getElementById('leftoverTmValue'), boxValueInput = document.getElementById('boxValue');
-if (!boxesCostTLEl) return;
-const boxValue = parseNumberInput(sanitizeInput(boxValueInput?.value || ''));
-if (boxValue <= 0) {
-boxesCostTLEl.innerHTML = 'TRY: —'; if (leftoverTmValueEl) leftoverTmValueEl.textContent = '—'; return;
-}
-if (targetMetal === null) targetMetal = isSumAllTabsMode ? getSumAllTabsMetalValue() : getCurrentTotalMetalValue();
-if (!Number.isFinite(targetMetal) || targetMetal <= 0) {
-boxesCostTLEl.innerHTML = 'TRY: 0'; if (leftoverTmValueEl) leftoverTmValueEl.textContent = '0'; return;
-}
-const neededBoxesRaw = Math.ceil(targetMetal / boxValue);
-const MAX_ALLOWED_BOXES = 1e9;
-if (neededBoxesRaw > MAX_ALLOWED_BOXES) {
-boxesCostTLEl.innerHTML = 'TRY: —'; if (leftoverTmValueEl) leftoverTmValueEl.textContent = '—'; return;
-}
-const requiredTM = neededBoxesRaw * CONFIG.TM_PER_BOX;
-const pack = (CONFIG.TM_PACKS && CONFIG.TM_PACKS[0]) || null;
-const packTm = pack?.tm || 0, packPriceTRY = pack?.priceTRY || 0;
-if (packTm <= 0 || packPriceTRY <= 0) {
-boxesCostTLEl.innerHTML = 'TRY: —'; if (leftoverTmValueEl) leftoverTmValueEl.textContent = '—'; return;
-}
-const packsCount = Math.max(1, Math.ceil(requiredTM / packTm));
-const totalTRY = packsCount * packPriceTRY;
-const leftoverTM = packsCount * packTm - requiredTM;
-const tryValue = formatNumberWithDots(totalTRY);
-const bynValue = formatNumberWithDots(Math.round(totalTRY / CONFIG.TRY_TO_BYN_RATE));
-boxesCostTLEl.innerHTML = `<span class="try-value">TRY: ${tryValue} / BYN: ${bynValue}</span>`;
-if (leftoverTmValueEl) leftoverTmValueEl.textContent = leftoverTM > 0 ? formatWithDotsRaw(leftoverTM) : '0';
-} catch (e) { console.warn('Update boxes cost:', e); }
+    try {
+        const boxesCostTLEl = document.getElementById('boxesCostTL');
+        const leftoverTmValueEl = document.getElementById('leftoverTmValue');
+        const boxValueInput = document.getElementById('boxValue');
+        const currencyValueEl = document.getElementById('currencyValue');
+        if (!boxesCostTLEl) return;
+        const boxValue = parseNumberInput(sanitizeInput(boxValueInput?.value || ''));
+        if (boxValue <= 0) {
+            boxesCostTLEl.innerHTML = 'TRY: —';
+            if (leftoverTmValueEl) leftoverTmValueEl.textContent = '—';
+            if (currencyValueEl) currencyValueEl.textContent = '—';
+            return;
+        }
+        if (targetMetal === null) targetMetal = isSumAllTabsMode ? getSumAllTabsMetalValue() : getCurrentTotalMetalValue();
+        if (!Number.isFinite(targetMetal) || targetMetal <= 0) {
+            boxesCostTLEl.innerHTML = 'TRY: 0';
+            if (leftoverTmValueEl) leftoverTmValueEl.textContent = '0';
+            if (currencyValueEl) currencyValueEl.textContent = '—';
+            return;
+        }
+        const neededBoxesRaw = Math.ceil(targetMetal / boxValue);
+        const MAX_ALLOWED_BOXES = 1e9;
+        if (neededBoxesRaw > MAX_ALLOWED_BOXES) {
+            boxesCostTLEl.innerHTML = 'TRY: —';
+            if (leftoverTmValueEl) leftoverTmValueEl.textContent = '—';
+            if (currencyValueEl) currencyValueEl.textContent = '—';
+            return;
+        }
+        const requiredTM = neededBoxesRaw * CONFIG.TM_PER_BOX;
+        const pack = (CONFIG.TM_PACKS && CONFIG.TM_PACKS[0]) || null;
+        const packTm = pack?.tm || 0, packPriceTRY = pack?.priceTRY || 0;
+        if (packTm <= 0 || packPriceTRY <= 0) {
+            boxesCostTLEl.innerHTML = 'TRY: —';
+            if (leftoverTmValueEl) leftoverTmValueEl.textContent = '—';
+            if (currencyValueEl) currencyValueEl.textContent = '—';
+            return;
+        }
+        const packsCount = Math.max(1, Math.ceil(requiredTM / packTm));
+        const totalTRY = packsCount * packPriceTRY;
+        const leftoverTM = packsCount * packTm - requiredTM;
+        const selectedCurrency = safeLocalStorageGet(KEYS.CURRENCY, 'BYN');
+        const amountInBYN = totalTRY / CONFIG.TRY_TO_BYN_RATE;
+        const amountInSelectedCurrency = Math.round(amountInBYN * CONFIG.CURRENCY_RATES[selectedCurrency]);
+        const tryValue = formatNumberWithDots(totalTRY);
+        const currencyValue = formatNumberWithDots(amountInSelectedCurrency);
+        boxesCostTLEl.innerHTML = `<span class="try-value">TRY: ${tryValue} / </span>`;
+        if (currencyValueEl) currencyValueEl.textContent = currencyValue;
+        if (leftoverTmValueEl) leftoverTmValueEl.textContent = leftoverTM > 0 ? formatWithDotsRaw(leftoverTM) : '0';
+    } catch (e) { console.warn('Update boxes cost:', e); }
 }
 function updateLfBonusesVisibility(race) {
 const bonusesEl = document.getElementById('lfBonuses');
@@ -1639,7 +1750,12 @@ localStorage.removeItem(KEYS.SUM_ALL_TABS);
 isSumAllTabsMode = false;
 const checkbox = document.getElementById('sumAllTabsCheckbox');
 if (checkbox) checkbox.checked = false;
-Object.keys(lfTotals).forEach(race => { lfTotals[race] = { buildings: 0, research: 0 }; });
+Object.keys(lfTotals).forEach(race => {
+lfTotals[race] = {
+buildings: { m: 0, c: 0, d: 0, p: 0, total: 0 },
+research: { m: 0, c: 0, d: 0, p: 0, total: 0 }
+};
+});
 saveLfTotals();
 document.querySelectorAll('input').forEach(i => { i.value = ''; });
 BONUS_INPUT_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
@@ -1832,6 +1948,15 @@ setTimeout(() => {
 if (typeof window.initExpeditionUI === 'function') window.initExpeditionUI();
 else document.dispatchEvent(new CustomEvent('initExpeditionOnLoad'));
 }, 150);
+}
+const currencySelector = document.getElementById('currencySelector');
+if (currencySelector) {
+const savedCurrency = safeLocalStorageGet(KEYS.CURRENCY, 'BYN');
+currencySelector.value = savedCurrency;
+currencySelector.addEventListener('change', function() {
+safeLocalStorageSet(KEYS.CURRENCY, this.value);
+updateBoxesCostTL();
+});
 }
 } catch (e) { console.error('Init app:', e); }
 }
