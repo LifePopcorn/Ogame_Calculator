@@ -1,6 +1,5 @@
 (function () {
 'use strict';
-
 const LANGUAGE_ICONS = {
 en: 'images/languages/en.png', ru: 'images/languages/ru.png',
 de: 'images/languages/de.png', pl: 'images/languages/pl.png',
@@ -9,13 +8,11 @@ it: 'images/languages/it.png', nl: 'images/languages/nl.png',
 sk: 'images/languages/sk.png', tr: 'images/languages/tr.png',
 pt: 'images/languages/pt.png', bs: 'images/languages/bs.png'
 };
-
 const LANGUAGE_NAMES = {
 en: 'English', ru: 'Russian', de: 'Deutsch', pl: 'Polski',
 es: 'Español', fr: 'Français', it: 'Italiano', nl: 'Nederlands',
 sk: 'Slovenčina', tr: 'Türkçe', pt: 'Português', bs: 'Bosnian'
 };
-
 const CONFIG = {
 TM_PER_BOX: 42000,
 TM_PACKS: [{ tm: 12500000, priceTRY: 900 }],
@@ -26,7 +23,6 @@ CURRENCY_RATES: { BYN: 1, RUB: 23.5, USD: 0.31, EUR: 0.28, TRY: 16.01 },
 MAX_LEVEL_SPAN: 1000,
 TM_PER_LEVEL_FACTOR: 2
 };
-
 const KEYS = {
 LANG: 'og_calc_lang_v2',
 TRANSFORM: 'og_calc_transform_v2',
@@ -48,13 +44,11 @@ LF_TOTALS: 'og_calc_lf_totals_v1',
 CURRENCY: 'og_calc_currency_v1',
 BASE_CURRENCY: 'og_calc_base_currency_v1'
 };
-
 const IMAGES_ROOT_PATH = 'images/';
 const IMAGES_BUILDINGS_PATH = 'images/buildings/';
 const IMAGES_RESEARCH_PATH = 'images/research/';
 const IMAGES_SHIPS_PATH = 'images/ships/';
 const MRC_REDUCABLE_IDS = new Set([1, 2, 3, 4, 12]);
-
 const TECH_COSTS_LF = {
 1001: [7, 2, 0, 0, 40, 1.2, 1.2, 0, 0, 1.21],
 1002: [5, 2, 0, 8, 40, 1.23, 1.23, 0, 1.02, 1.25],
@@ -177,9 +171,7 @@ const TECH_COSTS_LF = {
 4117: [500000, 300000, 200000, 0, 13000, 1.5, 1.5, 1.5, 0, 1.3],
 4118: [300000, 180000, 120000, 0, 11000, 1.7, 1.7, 1.7, 0, 1.4]
 };
-
 const LF_TECH_COSTS = TECH_COSTS_LF;
-
 const BUILDINGS_DATA = [
 { base: { m: 60, c: 15, d: 0 }, factor: 1.5 },
 { base: { m: 48, c: 24, d: 0 }, factor: 1.6 },
@@ -198,7 +190,6 @@ const BUILDINGS_DATA = [
 { base: { m: 200, c: 0, d: 50 }, factor: 5.0 },
 { base: { m: 20000, c: 20000, d: 1000 }, factor: 2.0 }
 ];
-
 const MOON_BUILDINGS_DATA = [
 { id: 44, name: 'Фабрика роботов', base: { m: 400, c: 120, d: 200 }, factor: 2.0, img: 'robot_factory.png' },
 { id: 45, name: 'Верфь', base: { m: 400000, c: 200000, d: 100000 }, factor: 2.0, img: 'shipyard.png' },
@@ -206,18 +197,15 @@ const MOON_BUILDINGS_DATA = [
 { id: 42, name: 'Сенсорная фаланга', base: { m: 20000, c: 40000, d: 20000 }, factor: 2.0, img: 'sensor_phalanx.png' },
 { id: 43, name: 'Ворота', base: { m: 2000000, c: 4000000, d: 2000000 }, factor: 2.0, img: 'jump_gate.png' }
 ];
-
 const ICONS_BUILDINGS = [
 'metal_mine.png', 'crystal_mine.png', 'deuterium_synth.png', 'solar_plant.png',
 'fusion_plant.png', 'robot_factory.png', 'nanite_factory.png', 'shipyard.png',
 'metal_storage.png', 'crystal_storage.png', 'deuterium_tank.png', 'research_lab.png',
 'terraformer.png', 'alliance_depot.png', 'dock.png', 'missile_silo.png'
 ];
-
 const MOON_BUILDINGS_ICONS = [
 'robot_factory.png', 'shipyard.png', 'lunar_base.png', 'sensor_phalanx.png', 'jump_gate.png'
 ];
-
 const RESEARCH_DATA = [
 { base: { m: 200, c: 1000, d: 200 }, factor: 2.0 },
 { base: { m: 0, c: 400, d: 600 }, factor: 2.0 },
@@ -236,13 +224,11 @@ const RESEARCH_DATA = [
 { base: { m: 4000, c: 8000, d: 4000 }, factor: 1.75 },
 { base: { m: 0, c: 0, d: 0 }, factor: 3.0 }
 ];
-
 const ICONS_RESEARCH = [
 'spy.png', 'computer.png', 'weapons.png', 'shield.png', 'armor.png', 'energy.png',
 'hyperspace.png', 'combustion.png', 'impulse.png', 'hyperdrive.png', 'laser.png',
 'ion.png', 'plasma.png', 'irn.png', 'astro.png', 'graviton.png'
 ];
-
 const shipList = [
 { id: 'small_cargo', metal: 2000, crystal: 2000, deut: 0, img: 'maly_transport.png' },
 { id: 'large_cargo', metal: 6000, crystal: 6000, deut: 0, img: 'bolshoy_transport.png' },
@@ -258,7 +244,6 @@ const shipList = [
 { id: 'reaper', metal: 85000, crystal: 55000, deut: 20000, img: 'reaper.png' },
 { id: 'pathfinder', metal: 8000, crystal: 15000, deut: 8000, img: 'pathfinder.png' }
 ];
-
 const LF_BUILDING_FILENAMES = {
 1001: 'residential_sector.png', 1002: 'biosphere_farm.png', 1003: 'research_center.png',
 1004: 'science_academy.png', 1005: 'nerve_calibration_center.png', 1006: 'high_energy_melting.png',
@@ -277,7 +262,6 @@ const LF_BUILDING_FILENAMES = {
 4007: 'cloning_lab.png', 4008: 'chrysalis_accelerator.png', 4009: 'biomodifier.png',
 4010: 'psionic_modulator.png', 4011: 'ship_production_hall.png', 4012: 'supra_refractor.png'
 };
-
 const LF_RESEARCH_FILENAMES = {
 1101: 'intergalactic_envoys.png', 1102: 'high_efficiency_extractors.png', 1103: 'fusion_drives.png',
 1104: 'stealth_field_generator.png', 1105: 'orbital_dock.png', 1106: 'research_ai.png',
@@ -304,19 +288,201 @@ const LF_RESEARCH_FILENAMES = {
 4113: 'efficient_swarm_intelligence.png', 4114: 'speed_boost_large_cargo.png', 4115: 'gravitational_sensors.png',
 4116: 'speed_boost_battleship.png', 4117: 'psionic_shield_matrix.png', 4118: 'kaelesh_explorer_enhancement.png'
 };
-
 const BONUS_INPUT_IDS = ['megalithLevel', 'mrcLevel', 'runoLevel', 'humansLevel', 'mechasLevel', 'kaeleshLevel'];
-
 let lfTotals = {
-humans:  { buildings: { m: 0, c: 0, d: 0, p: 0, total: 0 }, research: { m: 0, c: 0, d: 0, p: 0, total: 0 } },
+humans: { buildings: { m: 0, c: 0, d: 0, p: 0, total: 0 }, research: { m: 0, c: 0, d: 0, p: 0, total: 0 } },
 rocktal: { buildings: { m: 0, c: 0, d: 0, p: 0, total: 0 }, research: { m: 0, c: 0, d: 0, p: 0, total: 0 } },
-mechas:  { buildings: { m: 0, c: 0, d: 0, p: 0, total: 0 }, research: { m: 0, c: 0, d: 0, p: 0, total: 0 } },
+mechas: { buildings: { m: 0, c: 0, d: 0, p: 0, total: 0 }, research: { m: 0, c: 0, d: 0, p: 0, total: 0 } },
 kaelesh: { buildings: { m: 0, c: 0, d: 0, p: 0, total: 0 }, research: { m: 0, c: 0, d: 0, p: 0, total: 0 } }
 };
-
 let isSumAllTabsMode = false;
 let currentLifeformRace = localStorage.getItem(KEYS.LF_RACE) || 'humans';
-
+const SETTINGS_KEY = 'og_calc_settings_v1';
+const DEFAULT_SETTINGS = {
+tmPerBox: 42000,
+tmPackSize: 12500000,
+packPriceTRY: 900,
+rates: { BYN: 1, RUB: 23.5, USD: 0.31, EUR: 0.28, TRY: 16.01 }
+};
+let currentSettings = { ...DEFAULT_SETTINGS, rates: { ...DEFAULT_SETTINGS.rates } };
+function parseSettingsNumber(v, fallback = 0) {
+    if (v === null || v === undefined || v === '') return fallback;
+    const str = String(v).trim();
+    if (str === '') return fallback;
+    const hasComma = str.includes(',');
+    const hasDot = str.includes('.');
+    let cleaned;
+    if (hasComma && hasDot) {
+        const lastComma = str.lastIndexOf(',');
+        const lastDot = str.lastIndexOf('.');
+        if (lastComma > lastDot) {
+            cleaned = str.replace(/\./g, '').replace(',', '.');
+        } else {
+            cleaned = str.replace(/,/g, '');
+        }
+    } else if (hasComma) {
+        cleaned = str.replace(/,/g, '.');
+    } else if (hasDot) {
+        const dotCount = (str.match(/\./g) || []).length;
+        if (dotCount > 1) {
+            cleaned = str.replace(/\./g, '');
+        } else {
+            const dotIndex = str.indexOf('.');
+            const afterDot = str.slice(dotIndex + 1);
+            if (afterDot.length >= 3 && /^\d+$/.test(afterDot)) {
+                cleaned = str.replace(/\./g, '');
+            } else {
+                cleaned = str;
+            }
+        }
+    } else {
+        cleaned = str;
+    }
+    const n = parseFloat(cleaned);
+    return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+function loadSettings() {
+try {
+const saved = localStorage.getItem(SETTINGS_KEY);
+if (!saved) {
+currentSettings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+return;
+}
+const data = JSON.parse(saved);
+currentSettings = {
+tmPerBox: parseSettingsNumber(data.tmPerBox, DEFAULT_SETTINGS.tmPerBox),
+tmPackSize: parseSettingsNumber(data.tmPackSize, DEFAULT_SETTINGS.tmPackSize),
+packPriceTRY: parseSettingsNumber(data.packPriceTRY, DEFAULT_SETTINGS.packPriceTRY),
+rates: {
+BYN: 1,
+RUB: parseSettingsNumber(data.rates?.RUB, DEFAULT_SETTINGS.rates.RUB),
+USD: parseSettingsNumber(data.rates?.USD, DEFAULT_SETTINGS.rates.USD),
+EUR: parseSettingsNumber(data.rates?.EUR, DEFAULT_SETTINGS.rates.EUR),
+TRY: parseSettingsNumber(data.rates?.TRY, DEFAULT_SETTINGS.rates.TRY)
+}
+};
+} catch (e) {
+currentSettings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+}
+}
+function saveSettings() {
+try {
+localStorage.setItem(SETTINGS_KEY, JSON.stringify(currentSettings));
+} catch (e) { }
+}
+function applySettingsToConfig() {
+if (typeof CONFIG === 'undefined') return;
+CONFIG.TM_PER_BOX = Math.round(currentSettings.tmPerBox);
+CONFIG.TRY_TO_BYN_RATE = currentSettings.rates.TRY || 16.01;
+CONFIG.CURRENCY_RATES = {
+BYN: 1,
+RUB: currentSettings.rates.RUB,
+USD: currentSettings.rates.USD,
+EUR: currentSettings.rates.EUR,
+TRY: currentSettings.rates.TRY
+};
+if (Array.isArray(CONFIG.TM_PACKS) && CONFIG.TM_PACKS[0]) {
+CONFIG.TM_PACKS[0].tm = Math.round(currentSettings.tmPackSize);
+CONFIG.TM_PACKS[0].priceTRY = Math.round(currentSettings.packPriceTRY);
+}
+}
+function populateSettingsInputs() {
+const setVal = (id, val, isDecimal = false) => {
+const el = document.getElementById(id);
+if (!el) return;
+if (id === 'cfgRateBYN') {
+el.value = val !== undefined && val !== null ? String(val) : '';
+return;
+}
+const num = parseSettingsNumber(val, 0);
+if (num <= 0) {
+el.value = '';
+return;
+}
+if (isDecimal) {
+el.value = String(num);
+} else {
+el.value = formatNumberWithDots(Math.round(num));
+}
+};
+setVal('cfgTmPerBox', currentSettings.tmPerBox, false);
+setVal('cfgTmPackSize', currentSettings.tmPackSize, false);
+setVal('cfgPackPriceTRY', currentSettings.packPriceTRY, false);
+setVal('cfgRateRUB', currentSettings.rates.RUB, true);
+setVal('cfgRateUSD', currentSettings.rates.USD, true);
+setVal('cfgRateEUR', currentSettings.rates.EUR, true);
+setVal('cfgRateTRY', currentSettings.rates.TRY, true);
+}
+function readSettingsFromInputs() {
+currentSettings.tmPerBox = parseSettingsNumber(
+document.getElementById('cfgTmPerBox')?.value, DEFAULT_SETTINGS.tmPerBox);
+currentSettings.tmPackSize = parseSettingsNumber(
+document.getElementById('cfgTmPackSize')?.value, DEFAULT_SETTINGS.tmPackSize);
+currentSettings.packPriceTRY = parseSettingsNumber(
+document.getElementById('cfgPackPriceTRY')?.value, DEFAULT_SETTINGS.packPriceTRY);
+currentSettings.rates.RUB = parseSettingsNumber(
+document.getElementById('cfgRateRUB')?.value, DEFAULT_SETTINGS.rates.RUB);
+currentSettings.rates.USD = parseSettingsNumber(
+document.getElementById('cfgRateUSD')?.value, DEFAULT_SETTINGS.rates.USD);
+currentSettings.rates.EUR = parseSettingsNumber(
+document.getElementById('cfgRateEUR')?.value, DEFAULT_SETTINGS.rates.EUR);
+currentSettings.rates.TRY = parseSettingsNumber(
+document.getElementById('cfgRateTRY')?.value, DEFAULT_SETTINGS.rates.TRY);
+currentSettings.rates.BYN = 1;
+}
+function openSettingsModal() {
+const modal = document.getElementById('settingsModal');
+const btn = document.getElementById('settingsToggle');
+if (!modal) return;
+populateSettingsInputs();
+modal.classList.add('open');
+if (btn) btn.classList.add('active');
+}
+function closeSettingsModal() {
+const modal = document.getElementById('settingsModal');
+const btn = document.getElementById('settingsToggle');
+if (!modal) return;
+modal.classList.remove('open');
+if (btn) btn.classList.remove('active');
+}
+function saveAndApplySettings() {
+readSettingsFromInputs();
+saveSettings();
+applySettingsToConfig();
+if (typeof updateBoxesCostTL === 'function') updateBoxesCostTL();
+if (typeof updateBoxesNeeded === 'function') updateBoxesNeeded();
+closeSettingsModal();
+}
+function resetSettingsToDefaults() {
+currentSettings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+populateSettingsInputs();
+}
+function initSettingsPanel() {
+const toggleBtn = document.getElementById('settingsToggle');
+const modal = document.getElementById('settingsModal');
+const backdrop = modal?.querySelector('.settings-modal__backdrop');
+const closeBtn = document.getElementById('settingsModalClose');
+const saveBtn = document.getElementById('settingsSave');
+const resetBtn = document.getElementById('settingsReset');
+if (toggleBtn) {
+toggleBtn.addEventListener('click', (e) => {
+e.stopPropagation();
+if (modal?.classList.contains('open')) closeSettingsModal();
+else openSettingsModal();
+});
+}
+if (closeBtn) closeBtn.addEventListener('click', closeSettingsModal);
+if (backdrop) backdrop.addEventListener('click', closeSettingsModal);
+if (saveBtn) saveBtn.addEventListener('click', saveAndApplySettings);
+if (resetBtn) resetBtn.addEventListener('click', resetSettingsToDefaults);
+document.addEventListener('keydown', (e) => {
+if (e.key === 'Escape' && modal?.classList.contains('open')) {
+closeSettingsModal();
+}
+});
+loadSettings();
+applySettingsToConfig();
+}
 function safeLocalStorageSet(key, value) {
 try {
 localStorage.setItem(key, value);
@@ -336,7 +502,6 @@ return false;
 return false;
 }
 }
-
 function safeLocalStorageGet(key, defaultValue) {
 try {
 const value = localStorage.getItem(key);
@@ -345,9 +510,7 @@ return value !== null ? value : defaultValue;
 return defaultValue;
 }
 }
-
 const sanitizeInput = (input) => !input ? '' : String(input).replace(/[^0-9]/g, '').slice(0, 15);
-
 function formatWithDotsRaw(inputStr) {
 if (inputStr === null || inputStr === undefined || inputStr === '') return '';
 const s = String(inputStr);
@@ -361,12 +524,10 @@ out = digits.slice(start, i) + (out ? '.' + out : '');
 }
 return sign + out;
 }
-
 const formatNumberWithDots = (n) => {
 if (n === null || n === undefined || isNaN(n)) return '0';
 return Math.round(Number(n) || 0).toLocaleString('de-DE');
 };
-
 function parseNumberInput(s) {
 if (s === null || s === undefined) return 0;
 const str = String(s).trim();
@@ -378,10 +539,8 @@ if (!Number.isFinite(num)) return 0;
 const safe = Math.min(num, Number.MAX_SAFE_INTEGER);
 return negative ? -safe : safe;
 }
-
 const convertToMetal = (m, c, d) =>
 (m || 0) + (c || 0) * CONFIG.METAL_EQ_CRYSTAL + (d || 0) * CONFIG.METAL_EQ_DEUT;
-
 function debounce(fn, wait) {
 let t = null;
 return function (...a) {
@@ -389,11 +548,9 @@ clearTimeout(t);
 t = setTimeout(() => fn.apply(this, a), wait);
 };
 }
-
-const formatSpanMetal   = (n) => { const s = document.createElement('span'); s.className = 'val-metal';   s.textContent = formatNumberWithDots(n); return s; };
+const formatSpanMetal = (n) => { const s = document.createElement('span'); s.className = 'val-metal'; s.textContent = formatNumberWithDots(n); return s; };
 const formatSpanCrystal = (n) => { const s = document.createElement('span'); s.className = 'val-crystal'; s.textContent = formatNumberWithDots(n); return s; };
-const formatSpanDeut    = (n) => { const s = document.createElement('span'); s.className = 'val-deut';    s.textContent = formatNumberWithDots(n); return s; };
-
+const formatSpanDeut = (n) => { const s = document.createElement('span'); s.className = 'val-deut'; s.textContent = formatNumberWithDots(n); return s; };
 function createImageFallbackEl(label) {
 const span = document.createElement('span');
 span.className = 'icon-fallback';
@@ -401,7 +558,6 @@ span.setAttribute('aria-hidden', 'true');
 span.textContent = label ? label[0] : '—';
 return span;
 }
-
 function createIconWithFallback(src, alt, size = 20) {
 const img = document.createElement('img');
 img.src = src;
@@ -421,7 +577,6 @@ img._fallback = true;
 }, { once: true });
 return img;
 }
-
 const updateResourceCell = (td, value, className) => {
 if (!td) return;
 let span = td.firstChild;
@@ -433,7 +588,6 @@ td.appendChild(span);
 }
 span.textContent = formatNumberWithDots(value);
 };
-
 class LimitedCache {
 constructor(maxSize = 500) {
 this.cache = new Map();
@@ -456,17 +610,14 @@ this.cache.set(key, value);
 }
 clear() { this.cache.clear(); }
 }
-
 const calculationCache = new LimitedCache(500);
 const clearCalculationCache = () => calculationCache.clear();
-
 const getCachedCalculation = (key, fn) => {
 if (calculationCache.cache.has(key)) return calculationCache.cache.get(key);
 const result = fn();
 calculationCache.set(key, result);
 return result;
 };
-
 function geomSum(base, factor, from, to) {
 const cacheKey = `geom_${base.m}_${base.c}_${base.d}_${factor}_${from}_${to}`;
 return getCachedCalculation(cacheKey, () => {
@@ -486,7 +637,6 @@ const points = Math.round((m + c + d) / 1000);
 return { m, c, d, points, levels: count };
 });
 }
-
 function calcBuildCostLF(techID, techLevel, techData, costRdc) {
 const cacheKey = `build_${techID}_${techLevel}_${costRdc}`;
 return getCachedCalculation(cacheKey, () => {
@@ -501,7 +651,6 @@ cost[i] = Math.floor((1 - costRdc) * Math.floor(data[i] * techLevel * Math.pow(d
 return cost;
 });
 }
-
 function calcDeconstrCostLF(techID, techLevel, techData, ionTechLevel) {
 const cacheKey = `deconstr_${techID}_${techLevel}_${ionTechLevel}`;
 return getCachedCalculation(cacheKey, () => {
@@ -516,7 +665,6 @@ cost[i] = Math.floor(Math.floor(data[i] * techLevel * Math.pow(data[5 + i], tech
 return cost;
 });
 }
-
 function getBuildCostLF(techID, techLevelFrom, techLevelTo, techData, ionTechLevel, rsrCostRdc, bldCostRdc = 0) {
 const cacheKey = `build_range_${techID}_${techLevelFrom}_${techLevelTo}_${rsrCostRdc}_${bldCostRdc}`;
 return getCachedCalculation(cacheKey, () => {
@@ -537,7 +685,6 @@ totalCost[0] += cost[0]; totalCost[1] += cost[1]; totalCost[2] += cost[2];
 return totalCost;
 });
 }
-
 function createTableRow({ index, techId, name, iconPath, dataset, showPlanets, planetsType }) {
 const tr = document.createElement('tr');
 tr.dataset.index = index;
@@ -590,7 +737,6 @@ const tdP = document.createElement('td'); tdP.className = 'p'; tdP.textContent =
 tr.append(tdM, tdC, tdD, tdP);
 return tr;
 }
-
 function buildRowsBuildings() {
 const tbodyB = document.getElementById('tbodyBuildings');
 if (!tbodyB) return;
@@ -613,7 +759,6 @@ frag.appendChild(row);
 tbodyB.appendChild(frag);
 attachLvlInputHandlers();
 }
-
 function buildRowsResearch() {
 const tbodyR = document.getElementById('tbodyResearch');
 if (!tbodyR) return;
@@ -635,7 +780,6 @@ frag.appendChild(row);
 tbodyR.appendChild(frag);
 attachLvlInputHandlers();
 }
-
 function buildRowsMoonBuildings() {
 const tbody = document.getElementById('tbodyMoonBuildings');
 if (!tbody) return;
@@ -656,7 +800,6 @@ frag.appendChild(row);
 tbody.appendChild(frag);
 attachLvlInputHandlers();
 }
-
 function buildRowsLfBuildings() {
 const tbody = document.getElementById('tbodyLfBuildings');
 if (!tbody) return;
@@ -682,7 +825,6 @@ frag.appendChild(row);
 tbody.appendChild(frag);
 attachLvlInputHandlers();
 }
-
 function buildRowsLfResearch() {
 const tbody = document.getElementById('tbodyLfResearch');
 if (!tbody) return;
@@ -708,7 +850,6 @@ frag.appendChild(row);
 tbody.appendChild(frag);
 attachLvlInputHandlers();
 }
-
 function recalcStandardTable(tbodyId, dataArray, sumIds, isMoon = false) {
 const tbody = document.getElementById(tbodyId);
 if (!tbody) return;
@@ -760,7 +901,6 @@ document.getElementById(sumIds.total).textContent = formatNumberWithDots(Math.ro
 updateBoxesNeeded();
 updateSumAllTabsRows();
 }
-
 function recalcLfTable(tbodyId, isBuilding) {
 const tbody = document.getElementById(tbodyId);
 if (!tbody) return;
@@ -838,12 +978,10 @@ saveLfTotals();
 updateBoxesNeeded();
 updateSumAllTabsRows();
 }
-
-function recalcAllBuildings()   { recalcStandardTable('tbodyBuildings', BUILDINGS_DATA, { m: 'sumMetalB', c: 'sumCrystalB', d: 'sumDeutB', p: 'sumPointsB', total: 'sumTotalMetalB' }); }
-function recalcAllMoonBuildings(){ recalcStandardTable('tbodyMoonBuildings', MOON_BUILDINGS_DATA, { m: 'sumMetalMoon', c: 'sumCrystalMoon', d: 'sumDeutMoon', p: 'sumPointsMoon', total: 'sumTotalMetalMoon' }, true); }
+function recalcAllBuildings() { recalcStandardTable('tbodyBuildings', BUILDINGS_DATA, { m: 'sumMetalB', c: 'sumCrystalB', d: 'sumDeutB', p: 'sumPointsB', total: 'sumTotalMetalB' }); }
+function recalcAllMoonBuildings() { recalcStandardTable('tbodyMoonBuildings', MOON_BUILDINGS_DATA, { m: 'sumMetalMoon', c: 'sumCrystalMoon', d: 'sumDeutMoon', p: 'sumPointsMoon', total: 'sumTotalMetalMoon' }, true); }
 function recalcAllLfBuildings() { recalcLfTable('tbodyLfBuildings', true); }
-function recalcAllLfResearch()  { recalcLfTable('tbodyLfResearch', false); }
-
+function recalcAllLfResearch() { recalcLfTable('tbodyLfResearch', false); }
 function recalcAllResearch() {
 const tbodyR = document.getElementById('tbodyResearch');
 if (!tbodyR) return;
@@ -878,7 +1016,6 @@ document.getElementById('tmTotal').textContent = (dict.totalTMLabel || 'Итог
 updateBoxesNeeded();
 updateSumAllTabsRows();
 }
-
 function renderTable() {
 try {
 const tableBody = document.querySelector('#shipsTable tbody');
@@ -988,7 +1125,6 @@ computeFleet();
 console.error('Render table error:', e);
 }
 }
-
 function computeFleet() {
 try {
 const factorC = CONFIG.METAL_EQ_CRYSTAL, factorD = CONFIG.METAL_EQ_DEUT;
@@ -1027,7 +1163,6 @@ updateSumAllTabsRows();
 console.error('Fleet compute error:', e);
 }
 }
-
 function saveShipQuantities() {
 try {
 const qtyMap = {};
@@ -1039,7 +1174,6 @@ safeLocalStorageSet(KEYS.SHIP_QTY, JSON.stringify(qtyMap));
 console.warn('Failed to save ship quantities:', e);
 }
 }
-
 function attachLiveThousandsFormatting(selector) {
 const inputs = document.querySelectorAll(selector);
 inputs.forEach(inp => {
@@ -1097,7 +1231,6 @@ this.dispatchEvent(new Event('change', { bubbles: true }));
 });
 });
 }
-
 function attachLvlInputHandlers() {
 document.querySelectorAll('.lvl-input').forEach(inp => {
 if (inp._lvlBound) return;
@@ -1126,7 +1259,6 @@ inp.dispatchEvent(new Event('change', { bubbles: true }));
 });
 });
 }
-
 let __inputsHandlersAttached = false;
 function attachInputsHandlers() {
 if (__inputsHandlersAttached) return;
@@ -1307,7 +1439,6 @@ langDropdownMenu.style.display = 'none';
 }
 attachBonusInputHandlers();
 }
-
 function attachBonusInputHandlers() {
 BONUS_INPUT_IDS.forEach(id => {
 const el = document.getElementById(id);
@@ -1328,11 +1459,9 @@ el._bonusBound = true;
 }
 });
 }
-
 function saveLfTotals() {
 try { safeLocalStorageSet(KEYS.LF_TOTALS, JSON.stringify(lfTotals)); } catch (e) {}
 }
-
 function loadLfTotals() {
 try {
 const saved = safeLocalStorageGet(KEYS.LF_TOTALS, null);
@@ -1362,7 +1491,6 @@ total: Number(data[race].research?.total) || 0
 }
 } catch (e) {}
 }
-
 function persistLfInputs() {
 try {
 const buildRows = document.querySelectorAll('#tbodyLfBuildings tr');
@@ -1388,7 +1516,6 @@ safeLocalStorageSet(`${KEYS.LF_INPUTS_RESEARCH}_${currentLifeformRace}`, JSON.st
 console.warn('Persist LF inputs:', e);
 }
 }
-
 function saveInputRowsFromSelector(selector, key, planetsType = 'planets') {
 const rows = document.querySelectorAll(selector);
 const data = [];
@@ -1401,7 +1528,6 @@ planets: parseNumberInput(sanitizeInput(tr.querySelector(`input[data-type="${pla
 });
 safeLocalStorageSet(key, JSON.stringify(data));
 }
-
 function saveAllInputsBeforeSwitch() {
 try {
 saveInputRowsFromSelector('#tbodyBuildings tr', KEYS.INPUTS_BUILD, 'planets');
@@ -1422,7 +1548,6 @@ if (el) safeLocalStorageSet(`og_calc_${id}`, el.value);
 console.warn('Save all inputs:', e);
 }
 }
-
 function restoreInputRowsFromSelector(selector, key, planetsType = 'planets') {
 const data = JSON.parse(safeLocalStorageGet(key, 'null'));
 if (!data) return;
@@ -1437,7 +1562,6 @@ if (planetInp) planetInp.value = data[i].planets ? formatWithDotsRaw(data[i].pla
 }
 });
 }
-
 function restoreAllInputsAfterSwitch() {
 try {
 restoreInputRowsFromSelector('#tbodyBuildings tr', KEYS.INPUTS_BUILD, 'planets');
@@ -1464,7 +1588,6 @@ document.getElementById(id).value = String(parseNumberInput(saved));
 console.warn('Restore inputs:', e);
 }
 }
-
 function applyLang(lang, skipRebuild = false) {
 if (!lang) return;
 const currentLang = safeLocalStorageGet(KEYS.LANG, 'ru');
@@ -1519,15 +1642,12 @@ recalcAllMoonBuildings();
 recalcAllLfBuildings();
 recalcAllLfResearch();
 computeFleet();
-updateBoxesNeeded();
 updateLfBonusesVisibility(currentLifeformRace);
 if (typeof window.updateExpeditionsLang === 'function') window.updateExpeditionsLang();
 ensureProperPositioning();
 }
 }
-
 const getActiveTab = () => document.querySelector('.tab-btn.active')?.dataset.tab || 'buildings';
-
 function setActiveTab(tab) {
 clearCalculationCache();
 document.querySelectorAll('.tab-btn').forEach(b => {
@@ -1568,7 +1688,6 @@ recalcAllLfResearch();
 updateBoxesNeeded();
 safeLocalStorageSet(KEYS.ACTIVE_TAB, tab);
 }
-
 function switchView(newView) {
 document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.view === newView));
 const tableWrapper = document.getElementById('tableWrapper');
@@ -1580,7 +1699,6 @@ else if (newView === 'costs' && window.panZoomMain) window.panZoomMain.applyTran
 safeLocalStorageSet('og_calc_active_view', newView);
 updateBackgroundVideo(newView);
 }
-
 function getSumAllTabsMetalValue() {
 let total = 0;
 try {
@@ -1599,7 +1717,6 @@ console.warn('Sum tabs error:', e);
 }
 return total;
 }
-
 function getCurrentTotalMetalValue() {
 try {
 const active = document.querySelector('.tab-btn.active')?.dataset.tab;
@@ -1614,7 +1731,6 @@ return parseNumberInput(document.getElementById('sumTotalMetalB')?.textContent);
 return 0;
 }
 }
-
 function updateSumAllTabsRows() {
 const show = isSumAllTabsMode;
 document.querySelectorAll('.sum-all-tabs-row, .sum-all-tabs-total-row').forEach(row => {
@@ -1668,7 +1784,6 @@ document.querySelectorAll('.sum-all-tabs-deut').forEach(el => el.textContent = f
 document.querySelectorAll('.sum-all-tabs-total').forEach(el => el.textContent = formatNumberWithDots(totalMetal));
 document.querySelectorAll('.sum-all-tabs-points').forEach(el => el.textContent = formatNumberWithDots(totals.p));
 }
-
 function updateBoxesNeeded() {
 try {
 const boxesNeededEl = document.getElementById('boxesNeeded');
@@ -1690,7 +1805,6 @@ updateBoxesCostTL(targetMetal);
 console.warn('Update boxes:', e);
 }
 }
-
 function updateBoxesCostTL(targetMetal = null) {
 try {
 const boxesCostTLEl = document.getElementById('boxesCostTL');
@@ -1746,7 +1860,6 @@ if (leftoverTmValueEl) leftoverTmValueEl.textContent = leftoverTM > 0 ? formatWi
 console.warn('Update boxes cost:', e);
 }
 }
-
 function updateLfBonusesVisibility(race) {
 const bonusesEl = document.getElementById('lfBonuses');
 if (!bonusesEl) return;
@@ -1800,7 +1913,6 @@ input.value = formatWithDotsRaw(parseNumberInput(savedValue));
 }
 });
 }
-
 class PanZoomController {
 constructor(wrapperId, handleId, storageKey) {
 this.wrapper = document.getElementById(wrapperId);
@@ -1849,33 +1961,51 @@ this.state.x = Math.max(minX, Math.min(maxX, this.state.x));
 this.state.y = Math.max(minY, Math.min(maxY, this.state.y));
 }
 zoom(factor, centerPoint = null) {
-const oldScale = this.state.scale;
-const newScale = Math.max(this.minScale, Math.min(this.maxScale, oldScale * factor));
-if (newScale === oldScale) return;
-const cx = centerPoint ? centerPoint.x : window.innerWidth / 2;
-const cy = centerPoint ? centerPoint.y : window.innerHeight / 2;
-this.state.x = cx - (cx - this.state.x) * (newScale / oldScale);
-this.state.y = cy - (cy - this.state.y) * (newScale / oldScale);
-this.state.scale = newScale;
-this.clampPosition();
-this.wrapper.style.willChange = 'transform';
-this.applyTransform();
-this.saveState();
-setTimeout(() => { if (!this.isDragging) this.wrapper.style.willChange = 'auto'; }, 150);
+    const oldScale = this.state.scale;
+    const newScale = Math.max(this.minScale, Math.min(this.maxScale, oldScale * factor));
+    if (newScale === oldScale) return;
+
+    const cx = centerPoint ? centerPoint.x : window.innerWidth  / 2;
+    const cy = centerPoint ? centerPoint.y : window.innerHeight / 2;
+    this.state.x = cx - (cx - this.state.x) * (newScale / oldScale);
+    this.state.y = cy - (cy - this.state.y) * (newScale / oldScale);
+    this.state.scale = newScale;
+
+    // Сначала применяем transform, потом ограничиваем на свежем rect
+    this.applyTransform();
+    requestAnimationFrame(() => {
+        this.clampPosition();
+        this.applyTransform();
+        this.saveState();
+    });
 }
 reset() {
-this.state = { x: 0, y: 0, scale: 1 };
-this.clampPosition();
-this.applyTransform();
-this.saveState();
-}
-center() {
-const rect = this.wrapper.getBoundingClientRect(), s = this.state.scale;
-const baseW = rect.width / s, baseH = rect.height / s;
-this.state.x = Math.round((window.innerWidth - baseW) / 2);
-this.state.y = Math.round((window.innerHeight - baseH) / 2);
-this.applyTransform();
-this.saveState();
+    // 1. Сбрасываем в (0,0,1) и применяем — браузер пересчитывает layout
+    this.state = { x: 0, y: 0, scale: 1 };
+    this.applyTransform();
+
+    // 2. В следующем кадре центрируем с учётом реального положения wrapper'а
+    requestAnimationFrame(() => {
+        const rect  = this.wrapper.getBoundingClientRect();
+        const baseW = rect.width;    // scale = 1, делить не нужно
+        const baseH = rect.height;
+
+        // Текущий центр таблицы на экране
+        const curCX = rect.left + baseW / 2;
+        const curCY = rect.top  + baseH / 2;
+
+        // Желаемый центр — центр viewport
+        const tgtCX = window.innerWidth  / 2;
+        const tgtCY = window.innerHeight / 2;
+
+        // Смещение transform = разница (т.к. scale = 1)
+        this.state.x = tgtCX - curCX;
+        this.state.y = tgtCY - curCY;
+
+        this.clampPosition();
+        this.applyTransform();
+        this.saveState();
+    });
 }
 _bindDrag() {
 this.handle.style.touchAction = 'none';
@@ -1923,15 +2053,12 @@ document.removeEventListener('pointercancel', this._stopDrag);
 this.wrapper.style.transform = 'none';
 }
 }
-
 window.panZoomMain = null;
 window.panZoomExpeditions = null;
-
 function initPanZoom() {
 window.panZoomMain = new PanZoomController('tableWrapper', 'dragHandle', KEYS.TRANSFORM);
 window.panZoomExpeditions = new PanZoomController('expeditionsWrapper', 'dragHandleExpeditions', 'og_calc_expeditions_transform');
 }
-
 function initZoomControls() {
 const zoomIn = document.getElementById('globalZoomIn'),
 zoomOut = document.getElementById('globalZoomOut'),
@@ -1963,78 +2090,84 @@ fullResetToZero();
 ctrl?.reset();
 });
 }
-
 function fullResetToZero() {
 try {
 const lfSelectElement = document.getElementById('lifeformSelect');
-if (lfSelectElement) {
-currentLifeformRace = lfSelectElement.value || 'humans';
-}
-
+const originalRace = lfSelectElement ? lfSelectElement.value : 'humans';
 Object.values(KEYS).forEach(k => {
 if (k !== KEYS.TRANSFORM) localStorage.removeItem(k);
 });
 localStorage.removeItem('og_calc_expeditions_transform');
 localStorage.removeItem('og_calc_expeditions_pos');
-
-Object.keys(localStorage).forEach(k => {
-if (k.startsWith('og_calc_lf_inputs_') ||
+const allLfKeys = Object.keys(localStorage).filter(k =>
+k.startsWith('og_calc_lf_inputs') ||
 k.startsWith('og_calc_megalithLevel') ||
 k.startsWith('og_calc_mrcLevel') ||
 k.startsWith('og_calc_runoLevel') ||
 k.startsWith('og_calc_humansLevel') ||
 k.startsWith('og_calc_mechasLevel') ||
-k.startsWith('og_calc_kaeleshLevel')) {
-localStorage.removeItem(k);
-}
-});
-
+k.startsWith('og_calc_kaeleshLevel')
+);
+allLfKeys.forEach(k => localStorage.removeItem(k));
 BONUS_INPUT_IDS.forEach(id => localStorage.removeItem(`og_calc_${id}`));
-localStorage.removeItem(KEYS.SUM_ALL_TABS);
-
+localStorage.removeItem(KEYS.LF_TOTALS);
 isSumAllTabsMode = false;
 const checkbox = document.getElementById('sumAllTabsCheckbox');
 if (checkbox) checkbox.checked = false;
-
-Object.keys(lfTotals).forEach(race => {
-lfTotals[race] = {
-buildings: { m: 0, c: 0, d: 0, p: 0, total: 0 },
-research: { m: 0, c: 0, d: 0, p: 0, total: 0 }
+lfTotals = {
+humans: { buildings: { m: 0, c: 0, d: 0, p: 0, total: 0 }, research: { m: 0, c: 0, d: 0, p: 0, total: 0 } },
+rocktal: { buildings: { m: 0, c: 0, d: 0, p: 0, total: 0 }, research: { m: 0, c: 0, d: 0, p: 0, total: 0 } },
+mechas: { buildings: { m: 0, c: 0, d: 0, p: 0, total: 0 }, research: { m: 0, c: 0, d: 0, p: 0, total: 0 } },
+kaelesh: { buildings: { m: 0, c: 0, d: 0, p: 0, total: 0 }, research: { m: 0, c: 0, d: 0, p: 0, total: 0 } }
 };
+const boxValueEl = document.getElementById('boxValue');
+if (boxValueEl) boxValueEl.value = '';
+const tmInputEl = document.getElementById('tmInput');
+if (tmInputEl) tmInputEl.value = '';
+['#tbodyBuildings', '#tbodyResearch', '#tbodyMoonBuildings'].forEach(sel => {
+document.querySelectorAll(`${sel} input[data-type="from"], ${sel} input[data-type="to"]`).forEach(inp => {
+inp.value = '';
 });
-saveLfTotals();
-
-currentLifeformRace = 'humans';
-if (lfSelectElement) lfSelectElement.value = 'humans';
-safeLocalStorageSet(KEYS.LF_RACE, 'humans');
-
-document.querySelectorAll('input').forEach(i => { i.value = ''; });
-BONUS_INPUT_IDS.forEach(id => {
-const el = document.getElementById(id);
-if (el) el.value = '';
+document.querySelectorAll(`${sel} input[data-type="planets"], ${sel} input[data-type="moons"]`).forEach(inp => {
+inp.value = '1';
 });
-
+});
+const races = ['humans', 'rocktal', 'mechas', 'kaelesh'];
+races.forEach(race => {
+currentLifeformRace = race;
+buildRowsLfBuildings();
+buildRowsLfResearch();
+document.querySelectorAll('#tbodyLfBuildings input[data-type="from"], #tbodyLfBuildings input[data-type="to"], #tbodyLfResearch input[data-type="from"], #tbodyLfResearch input[data-type="to"]').forEach(inp => {
+inp.value = '';
+});
+document.querySelectorAll('#tbodyLfBuildings input[data-type="planets"], #tbodyLfResearch input[data-type="planets"]').forEach(inp => {
+inp.value = '1';
+});
+saveInputRowsFromSelector('#tbodyLfBuildings tr', `${KEYS.LF_INPUTS_BUILD}_${race}`, 'planets');
+saveInputRowsFromSelector('#tbodyLfResearch tr', `${KEYS.LF_INPUTS_RESEARCH}_${race}`, 'planets');
+recalcAllLfBuildings();
+recalcAllLfResearch();
+});
+currentLifeformRace = originalRace;
+if (lfSelectElement) lfSelectElement.value = originalRace;
+safeLocalStorageSet(KEYS.LF_RACE, originalRace);
 buildRowsBuildings();
 buildRowsResearch();
 buildRowsMoonBuildings();
 buildRowsLfBuildings();
 buildRowsLfResearch();
 renderTable();
-
 recalcAllBuildings();
 recalcAllResearch();
 recalcAllMoonBuildings();
 recalcAllLfBuildings();
 recalcAllLfResearch();
 computeFleet();
-
 updateLfBonusesVisibility(currentLifeformRace);
-
 ['sumPointsB', 'sumPointsR', 'sumPointsLfB', 'sumPointsLfR'].forEach(id => {
 const el = document.getElementById(id);
 if (el) el.textContent = '0';
 });
-
 const boxesNeeded = document.getElementById('boxesNeeded');
 if (boxesNeeded) boxesNeeded.textContent = '—';
 const boxesCost = document.getElementById('boxesCostTL');
@@ -2043,39 +2176,13 @@ const leftover = document.getElementById('leftoverTmValue');
 if (leftover) leftover.textContent = '—';
 const currencyValue = document.getElementById('currencyValue');
 if (currencyValue) currencyValue.textContent = '0';
-
 updateSumAllTabsRows();
 updateBoxesNeeded();
+saveLfTotals();
 } catch (e) {
 console.error('Full reset:', e);
 }
 }
-
-function resetAndCenter() {
-fullResetToZero();
-setTimeout(() => {
-const isExpeditions = document.getElementById('expeditionsWrapper')?.style.display !== 'none';
-if (isExpeditions) { if (window.panZoomExpeditions) window.panZoomExpeditions.center(); }
-else { if (window.panZoomMain) window.panZoomMain.center(); }
-}, 100);
-}
-
-function positionTabs() {
-try {
-const tabsLeftEl = document.getElementById('tabsLeft'),
-headerBarEl = document.getElementById('headerBar'),
-wrapperEl = document.getElementById('tableWrapper');
-if (!tabsLeftEl || !headerBarEl || !wrapperEl) return;
-const boxRow = document.getElementById('globalBoxRow') || headerBarEl;
-const wrapperRect = wrapperEl.getBoundingClientRect(),
-targetRect = boxRow.getBoundingClientRect();
-const offsetWithinWrapper = targetRect.top - wrapperRect.top;
-tabsLeftEl.style.top = `${Math.max(0, Math.round(offsetWithinWrapper - 2))}px`;
-} catch (e) {
-console.warn('Position tabs:', e);
-}
-}
-
 function ensureProperPositioning() {
 window.requestAnimationFrame(() => {
 window.requestAnimationFrame(() => {
@@ -2089,7 +2196,6 @@ positionTabs();
 });
 });
 }
-
 function updateBackgroundVideo(view) {
 const bgVideo = document.getElementById('bgVideo');
 if (!bgVideo) return;
@@ -2103,7 +2209,6 @@ bgVideo.src = targetSrc;
 bgVideo.load();
 bgVideo.play().catch(() => {});
 }
-
 function restoreFromStorage() {
 try {
 loadLfTotals();
@@ -2169,9 +2274,9 @@ if (dict && dict[key]) el.setAttribute('placeholder', dict[key]);
 console.error('Restore from storage:', e);
 }
 }
-
 function initApp() {
 try {
+initSettingsPanel();
 attachLiveThousandsFormatting('#boxValue, input[data-id]');
 attachLvlInputHandlers();
 attachInputsHandlers();
@@ -2254,7 +2359,6 @@ updateBoxesCostTL();
 console.error('Init app:', e);
 }
 }
-
 if (document.readyState !== 'loading') initApp();
 else document.addEventListener('DOMContentLoaded', initApp);
 })();
