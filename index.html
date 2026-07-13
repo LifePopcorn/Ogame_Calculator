@@ -42,13 +42,13 @@
 
             <div class="box-row" id="globalBoxRow">
     <div class="label">
-        <label for="boxValue" data-i18n="metalBox">Коробка с металлом</label>
+        <label for="boxValue" data-i18n="boxesLabel">Коробка с металлом</label>
         <input type="text" id="boxValue" inputmode="numeric" placeholder="0" data-i18n-ph="metalBoxPlaceholder">
     </div>
     <div class="info">
     <div class="info-row">
         <div>
-            <span data-i18n="boxesNeeded">Нужно открыть:</span>
+            <span data-i18n="needOpen">Нужно открыть:</span>
             <span id="boxesNeeded" class="tm-left">—</span>
             <span data-i18n="boxes">коробок</span>
         </div>
@@ -72,7 +72,7 @@
         </div>
     </div>
     <div class="info-row">
-        <span data-i18n="leftoverTM">Остаток ТМ:</span>
+        <span data-i18n="leftoverLabel">Остаток ТМ:</span>
         <span id="leftoverTmValue" class="tm-left">—</span>
         <label style="margin-left: 12px; cursor: pointer;">
             <input type="checkbox" id="sumAllTabsCheckbox">
@@ -85,8 +85,8 @@
             <div aria-hidden="false" class="tab-content active" id="tabBuildings" role="tabpanel">
                 <div class="table-frame">
                     <div class="building-subtabs">
-                        <button class="building-subtab-btn active" data-building-tab="planet">🪐 Планета</button>
-                        <button class="building-subtab-btn" data-building-tab="moon">🌙 Луна</button>
+                        <button class="building-subtab-btn active" data-building-tab="planet" data-i18n="planetTab">🪐 Планета</button>
+                        <button class="building-subtab-btn" data-building-tab="moon" data-i18n="moonTab">🌙 Луна</button>
                     </div>
 
                     <div id="planetBuildingsContent" class="building-subtab-content active">
