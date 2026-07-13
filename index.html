@@ -593,8 +593,64 @@
         <button id="globalZoomIn" title="Приблизить">+</button>
         <button id="globalZoomOut" title="Отдалить">−</button>
         <button id="globalZoomReset" title="Сброс">↻</button>
+        <button id="settingsToggle" class="settings-toggle-btn" title="Настройки">⚙</button>
     </div>
-
+      <!-- Модальное окно настроек -->
+<div id="settingsModal" class="settings-modal">
+    <div class="settings-modal__backdrop"></div>
+    <div class="settings-modal__content">
+        <div class="settings-modal__header">
+            <span class="settings-modal__title">⚙ Настройки калькулятора</span>
+            <button class="settings-modal__close" id="settingsModalClose" title="Закрыть">✕</button>
+        </div>
+        <div class="settings-modal__body">
+            <!-- Тёмная материя -->
+            <fieldset class="settings-modal__section">
+                <legend>Тёмная материя</legend>
+                <div class="settings-modal__row">
+                    <label for="cfgTmPerBox">ТМ за одну коробку</label>
+                    <input type="text" id="cfgTmPerBox" class="settings-modal__input" inputmode="numeric" placeholder="42000">
+                </div>
+                <div class="settings-modal__row">
+                    <label for="cfgTmPackSize">ТМ в паке</label>
+                    <input type="text" id="cfgTmPackSize" class="settings-modal__input" inputmode="numeric" placeholder="12500000">
+                </div>
+                <div class="settings-modal__row">
+                    <label for="cfgPackPriceTRY">Цена пака (TRY)</label>
+                    <input type="text" id="cfgPackPriceTRY" class="settings-modal__input" inputmode="numeric" placeholder="900">
+                </div>
+            </fieldset>
+            <!-- Курсы валют -->
+            <fieldset class="settings-modal__section">
+                <legend>Курсы валют (относительно 1 BYN)</legend>
+                <div class="settings-modal__row">
+                    <label for="cfgRateBYN">BYN (базовая)</label>
+                    <input type="text" id="cfgRateBYN" class="settings-modal__input" value="1" disabled>
+                </div>
+                <div class="settings-modal__row">
+                    <label for="cfgRateRUB">RUB</label>
+                    <input type="text" id="cfgRateRUB" class="settings-modal__input" inputmode="decimal" placeholder="23.5">
+                </div>
+                <div class="settings-modal__row">
+                    <label for="cfgRateUSD">USD</label>
+                    <input type="text" id="cfgRateUSD" class="settings-modal__input" inputmode="decimal" placeholder="0.31">
+                </div>
+                <div class="settings-modal__row">
+                    <label for="cfgRateEUR">EUR</label>
+                    <input type="text" id="cfgRateEUR" class="settings-modal__input" inputmode="decimal" placeholder="0.28">
+                </div>
+                <div class="settings-modal__row">
+                    <label for="cfgRateTRY">TRY</label>
+                    <input type="text" id="cfgRateTRY" class="settings-modal__input" inputmode="decimal" placeholder="16.01">
+                </div>
+            </fieldset>
+        </div>
+        <div class="settings-modal__footer">
+            <button class="settings-modal__btn settings-modal__btn--reset" id="settingsReset">Сбросить</button>
+            <button class="settings-modal__btn settings-modal__btn--save" id="settingsSave">Сохранить</button>
+        </div>
+    </div>
+</div>
     <div aria-hidden="false" class="language-container">
         <div class="lang-dropdown">
             <button class="tab-btn" id="langToggle">
