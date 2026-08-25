@@ -460,7 +460,7 @@
             bonusCell.style.cssText = 'text-align:center;padding:2px 4px;';
             const input = document.createElement('input');
             input.type = 'text';
-            input.inputMode = 'numeric';
+            
             input.value = state.prm.lfShipsBonuses[shipIdx] || 0;
             input.dataset.index = shipIdx;
             input.className = 'lf-bonus-input quantity-input';
@@ -512,7 +512,6 @@
                 const input = document.createElement('input');
                 input.id = 'num' + ship[2];
                 input.type = 'text';
-                input.inputMode = 'numeric';
                 input.placeholder = '0';
                 input.className = 'quantity-input';
                 input.maxLength = 9;

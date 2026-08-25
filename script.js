@@ -559,7 +559,6 @@
         refs.from.className = 'lvl-input';
         refs.from.dataset.type = 'from';
         refs.from.dataset.index = index;
-        refs.from.inputMode = 'numeric';
         tdFrom.appendChild(refs.from);
         tr.appendChild(tdFrom);
 
@@ -569,7 +568,6 @@
         refs.to.className = 'lvl-input';
         refs.to.dataset.type = 'to';
         refs.to.dataset.index = index;
-        refs.to.inputMode = 'numeric';
         tdTo.appendChild(refs.to);
         tr.appendChild(tdTo);
 
@@ -584,7 +582,6 @@
             refs.planets.className = 'planet-input';
             refs.planets.dataset.type = planetsType;
             refs.planets.dataset.index = index;
-            refs.planets.inputMode = 'numeric';
             refs.planets.value = '1';
             td.append(planetImg, refs.planets);
             tr.appendChild(td);
@@ -905,7 +902,6 @@
             const tdQty = document.createElement('td');
             const qtyInput = document.createElement('input');
             qtyInput.type = 'text';
-            qtyInput.inputMode = 'numeric';
             qtyInput.pattern = '[0-9.]*';
             qtyInput.value = qtyMap[ship.id] ? formatWithDotsRaw(qtyMap[ship.id]) : '';
             qtyInput.dataset.id = ship.id;
@@ -1642,7 +1638,6 @@
             const input = document.createElement('input');
             input.id = inputId;
             input.type = 'text';
-            input.inputMode = 'numeric';
             input.min = '0';
             input.max = '100';
             input.placeholder = '0';
@@ -1735,7 +1730,6 @@
         }
         bindDrag() {
             if (!this.wrapper || !this.handle) return;
-            this.handle.style.touchAction = 'none';
             this.handle.style.cursor = 'grab';
             this._onPointerDown = e => {
                 this.isDragging = true;
